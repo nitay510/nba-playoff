@@ -1,0 +1,164 @@
+.series-modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  
+    .series-modal {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 450px;
+  
+      /* ADD THESE to limit height */
+      max-height: 80vh;      /* 80% of viewport height */
+      overflow-y: auto;      /* scroll inside the modal if content is too large */
+  
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      direction: rtl;
+      color: #000;
+  
+      .modal-title {
+        text-align: center;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        color: #000;
+      }
+  
+      .modal-label {
+        display: block;
+        margin-top: 0.75rem;
+        font-weight: 600;
+        color: #000;
+      }
+  
+      .modal-input {
+        margin-top: 0.3rem;
+        padding: 0.5rem;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #000;
+        background-color: #fff;
+      }
+  
+      .bet-options-header {
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #000;
+        font-size: 1rem;
+        font-weight: bold;
+        text-align: center;
+      }
+  
+      .bet-category {
+        margin-top: 1.2rem;
+        padding: 0.8rem;
+        background-color: #f5f5f5; /* light grey background for contrast */
+        border-radius: 6px;
+        position: relative; /* for add-choice-btn positioning? */
+  
+        .bet-category-title {
+          font-size: 1rem;
+          color: #000;
+        }
+  
+        .add-choice-btn {
+          position: absolute;
+          top: 8px;
+          left: 12px;
+          font-size: 0.8rem;
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          padding: 0.3rem 0.6rem;
+          margin-right: 0.5rem;
+          cursor: pointer;
+  
+          &:hover {
+            background-color: darken(#007bff, 10%);
+          }
+        }
+  
+        .bet-choice {
+          display: flex;
+          align-items: center;
+          margin-top: 0.5rem;
+  
+          .choice-name-input {
+            flex: 2;
+            margin-right: 0.5rem;
+            color: #000;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.4rem;
+          }
+  
+          .choice-odds-input {
+            width: 60px;
+            margin-left: 0.5rem;
+            color: #000;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.4rem;
+          }
+        }
+      }
+  
+      .add-category-btn {
+        margin-top: 1.2rem;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+  
+        &:hover {
+          background-color: darken(#28a745, 10%);
+        }
+      }
+  
+      .modal-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+  
+        button {
+          margin: 0 0.5rem;
+          padding: 0.6rem 1rem;
+          cursor: pointer;
+          border: none;
+          border-radius: 4px;
+          font-size: 0.9rem;
+        }
+  
+        .save-btn {
+          background-color: #007bff;
+          color: #fff;
+  
+          &:hover {
+            background-color: darken(#007bff, 10%);
+          }
+        }
+  
+        .cancel-btn {
+          background-color: #ccc;
+  
+          &:hover {
+            background-color: darken(#ccc, 10%);
+          }
+        }
+      }
+    }
+  }
+  
