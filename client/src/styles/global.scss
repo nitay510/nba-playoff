@@ -1,0 +1,63 @@
+@import './reset';
+@import './variables';
+@import './mixins';
+
+/* Global Styles */
+body {
+  font-family: $font-stack;
+  background: $background-grad;
+  min-height: 100vh;
+  @include flex-center; /* Center content on small devices */
+  padding: 1rem;
+}
+
+/* We'll wrap our content in a container with mobile-first widths */
+.main-container {
+  width: 100%;
+  max-width: 350px;   // Good for mobile
+  background-color: $card-bg;
+  border-radius: 8px;
+  padding: 2rem;
+  @include card-shadow;
+  @include transition-all(0.4s);
+
+  /* For larger screens, we can widen it slightly */
+  @include desktop {
+    max-width: 400px;
+  }
+}
+
+/* Global elements in Hebrew direction */
+label,
+input,
+button,
+p,
+h1,
+h2,
+a {
+  direction: rtl;
+}
+
+/* Global link styling */
+a {
+  color: $primary-color;
+  text-decoration: none;
+  @include transition-all(0.2s);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Buttons - you could also define button classes in a partial if desired */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Example: create a 'title' class for uniform styling across pages */
+.title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}

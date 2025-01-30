@@ -1,0 +1,21 @@
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @mixin card-shadow {
+    box-shadow: 0 2px 6px $shadow-color;
+  }
+  
+  @mixin transition-all($time: 0.3s) {
+    transition: all $time ease;
+  }
+  
+  /* Example media query mixin: for screens wider than mobile */
+  @mixin desktop {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+  
