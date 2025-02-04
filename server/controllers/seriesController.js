@@ -1,6 +1,7 @@
 // server/controllers/seriesController.js
 const Series = require('../models/Series');
-
+const UserBet = require('../models/UserBet');
+const User = require('../models/User');
 // Create a new series (admin)
 exports.createSeries = async (req, res) => {
   try {
@@ -84,3 +85,50 @@ exports.getSeriesById = async (req, res) => {
     return res.status(500).json({ msg: 'Server error' });
   }
 };
+
+exports.setFinalResults = async (req, res) => {
+    try {
+      const { seriesId } = req.params;
+      const { finalResults } = req.body;
+      const series = await Series.findById(seriesId);
+      if (!series) {
+        return res.status(404).json({ msg: 'Series not found' });
+      }
+  
+      // update finalChoice in each category
+      finalResults.forEach((fr) => {
+        const opt = series.betOptions.find((o) => o.category === fr.category);
+        if (opt) {
+          opt.finalChoice = fr.finalChoice;
+        }
+      });
+  
+      series.isFinished = true;
+      await series.save();
+  
+      // award points to users
+      const userBets = await UserBet.find({ seriesId: series._id });
+      for (let ub of userBets) {
+        let totalPointsAwarded = 0;
+        for (let b of ub.bets) {
+          const cat = series.betOptions.find((o) => o.category === b.category);
+          if (cat && cat.finalChoice === b.choiceName) {
+            // user guessed correctly => add b.oddsWhenPlaced
+            totalPointsAwarded += b.oddsWhenPlaced;
+          }
+        }
+        if (totalPointsAwarded > 0) {
+          const user = await User.findById(ub.userId);
+          if (user) {
+            user.points += totalPointsAwarded;
+            await user.save();
+          }
+        }
+      }
+  
+      return res.json({ msg: 'Final results set, points awarded' });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: 'Server error' });
+    }
+  };

@@ -29,19 +29,15 @@ function HomePage() {
         credentials: 'include',
       });
       const data = await res.json();
-      setUserBets(data);
+      setUserBets(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // FIX: Safely check if b.seriesId exists before b.seriesId._id
+  // Safely find the user's bet for a given series
   const findUserBet = (seriesId) => {
-    return (
-      userBets.find(
-        (b) => b.seriesId && b.seriesId._id === seriesId
-      ) || null
-    );
+    return userBets.find((b) => b.seriesId && b.seriesId._id === seriesId) || null;
   };
 
   const openBetModal = (series) => {
@@ -54,18 +50,21 @@ function HomePage() {
     fetchUserBets();
   };
 
+  // Filter out finished series
+  const ongoingSeries = seriesList.filter((s) => !s.isFinished);
+
   return (
     <div className="home-page container">
       <h2>הימורי פלייאוף - ברוך הבא!</h2>
       <div className="series-list">
-        {seriesList.map((s) => {
+        {ongoingSeries.length === 0 && <p>אין סדרות פעילות כרגע.</p>}
+
+        {ongoingSeries.map((s) => {
           const bet = findUserBet(s._id);
           return (
             <div key={s._id} className="series-card">
-              <h3>
-                {s.teamA} נגד {s.teamB}
-              </h3>
-              <p>סגור להימורים? {s.isLocked ? 'כן' : 'לא'}</p>
+              <h3>{s.teamA} נגד {s.teamB}</h3>
+              <p>נעול? {s.isLocked ? 'כן' : 'לא'}</p>
 
               {bet ? (
                 <div className="user-bet">

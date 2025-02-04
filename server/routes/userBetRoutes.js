@@ -7,6 +7,7 @@ const { requireAuth } = require('../middleware/authMiddleware');
 // To place/update bet, the user must be logged in
 router.post('/:seriesId', requireAuth, userBetController.placeOrUpdateBet);
 router.get('/', requireAuth, userBetController.getUserBets);
+router.get('/all', requireAuth, userBetController.getAllUserBets);
 router.get('/:seriesId', requireAuth, userBetController.getUserBetForSeries);
 
 module.exports = router;

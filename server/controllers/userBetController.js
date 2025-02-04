@@ -1,6 +1,7 @@
 // server/controllers/userBetController.js
 const UserBet = require('../models/UserBet');
 const Series = require('../models/Series');
+const User = require('../models/User');
 
 exports.placeOrUpdateBet = async (req, res) => {
   try {
@@ -61,3 +62,14 @@ exports.getUserBetForSeries = async (req, res) => {
     return res.status(500).json({ msg: 'Server error' });
   }
 };
+exports.getAllUserBets = async (req, res) => {
+    try {
+      const userId = req.user._id; // from requireAuth
+      // Populate seriesId so we can see which teams it was
+      const bets = await UserBet.find({ userId }).populate('seriesId');
+      return res.json(bets);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: 'Server error' });
+    }
+  };
