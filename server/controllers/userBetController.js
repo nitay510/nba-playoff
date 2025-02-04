@@ -73,3 +73,22 @@ exports.getAllUserBets = async (req, res) => {
       return res.status(500).json({ msg: 'Server error' });
     }
   };
+
+  exports.getAllBetsOfAnyUser = async (req, res) => {
+    try {
+      const { username } = req.params;
+      
+      // 1) Find user doc
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+      
+      // 2) Find all bets with userId = user._id
+      const bets = await UserBet.find({ userId: user._id }).populate('seriesId');
+      return res.json(bets);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: 'Server error' });
+    }
+  };

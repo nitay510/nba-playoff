@@ -9,5 +9,5 @@ router.post('/:seriesId', requireAuth, userBetController.placeOrUpdateBet);
 router.get('/', requireAuth, userBetController.getUserBets);
 router.get('/all', requireAuth, userBetController.getAllUserBets);
 router.get('/:seriesId', requireAuth, userBetController.getUserBetForSeries);
-
+router.get('/user/:username', requireAuth, userBetController.getAllBetsOfAnyUser);
 module.exports = router;

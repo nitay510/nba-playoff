@@ -64,3 +64,16 @@ exports.login = async (req, res) => {
       return res.status(500).json({ msg: 'שגיאה בשרת' });
     }
   };
+
+  exports.getAllUsers = async (req, res) => {
+    try {
+    const users = await User.find().sort({ points: -1 });
+    console.log(users)
+    return res.status(200).json(users);
+    } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'שגיאה בקבלת המשתמשים' });
+    }
+    };
+    
+    
