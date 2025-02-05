@@ -1,0 +1,48 @@
+.bottom-nav {
+    position: fixed;
+    bottom: 0; /* pin to bottom */
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    padding: 0.3rem;
+    direction: rtl;
+    z-index: 999; /* ensure it’s above other elements */
+  
+    .nav-list {
+      list-style: none;
+      display: flex;
+      justify-content: space-around; /* distribute links evenly */
+      margin: 0;
+      padding: 0;
+  
+      li {
+        margin: 0 0.5rem;
+  
+        a {
+          color: #ccc;
+          text-decoration: none;
+          font-size: 0.95rem;
+          display: flex;
+          align-items: center;
+          padding: 0.3rem 0.6rem;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+  
+          &:hover {
+            background-color: #444;
+            color: #fff;
+          }
+  
+          &.active-link {
+            background-color: #007bff;
+            color: #fff;
+          }
+  
+          .nav-icon {
+            margin-right: 0.3rem;
+          }
+        }
+      }
+    }
+  }
+  

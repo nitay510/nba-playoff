@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
+const leagueRoutes = require('./routes/leagueRoutes');
 const userBetRoutes = require('./routes/userBetRoutes');
 
 const app = express();
@@ -31,6 +32,7 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/user-bets', userBetRoutes);
+app.use('/api/leagues', leagueRoutes);
 
 app.get('/', (req, res) => {
   res.send('NBA Playoff League API is running...');

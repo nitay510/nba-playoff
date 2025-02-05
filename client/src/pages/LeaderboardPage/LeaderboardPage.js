@@ -1,46 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './LeaderboardPage.scss';
 
 function LeaderboardPage() {
-  const [users, setUsers] = useState([]);
+  const { leagueId } = useParams(); // from /leagues/:leagueId/leaderboard
+  const [leagueName, setLeagueName] = useState('');
+  const [members, setMembers] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, []);
+    fetchLeagueLeaderboard();
+  }, [leagueId]);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeagueLeaderboard = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth', {
+      const res = await fetch(`http://localhost:5000/api/leagues/${leagueId}/leaderboard`, {
         credentials: 'include',
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.msg || 'Failed to fetch users');
-      }
       const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+      if (!res.ok) {
+        throw new Error(data.msg || 'Failed to fetch league leaderboard');
+      }
+      setLeagueName(data.leagueName);
+      setMembers(data.leaderboard || []);
     } catch (err) {
       console.error(err);
       setError(err.message);
     }
   };
 
-  // When user clicks on a row => navigate to /user-bets/:username
   const handleUserClick = (username) => {
-    console.log(username);
     navigate(`/user-bets/${username}`);
   };
 
   return (
-    <div className="leaderboard-page container">
-      <h2>טבלת ניקוד</h2>
+    <div className="league-leaderboard-page container">
+      <h2>טבלת ניקוד - ליגה: {leagueName}</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {users.length === 0 ? (
-        <p>אין משתמשים להצגה.</p>
+      {members.length === 0 ? (
+        <p>אין משתמשים להצגה בליגה זו.</p>
       ) : (
         <table className="leaderboard-table">
           <thead>
@@ -50,7 +50,7 @@ function LeaderboardPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {members.map((u) => (
               <tr key={u._id} onClick={() => handleUserClick(u.username)}>
                 <td>{u.username}</td>
                 <td>{u.points}</td>
