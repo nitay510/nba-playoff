@@ -62,16 +62,33 @@ exports.lockSeries = async (req, res) => {
   }
 };
 
-// Get all series (public)
+
 exports.getAllSeries = async (req, res) => {
   try {
-    const seriesList = await Series.find({});
+    // Fetch all series
+    let seriesList = await Series.find({});
+    
+    // Check each series if startDate is in the past
+    // If so, and not locked yet, lock it
+    for (const series of seriesList) {
+      if (!series.isLocked && series.startDate) {
+        if (new Date() >= series.startDate) {
+          series.isLocked = true;
+          await series.save();
+        }
+      }
+    }
+
+    // Re-fetch or just return the updated array
+    // If you want to ensure the newly locked statuses are included:
+    seriesList = await Series.find({});
     return res.json(seriesList);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: 'Server error' });
   }
 };
+
 
 // Get single series by ID (public)
 exports.getSeriesById = async (req, res) => {

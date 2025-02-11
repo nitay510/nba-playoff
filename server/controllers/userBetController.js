@@ -7,11 +7,8 @@ exports.placeOrUpdateBet = async (req, res) => {
   try {
     const { seriesId } = req.params;
     const { bets } = req.body;
-    
-    // userId comes from the middleware now
     const userId = req.user._id;
 
-    // 1. Check if series is locked
     const series = await Series.findById(seriesId);
     if (!series) {
       return res.status(404).json({ msg: 'Series not found' });
@@ -20,7 +17,6 @@ exports.placeOrUpdateBet = async (req, res) => {
       return res.status(400).json({ msg: 'Series is locked - no changes allowed' });
     }
 
-    // 2. Find or create a UserBet doc
     let userBet = await UserBet.findOne({ userId, seriesId });
     if (!userBet) {
       userBet = new UserBet({ userId, seriesId, bets });
@@ -41,7 +37,10 @@ exports.placeOrUpdateBet = async (req, res) => {
 exports.getUserBets = async (req, res) => {
   try {
     const userId = req.user._id;
-    const userBets = await UserBet.find({ userId }).populate('seriesId');
+    // Sort newest to oldest by _id descending
+    const userBets = await UserBet.find({ userId })
+      .sort({ _id: -1 })
+      .populate('seriesId');
     return res.json(userBets);
   } catch (err) {
     console.error(err);
@@ -62,33 +61,36 @@ exports.getUserBetForSeries = async (req, res) => {
     return res.status(500).json({ msg: 'Server error' });
   }
 };
-exports.getAllUserBets = async (req, res) => {
-    try {
-      const userId = req.user._id; // from requireAuth
-      // Populate seriesId so we can see which teams it was
-      const bets = await UserBet.find({ userId }).populate('seriesId');
-      return res.json(bets);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ msg: 'Server error' });
-    }
-  };
 
-  exports.getAllBetsOfAnyUser = async (req, res) => {
-    try {
-      const { username } = req.params;
-      
-      // 1) Find user doc
-      const user = await User.findOne({ username });
-      if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
-      }
-      
-      // 2) Find all bets with userId = user._id
-      const bets = await UserBet.find({ userId: user._id }).populate('seriesId');
-      return res.json(bets);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ msg: 'Server error' });
+exports.getAllUserBets = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    // Return bets in descending order by _id
+    const bets = await UserBet.find({ userId })
+      .sort({ _id: -1 })
+      .populate('seriesId');
+    return res.json(bets);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+exports.getAllBetsOfAnyUser = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
-  };
+
+    // Sort newest to oldest
+    const bets = await UserBet.find({ userId: user._id })
+      .sort({ _id: -1 })
+      .populate('seriesId');
+    return res.json(bets);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+};

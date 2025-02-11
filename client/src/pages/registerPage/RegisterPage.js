@@ -21,10 +21,37 @@ function RegisterPage() {
 
       const data = await response.json();
       if (response.ok) {
-        // Go to login after successful register
-        navigate('/home');
+        // Automatically log in the user after successful registration
+        handleLogin();
       } else {
         setErrorMsg(data.msg || 'שגיאה בהרשמה');
+      }
+    } catch (error) {
+      setErrorMsg('שגיאה בהתחברות לשרת');
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('username', data.username);
+        
+        if (data.username === 'nitay510') {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
+      } else {
+        setErrorMsg(data.msg || 'שגיאה בהתחברות');
       }
     } catch (error) {
       setErrorMsg('שגיאה בהתחברות לשרת');

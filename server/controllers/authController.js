@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const League = require('../models/League');
 
 exports.register = async (req, res) => {
   try {
@@ -18,6 +19,11 @@ exports.register = async (req, res) => {
     // Create user
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
+    const israelLeague = await League.findOne({ name: 'ישראל' });
+if (israelLeague && !israelLeague.members.includes(newUser._id)) {
+  israelLeague.members.push(newUser._id);
+  await israelLeague.save();
+}
 
     return res.status(201).json({ msg: 'המשתמש נוצר בהצלחה' });
   } catch (error) {

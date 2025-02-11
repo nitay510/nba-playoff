@@ -1,9 +1,12 @@
+// client/src/pages/MyBetsPage/MyBetsPage.js
 import React, { useEffect, useState } from 'react';
-import './MyBetsPage.scss'; // optional styling
+import { calculateSeriesPoints } from '../../utils/points';  // import
+import './MyBetsPage.scss';
 
 function MyBetsPage() {
   const [userBets, setUserBets] = useState([]);
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     fetchAllUserBets();
@@ -26,45 +29,69 @@ function MyBetsPage() {
     }
   };
 
-  // Filter only finished series
-  const finishedBets = userBets.filter((ub) => {
-    return ub.seriesId && ub.seriesId.isFinished;
-  });
+  // show only locked (isLocked = true) series
+  const lockedBets = userBets.filter((ub) => ub.seriesId && ub.seriesId.isLocked);
+
+  const toggleExpand = (betId) => {
+    setExpanded((prev) => ({ ...prev, [betId]: !prev[betId] }));
+  };
 
   return (
     <div className="my-bets-page container">
-      <h2>ההימורים שלי (סדרות שהסתיימו)</h2>
+      <h2>ההימורים שלי (סדרות נעולות)</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {finishedBets.length === 0 ? (
-        <p>אין הימורים על סדרות שהסתיימו.</p>
+      {lockedBets.length === 0 ? (
+        <p>אין הימורים על סדרות נעולות.</p>
       ) : (
-        finishedBets.map((ub) => {
-          const series = ub.seriesId; 
-          // We'll show each bet and the final result
+        lockedBets.map((ub) => {
+          const series = ub.seriesId;
+          // compute total points if series is finished
+          const points = calculateSeriesPoints(ub, series);
+          const isExpanded = !!expanded[ub._id];
+
           return (
             <div key={ub._id} className="bet-card">
-              <h3>{series.teamA} נגד {series.teamB}</h3>
-              <p>הסתיים? {series.isFinished ? 'כן' : 'לא'}</p>
-              
-              <p>ההימורים שלך:</p>
-              <ul>
-                {ub.bets.map((b, idx) => {
-                  // find the finalChoice for this category
-                  const cat = series.betOptions.find((o) => o.category === b.category);
-                  const finalChoice = cat?.finalChoice || 'לא נקבע';
-                  const isCorrect = finalChoice === b.choiceName;
+              <div className="bet-summary">
+                <h3>{series.teamA} נגד {series.teamB}</h3>
+                <p>נקודות בסדרה זו: {points}</p>
+                <button className="expand-btn" onClick={() => toggleExpand(ub._id)}>
+                  {isExpanded ? 'הסתר פירוט' : 'הצג פירוט'}
+                </button>
+              </div>
 
-                  return (
-                    <li key={idx}>
-                      <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
-                      <br />
-                      <em>תוצאה סופית: {finalChoice}</em>
-                      {isCorrect ? <span style={{ color: 'green' }}> ✅ </span> : <span style={{ color: 'red' }}> ❌ </span>}
-                    </li>
-                  );
-                })}
-              </ul>
+              {isExpanded && (
+                <div className="bet-details">
+                  <ul>
+                    {ub.bets.map((b, idx) => {
+                      const cat = series.betOptions.find((o) => o.category === b.category);
+                      const finalChoice = cat?.finalChoice || null;
+                      const isCorrect = finalChoice && finalChoice === b.choiceName;
+                      return (
+                        <li key={idx}>
+                          <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
+                          {series.isFinished && cat ? (
+                            <>
+                              <br />
+                              תוצאה סופית: {cat.finalChoice || '---'}
+                              {isCorrect ? (
+                                <span style={{ color: 'green' }}> ✅</span>
+                              ) : (
+                                <span style={{ color: 'red' }}> ❌</span>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                            <br />
+                            <span>לא התקבלה תוצאה סופית</span>
+                            </>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           );
         })

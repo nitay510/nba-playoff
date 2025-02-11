@@ -9,6 +9,7 @@ import MyBetsPage from './pages/MyBetsPage/MyBetsPage';
 import LeaderboardPage from './pages/LeaderboardPage/LeaderboardPage';
 import UserBetsPage from './pages/UserBetsPage/UserBetsPage';
 import LeaguesPage from './pages/LeaguesPage/LeaguesPage';
+import AdminFinishedPage from './pages/adminPage/AdminFinishedPage';
 import './styles/global.scss'; // Ensure global styles are imported
 
 function AppWrapper() {
@@ -16,7 +17,7 @@ function AppWrapper() {
   const location = useLocation();
 
   // If the path is "/" (login) or "/register", we hide the nav
-  const hideNav = location.pathname === '/' || location.pathname === '/register';
+  const hideNav = location.pathname === '/' || location.pathname === '/register' || location.pathname === '/admin'|| location.pathname === '/admin/finished';
 
   return (
     <div className="app-content">
@@ -29,6 +30,7 @@ function AppWrapper() {
         <Route path="/leagues/:leagueId/leaderboard" element={<LeaderboardPage />} />
         <Route path="/leagues" element={<LeaguesPage />} />
         <Route path="/user-bets/:username" element={<UserBetsPage />} />
+        <Route path="/admin/finished" element={<AdminFinishedPage />} />
       </Routes>
 
       {!hideNav && <NavBar />}

@@ -1,11 +1,14 @@
+// client/src/pages/UserBetsPage/UserBetsPage.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { calculateSeriesPoints } from '../../utils/points';
 import './UserBetsPage.scss';
 
 function UserBetsPage() {
-  const { username } = useParams(); // from /user-bets/:username
+  const { username } = useParams();
   const [bets, setBets] = useState([]);
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     fetchUserBets();
@@ -28,38 +31,69 @@ function UserBetsPage() {
     }
   };
 
-  // Filter only finished series
-  const finishedBets = bets.filter((ub) => ub.seriesId && ub.seriesId.isFinished);
+  // Only locked series => isLocked = true
+  const lockedBets = bets.filter((ub) => ub.seriesId && ub.seriesId.isLocked);
+
+  const toggleExpand = (betId) => {
+    setExpanded((prev) => ({ ...prev, [betId]: !prev[betId] }));
+  };
 
   return (
     <div className="user-bets-page container">
-      <h2>הימורים של משתמש {username} (סדרות שהסתיימו)</h2>
+      <h2>הימורים של משתמש {username} (סדרות נעולות)</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {finishedBets.length === 0 ? (
-        <p>אין הימורים על סדרות שהסתיימו.</p>
+      {lockedBets.length === 0 ? (
+        <p>אין הימורים על סדרות נעולות.</p>
       ) : (
-        finishedBets.map((ub) => {
+        lockedBets.map((ub) => {
           const series = ub.seriesId;
+          const points = calculateSeriesPoints(ub, series);
+          const isExpanded = !!expanded[ub._id];
+
           return (
             <div key={ub._id} className="bet-card">
-              <h3>{series.teamA} נגד {series.teamB}</h3>
-              <ul>
-                {ub.bets.map((b, idx) => {
-                  const cat = series.betOptions.find((o) => o.category === b.category);
-                  const finalChoice = cat?.finalChoice || 'לא נקבע';
-                  const isCorrect = finalChoice === b.choiceName;
+              <div className="bet-summary">
+                <h3>{series.teamA} נגד {series.teamB}</h3>
+                <p>נקודות בסדרה זו: {points}</p>
+                <button className="expand-btn" onClick={() => toggleExpand(ub._id)}>
+                  {isExpanded ? 'הסתר פירוט' : 'הצג פירוט'}
+                </button>
+              </div>
 
-                  return (
-                    <li key={idx}>
-                      <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
-                      {' '}
-                      <em>תוצאה סופית: {finalChoice}</em>
-                      {isCorrect ? <span style={{ color: 'green' }}> ✅ </span> : <span style={{ color: 'red' }}> ❌ </span>}
-                    </li>
-                  );
-                })}
-              </ul>
+              {isExpanded && (
+                <div className="bet-details">
+                  <ul>
+                    {ub.bets.map((b, idx) => {
+                      const cat = series.betOptions.find((o) => o.category === b.category);
+                      const finalChoice = cat?.finalChoice || null;
+                      const isCorrect = finalChoice && finalChoice === b.choiceName;
+
+                      return (
+                        <li key={idx}>
+                          <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
+                          {series.isFinished && cat ? (
+                            <>
+                              <br />
+                              תוצאה סופית: {cat.finalChoice || '---'}
+                              {isCorrect ? (
+                                <span style={{ color: 'green' }}> ✅</span>
+                              ) : (
+                                <span style={{ color: 'red' }}> ❌</span>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                            <br />
+                            <span>לא התקבלה תוצאה סופית</span>
+                            </>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           );
         })

@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './SeriesModal.scss';
 
 function SeriesModal({ onClose, onSave, existingSeries }) {
-  // By default, we have two categories:
-  // 1) מנצחת הסדרה (auto-updated with team names)
-  // 2) בכמה משחקים
   const [teamA, setTeamA] = useState('');
   const [teamB, setTeamB] = useState('');
   const [betOptions, setBetOptions] = useState([
@@ -25,17 +22,24 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
       ],
     },
   ]);
+  const [startDateStr, setStartDateStr] = useState('');
 
-  // If editing an existing series, load its data
   useEffect(() => {
     if (existingSeries) {
       setTeamA(existingSeries.teamA);
       setTeamB(existingSeries.teamB);
       setBetOptions(existingSeries.betOptions || []);
+
+      if (existingSeries.startDate) {
+        const d = new Date(existingSeries.startDate);
+        const localISO = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 16);
+        setStartDateStr(localISO);
+      }
     }
   }, [existingSeries]);
 
-  // Auto-update "מנצחת הסדרה" if found
   useEffect(() => {
     const winnerIndex = betOptions.findIndex((o) => o.category === 'מנצחת הסדרה');
     if (winnerIndex !== -1) {
@@ -46,13 +50,22 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
       }
       setBetOptions(updated);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamA, teamB]);
+  }, [teamA, teamB, betOptions]);
 
-  // Save (create/update) the series
   const handleSave = async () => {
     try {
-      const bodyData = { teamA, teamB, betOptions };
+      let startDate = null;
+      if (startDateStr) {
+        startDate = new Date(startDateStr);
+      }
+
+      const bodyData = {
+        teamA,
+        teamB,
+        betOptions,
+        startDate,
+      };
+
       let url = 'http://localhost:5000/api/series';
       let method = 'POST';
 
@@ -75,21 +88,18 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     }
   };
 
-  // Update odds for a specific choice
   const updateOdds = (catIndex, choiceIndex, newOdds) => {
     const updated = [...betOptions];
     updated[catIndex].choices[choiceIndex].odds = parseFloat(newOdds) || 0;
     setBetOptions(updated);
   };
 
-  // Update the name of a choice (for extra categories, etc.)
   const updateChoiceName = (catIndex, choiceIndex, newName) => {
     const updated = [...betOptions];
     updated[catIndex].choices[choiceIndex].name = newName;
     setBetOptions(updated);
   };
 
-  // Add a new custom category (prompt for name)
   const addNewCategory = () => {
     const catName = prompt('הכנס שם לקטגוריה החדשה:');
     if (catName && catName.trim()) {
@@ -102,7 +112,6 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     }
   };
 
-  // Add a new choice to an existing category
   const addChoiceToCategory = (catIndex) => {
     const updated = [...betOptions];
     updated[catIndex].choices.push({ name: 'אופציה חדשה', odds: 1.0 });
@@ -132,6 +141,14 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
           onChange={(e) => setTeamB(e.target.value)}
         />
 
+        <label className="modal-label">תאריך התחלה (ננעל אוטומטית בשעה זו):</label>
+        <input
+          className="modal-input"
+          type="datetime-local"
+          value={startDateStr}
+          onChange={(e) => setStartDateStr(e.target.value)}
+        />
+
         <h4 className="bet-options-header">אפשרויות הימור</h4>
         {betOptions.map((opt, i) => (
           <div key={i} className="bet-category">
@@ -146,14 +163,16 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
 
             {opt.choices.map((c, j) => {
               const isDefaultWinner =
-                opt.category === 'מנצחת הסדרה' && j < 2; // first 2 lines
+                opt.category === 'מנצחת הסדרה' && j < 2;
               return (
                 <div key={j} className="bet-choice">
                   <input
                     className="choice-name-input"
                     type="text"
                     value={c.name}
-                    onChange={(e) => !isDefaultWinner && updateChoiceName(i, j, e.target.value)}
+                    onChange={(e) =>
+                      !isDefaultWinner && updateChoiceName(i, j, e.target.value)
+                    }
                     disabled={isDefaultWinner}
                   />
 
