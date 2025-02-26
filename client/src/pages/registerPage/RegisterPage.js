@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './RegisterPage.scss';
+import Background from '../../components/Login-back';
 
 function RegisterPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -16,13 +18,12 @@ function RegisterPage() {
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        // Automatically log in the user after successful registration
-        handleLogin();
+        handleLogin(); // Automatically log in the user after registration
       } else {
         setErrorMsg(data.msg || 'שגיאה בהרשמה');
       }
@@ -44,7 +45,6 @@ function RegisterPage() {
 
       if (response.ok) {
         localStorage.setItem('username', data.username);
-        
         if (data.username === 'nitay510') {
           navigate('/admin');
         } else {
@@ -60,20 +60,26 @@ function RegisterPage() {
 
   return (
     <div className="main-container register-container">
-      <h1 className="title">הרשמה</h1>
+      <Background image="open-screen.png" />
+      <h2 className="title-small">הרשמה</h2>
       <form onSubmit={handleRegister} className="register-form">
         <label>שם משתמש</label>
         <input
           type="text"
-          placeholder="שם משתמש"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <label>אימייל</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <label>סיסמה</label>
         <input
           type="password"
-          placeholder="סיסמה"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -83,9 +89,9 @@ function RegisterPage() {
         <button type="submit">הירשם</button>
       </form>
 
-      <div className="login-link">
-        <p>כבר רשום?</p>
-        <Link to="/login">התחבר עכשיו</Link>
+      <div className="login-container">
+        <p className="login-text">כבר רשום?</p>
+        <Link to="/" className="login-link">התחבר עכשיו</Link>
       </div>
     </div>
   );

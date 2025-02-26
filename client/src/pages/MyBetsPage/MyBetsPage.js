@@ -1,12 +1,14 @@
-// client/src/pages/MyBetsPage/MyBetsPage.js
 import React, { useEffect, useState } from 'react';
-import { calculateSeriesPoints } from '../../utils/points';  // import
+import { calculateSeriesPoints } from '../../utils/points';
 import './MyBetsPage.scss';
+import Background from '../../components/Login-back';
+import TeamLogo from '../../components/TeamLogo';
 
 function MyBetsPage() {
   const [userBets, setUserBets] = useState([]);
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
+  const [activePage, setActivePage] = useState('active');
 
   useEffect(() => {
     fetchAllUserBets();
@@ -29,8 +31,9 @@ function MyBetsPage() {
     }
   };
 
-  // show only locked (isLocked = true) series
-  const lockedBets = userBets.filter((ub) => ub.seriesId && ub.seriesId.isLocked);
+  // Separate active and finished bets
+  const activeBets = userBets.filter((ub) => ub.seriesId && !ub.seriesId.isFinished && ub.seriesId.isLocked);
+  const finishedBets = userBets.filter((ub) => ub.seriesId && ub.seriesId.isFinished && ub.seriesId.isLocked);
 
   const toggleExpand = (betId) => {
     setExpanded((prev) => ({ ...prev, [betId]: !prev[betId] }));
@@ -38,63 +41,100 @@ function MyBetsPage() {
 
   return (
     <div className="my-bets-page container">
-      <h2>ההימורים שלי (סדרות נעולות)</h2>
+      <Background image="background2.png" />
+      <h2>ההימורים שלי</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {lockedBets.length === 0 ? (
-        <p>אין הימורים על סדרות נעולות.</p>
-      ) : (
-        lockedBets.map((ub) => {
-          const series = ub.seriesId;
-          // compute total points if series is finished
-          const points = calculateSeriesPoints(ub, series);
-          const isExpanded = !!expanded[ub._id];
+      {/* Toggle Buttons */}
+      <div className="toggle-buttons">
+        <button onClick={() => setActivePage('active')} className={activePage === 'active' ? 'active' : ''}>
+          פעילים
+        </button>
+        <button onClick={() => setActivePage('history')} className={activePage === 'history' ? 'active' : ''}>
+          היסטוריה
+        </button>
+      </div>
 
-          return (
-            <div key={ub._id} className="bet-card">
-              <div className="bet-summary">
-                <h3>{series.teamA} נגד {series.teamB}</h3>
-                <p>נקודות בסדרה זו: {points}</p>
-                <button className="expand-btn" onClick={() => toggleExpand(ub._id)}>
-                  {isExpanded ? 'הסתר פירוט' : 'הצג פירוט'}
-                </button>
-              </div>
+      {/* Show Active Bets */}
+      {activePage === 'active' && (
+        <>
+          {activeBets.length === 0 ? (
+            <p>אין הימורים פעילים.</p>
+          ) : (
+            activeBets.map((ub) => {
+              const series = ub.seriesId;
+              const points = calculateSeriesPoints(ub, series);
+              const isExpanded = !!expanded[ub._id];
 
-              {isExpanded && (
-                <div className="bet-details">
-                  <ul>
-                    {ub.bets.map((b, idx) => {
-                      const cat = series.betOptions.find((o) => o.category === b.category);
-                      const finalChoice = cat?.finalChoice || null;
-                      const isCorrect = finalChoice && finalChoice === b.choiceName;
-                      return (
-                        <li key={idx}>
-                          <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
-                          {series.isFinished && cat ? (
-                            <>
-                              <br />
-                              תוצאה סופית: {cat.finalChoice || '---'}
-                              {isCorrect ? (
-                                <span style={{ color: 'green' }}> ✅</span>
-                              ) : (
-                                <span style={{ color: 'red' }}> ❌</span>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                            <br />
-                            <span>לא התקבלה תוצאה סופית</span>
-                            </>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
+              return (
+                <div key={ub._id} className="bet-card" onClick={() => toggleExpand(ub._id)}>
+                  <div className="bet-summary">
+                    <span>סטטוס ההימור</span>
+                    <strong>הימור פעיל</strong>
+                  </div>
+
+                  <div className="team-logos">
+                    <TeamLogo teamName={series.teamA} />
+                    <TeamLogo teamName={series.teamB} />
+                  </div>
+
+                  {isExpanded && (
+                    <div className="bet-details">
+                      <ul>
+                        {ub.bets.map((b, idx) => (
+                          <li key={idx}>
+                            <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          );
-        })
+              );
+            })
+          )}
+        </>
+      )}
+
+      {/* Show Finished Bets (History) */}
+      {activePage === 'history' && (
+        <>
+          {finishedBets.length === 0 ? (
+            <p>אין הימורים היסטוריים.</p>
+          ) : (
+            finishedBets.map((ub) => {
+              const series = ub.seriesId;
+              const points = calculateSeriesPoints(ub, series);
+              const isExpanded = !!expanded[ub._id];
+
+              return (
+                <div key={ub._id} className="bet-card" onClick={() => toggleExpand(ub._id)}>
+                  <div className="bet-summary">
+                    <span>סטטוס ההימור</span>
+                    <span className='activeOrNot'>הימור הסתיים</span>
+                  </div>
+
+                  <div className="team-logos">
+                    <TeamLogo teamName={series.teamA} />
+                    <TeamLogo teamName={series.teamB} />
+                  </div>
+
+                  {isExpanded && (
+                    <div className="bet-details">
+                      <ul>
+                        {ub.bets.map((b, idx) => (
+                          <li key={idx}>
+                            <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </>
       )}
     </div>
   );

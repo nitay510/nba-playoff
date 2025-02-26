@@ -15,10 +15,10 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     {
       category: 'בכמה משחקים',
       choices: [
-        { name: '4 משחקים', odds: 3.0 },
-        { name: '5 משחקים', odds: 2.5 },
-        { name: '6 משחקים', odds: 2.5 },
-        { name: '7 משחקים', odds: 2.5 },
+        { name: '4', odds: 3.0 },
+        { name: '5', odds: 3.0 },
+        { name: '6', odds: 3.0 },
+        { name: '7', odds: 3.0 },
       ],
     },
   ]);

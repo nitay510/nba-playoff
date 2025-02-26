@@ -5,7 +5,7 @@ const League = require('../models/League');
 
 exports.register = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password,email } = req.body;
 
     // Check if username is taken
     const existingUser = await User.findOne({ username });
@@ -17,14 +17,13 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const newUser = new User({ username, password: hashedPassword });
+    const newUser = new User({ username, password: hashedPassword,email });
     await newUser.save();
     const israelLeague = await League.findOne({ name: 'ישראל' });
 if (israelLeague && !israelLeague.members.includes(newUser._id)) {
   israelLeague.members.push(newUser._id);
   await israelLeague.save();
 }
-
     return res.status(201).json({ msg: 'המשתמש נוצר בהצלחה' });
   } catch (error) {
     console.error(error);
@@ -68,6 +67,28 @@ exports.login = async (req, res) => {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ msg: 'שגיאה בשרת' });
+    }
+  };
+
+  exports.setChampion = async (req, res) => {
+    try {
+      const { username, champion } = req.body; // Get username & champion from request
+  
+      // Find user by username
+      const user = await User.findOne({ username });
+  
+      if (!user) {
+        return res.status(404).json({ msg: 'המשתמש לא נמצא' });
+      }
+  
+      // Update the champion field
+      user.champions = champion;
+      await user.save();
+  
+      return res.status(200).json({ msg: 'אלוף עודכן בהצלחה', champion: user.champions });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ msg: 'שגיאה בעדכון האלוף' });
     }
   };
 

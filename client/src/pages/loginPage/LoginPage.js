@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './LoginPage.scss';
-
+import Background from '../../components/Login-back';
 function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -44,12 +44,12 @@ function LoginPage() {
 
   return (
     <div className="main-container login-container">
-      <h1 className="title">התחברות</h1>
+        <Background image="open-screen.png" />
+      <h2 className="title-small">התחברות</h2>
       <form onSubmit={handleLogin} className="login-form">
         <label>שם משתמש</label>
         <input
           type="text"
-          placeholder="שם משתמש"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -57,7 +57,6 @@ function LoginPage() {
         <label>סיסמה</label>
         <input
           type="password"
-          placeholder="סיסמה"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -65,12 +64,12 @@ function LoginPage() {
         {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
         <button type="submit">התחבר</button>
-      </form>
+        <div className="register-container2">
+  <p className="register-text">עדיין אין לך חשבון?</p>
+  <Link to="/register" className="register-link">הירשם עכשיו</Link>
+</div>
 
-      <div className="register-link">
-        <p>עדיין אין לך חשבון?</p>
-        <Link to="/register">להירשם עכשיו</Link>
-      </div>
+      </form>
     </div>
   );
 }

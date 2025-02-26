@@ -1,51 +1,102 @@
 @import '../../styles/_variables.scss';
 @import '../../styles/_mixins.scss';
+
 .register-container {
-    .register-form {
-      display: flex;
-      flex-direction: column;
-  
-      label {
-        margin-bottom: 0.25rem;
-        font-weight: 600;
-      }
-  
-      input {
-        padding: 0.6rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 1rem;
-      }
-  
-      .error-msg {
-        color: $error-color;
-        margin-bottom: 1rem;
-        text-align: center;
-        font-size: 0.9rem;
-      }
-  
-      button {
-        padding: 0.7rem;
-        font-size: 1rem;
-        background-color: $secondary-color;
-        color: $white;
-        font-weight: bold;
-        @include transition-all(0.2s);
-  
-        &:hover {
-          background-color: darken($secondary-color, 10%);
-        }
-      }
+  margin-top: 28vh;
+
+  .title-small {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 35.27px;
+    text-align: center;
+  }
+
+  .register-form {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    backdrop-filter: blur(24px);
+
+    label {
+      margin-bottom: 0.25rem;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 23.52px;
+      letter-spacing: 0%;
+      text-align: right;
+      margin-left: 2rem;
+      margin-right: 2rem;
     }
-  
-    .login-link {
+
+    input {
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      font-size: 1rem;
+      margin-left: 2rem;
+      margin-right: 2rem;
+    }
+
+    .error-msg {
+      color: $error-color;
+      margin-bottom: 1rem;
       text-align: center;
-      margin-top: 1.5rem;
-  
-      p {
-        margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    button {
+      border: 1px solid rgba(255, 255, 255, 1);
+      color: rgba(255, 255, 255, 1);
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 23.52px;
+      text-align: center;
+      margin-right: 2rem;
+      margin-left: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
       }
     }
   }
-  
+
+  .login-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  .login-text {
+    color: #ccc;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20.58px;
+    text-align: right;
+  }
+
+  .login-link {
+    color: white;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20.58px;
+    letter-spacing: 0%;
+    text-align: right;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-thickness: Auto;
+    text-decoration-skip-ink: auto;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

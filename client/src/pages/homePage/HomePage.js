@@ -1,7 +1,9 @@
-// client/src/pages/homePage/HomePage.js
 import React, { useState, useEffect } from 'react';
 import PlaceBetModal from './PlaceBetModal';
 import CountdownClock from '../../components/CountdownClock';
+import TeamLogo from '../../components/TeamLogo';
+import { FaCheckCircle } from 'react-icons/fa';
+import Background from '../../components/Login-back';
 import './HomePage.scss';
 
 function HomePage() {
@@ -10,20 +12,17 @@ function HomePage() {
   const [showBetModal, setShowBetModal] = useState(false);
   const [currentSeries, setCurrentSeries] = useState(null);
 
-  // track expanded state for each series
-  const [expanded, setExpanded] = useState({}); // { [seriesId]: bool }
-
   useEffect(() => {
     fetchUnlockedSeries();
     fetchUserBets();
   }, []);
 
-  // 1) Show only unlocked => isLocked === false
+  // Show only isLocked === false
   const fetchUnlockedSeries = async () => {
     try {
       const res = await fetch('http://localhost:5000/api/series');
       const data = await res.json();
-      const unlocked = data.filter((s) => s.isLocked === false);
+      const unlocked = data.filter((s) => !s.isLocked);
       setSeriesList(unlocked);
     } catch (error) {
       console.error(error);
@@ -42,12 +41,10 @@ function HomePage() {
     }
   };
 
-  const findUserBet = (seriesId) => {
-    return (
-      userBets.find((b) => b.seriesId && b.seriesId._id === seriesId) || null
-    );
-  };
+  const findUserBet = (seriesId) =>
+    userBets.find((b) => b.seriesId && b.seriesId._id === seriesId) || null;
 
+  // Instead of an overlay, we show the bet panel inline
   const openBetModal = (series) => {
     setCurrentSeries(series);
     setShowBetModal(true);
@@ -55,23 +52,22 @@ function HomePage() {
 
   const onModalSave = () => {
     setShowBetModal(false);
-    fetchUserBets(); // refresh bets
-  };
-
-  const toggleExpand = (id) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+    fetchUserBets();
   };
 
   return (
-    <div className="home-page container">
-      <h2>הימורי פלייאוף - ללא נעילה</h2>
+    <div className="home-page">
+      <Background image="background.png" />
+
       <div className="series-list">
+        <h2 className="bets">הימורים</h2>
         {seriesList.length === 0 && <p>אין סדרות פתוחות כרגע.</p>}
 
         {seriesList.map((s) => {
           const bet = findUserBet(s._id);
+          const hasBet = !!bet;
 
-          // If we have a future startDate, show countdown
+          // Countdown logic
           let countdownElem = null;
           if (s.startDate) {
             const now = new Date();
@@ -81,58 +77,48 @@ function HomePage() {
           }
 
           return (
-            <div key={s._id} className="series-card">
-              <div className="series-header">
-                <h3>{s.teamA} נגד {s.teamB}</h3>
-                {/* Show countdown if any */}
-                {countdownElem && (
-                  <div className="countdown-wrapper">
-                    <span>מתחיל בעוד: </span>{countdownElem}
-                  </div>
-                )}
-              </div>
-
-              <div className="action-row">
-                {/* If it's unlocked, let user bet */}
-                <button className="primary-btn" onClick={() => openBetModal(s)}>
-                  {bet ? 'ערוך הימור' : 'הימר עכשיו'}
-                </button>
-
-                <button className="expand-btn" onClick={() => toggleExpand(s._id)}>
-                  {expanded[s._id] ? 'הסתר פירוט' : 'הצג פירוט'}
-                </button>
-              </div>
-
-              {expanded[s._id] && (
-                <div className="expanded-bets">
-                  {bet ? (
-                    <div className="user-bet">
-                      <p>ההימורים שלך:</p>
-                      <ul>
-                        {bet.bets.map((b) => (
-                          <li key={b.category}>
-                            <strong>{b.category}</strong>:
-                            {' '}{b.choiceName} (יחס: {b.oddsWhenPlaced})
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <p>אין הימור עדיין.</p>
-                  )}
-                  <p>
-                    תאריך התחלה: 
-                    {s.startDate
-                      ? new Date(s.startDate).toLocaleString('he-IL')
-                      : '---'}
-                  </p>
+            <div
+              key={s._id}
+              className={`series-card ${hasBet ? 'has-bet' : 'no-bet'}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentSeries(s);
+                setShowBetModal(true);
+              }}
+            >
+              <div className="series-header" style={{ cursor: 'pointer' }}>
+                <div
+                  className="left-logos"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openBetModal(s);
+                  }}
+                >
+                  <TeamLogo teamName={s.teamA} className="big-logo" />
+                  <TeamLogo teamName={s.teamB} className="big-logo" />
                 </div>
-              )}
+
+                <div
+                  className="right-column"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openBetModal(s);
+                  }}
+                >
+                  <div>{hasBet && <FaCheckCircle className="check-icon" />}</div>
+                  <div className="top-line">
+                    <span style={{ opacity: 0.75 }}>סיום הימור בעוד</span>
+                  </div>
+                  {hasBet && <span className="bet-confirmed">הימור בוצע</span>}
+                  {!hasBet && <div className="countdown-line">{countdownElem}</div>}
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
+      {/* Inline extension for the current series if showBetModal === true */}
       {showBetModal && currentSeries && (
         <PlaceBetModal
           series={currentSeries}
