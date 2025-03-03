@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Background from '../../components/Login-back';
 import './LeaderboardPage.scss';
 
 function LeaderboardPage() {
@@ -36,6 +37,7 @@ function LeaderboardPage() {
 
   return (
     <div className="league-leaderboard-page container">
+      <Background image="background3.png" />
       <h2>טבלת ניקוד - ליגה: {leagueName}</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 

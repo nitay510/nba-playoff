@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { calculateSeriesPoints } from '../../utils/points';
-import './MyBetsPage.scss';
 import Background from '../../components/Login-back';
 import TeamLogo from '../../components/TeamLogo';
+import { calculateSeriesPoints } from '../../utils/points';
+import { FaTimes } from 'react-icons/fa';
+import './MyBetsPage.scss';
 
 function MyBetsPage() {
   const [userBets, setUserBets] = useState([]);
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState({});
-  const [activePage, setActivePage] = useState('active');
+  const [expanded, setExpanded] = useState({}); // track which cards are expanded
+  const [activePage, setActivePage] = useState('active'); // 'active' or 'history'
 
   useEffect(() => {
     fetchAllUserBets();
@@ -32,25 +33,53 @@ function MyBetsPage() {
   };
 
   // Separate active and finished bets
-  const activeBets = userBets.filter((ub) => ub.seriesId && !ub.seriesId.isFinished && ub.seriesId.isLocked);
-  const finishedBets = userBets.filter((ub) => ub.seriesId && ub.seriesId.isFinished && ub.seriesId.isLocked);
+  const activeBets = userBets.filter(
+    (ub) => ub.seriesId && !ub.seriesId.isFinished && ub.seriesId.isLocked
+  );
+  const finishedBets = userBets.filter(
+    (ub) => ub.seriesId && ub.seriesId.isFinished && ub.seriesId.isLocked
+  );
 
   const toggleExpand = (betId) => {
     setExpanded((prev) => ({ ...prev, [betId]: !prev[betId] }));
   };
 
+  // We mimic the "pills" style from the place-bet form, but read-only
+  // So we see which picks the user made, with .selected if it matches
+  // We do not allow any click changes.
+
+  // Helper to check if user picked a certain choice
+  const isChoiceSelected = (ub, category, choiceName) => { 
+    const extractNumbers = (str) => str.match(/\d+/g)?.join('') || '';
+
+    const catBet = ub.bets.find((b) => b.category === category);
+    if (!catBet) return false;
+
+    if (category === "בכמה משחקים") {
+        return extractNumbers(catBet.choiceName) === extractNumbers(choiceName);
+    }
+
+    return catBet.choiceName === choiceName;
+};
+
   return (
-    <div className="my-bets-page container">
+    <div className="my-bets-page">
       <Background image="background2.png" />
       <h2>ההימורים שלי</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {/* Toggle Buttons */}
       <div className="toggle-buttons">
-        <button onClick={() => setActivePage('active')} className={activePage === 'active' ? 'active' : ''}>
+        <button
+          onClick={() => setActivePage('active')}
+          className={activePage === 'active' ? 'active' : ''}
+        >
           פעילים
         </button>
-        <button onClick={() => setActivePage('history')} className={activePage === 'history' ? 'active' : ''}>
+        <button
+          onClick={() => setActivePage('history')}
+          className={activePage === 'history' ? 'active' : ''}
+        >
           היסטוריה
         </button>
       </div>
@@ -63,30 +92,72 @@ function MyBetsPage() {
           ) : (
             activeBets.map((ub) => {
               const series = ub.seriesId;
-              const points = calculateSeriesPoints(ub, series);
-              const isExpanded = !!expanded[ub._id];
+              const betId = ub._id;
+              const isExpanded = !!expanded[betId];
 
               return (
-                <div key={ub._id} className="bet-card" onClick={() => toggleExpand(ub._id)}>
-                  <div className="bet-summary">
-                    <span>סטטוס ההימור</span>
-                    <strong>הימור פעיל</strong>
-                  </div>
+                <div
+                  key={betId}
+                  className="mybet-card"
+                  onClick={() => toggleExpand(betId)}
+                >
+                  {/* Collapsed View */}
+                  {!isExpanded && (
+                    <div className="mybet-header">
+                      <div className="left-logos">
+                        <TeamLogo teamName={series.teamA} className="big-logo" />
+                        <TeamLogo teamName={series.teamB} className="big-logo" />
+                      </div>
+                      <div className="right-column">
+                        <span className="bet-status">הימור פעיל</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="team-logos">
-                    <TeamLogo teamName={series.teamA} />
-                    <TeamLogo teamName={series.teamB} />
-                  </div>
-
+                  {/* Expanded Pink Panel - read-only form style */}
                   {isExpanded && (
-                    <div className="bet-details">
-                      <ul>
-                        {ub.bets.map((b, idx) => (
-                          <li key={idx}>
-                            <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
-                          </li>
+                    <div className="mybet-expanded">
+                      <div className="top-bar">
+                        <div className="top-bar-center">
+                          <span className="bet-status">הימור פעיל</span>
+                        </div>
+                        <FaTimes
+                          className="close-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(betId);
+                          }}
+                        />
+                      </div>
+
+                      <div className="teams-row">
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamB} className="team-logo" />
+                      </div>
+
+                      <div className="bet-details-pill">
+                        {/* We replicate the "bet-options" style from place-bet,
+                            but each category is read-only, showing user picks. */}
+                        {series.betOptions.map((cat, i) => (
+                          <div key={i} className="bet-category">
+                            <h5>{cat.category}</h5>
+                            <div className="pill-container">
+                              {cat.choices.map((c, j) => {
+                                const selected = isChoiceSelected(ub, cat.category, c.name);
+                                return (
+                                  <div
+                                    key={j}
+                                    className={`pill ${selected ? 'selected' : ''}`}
+                                  >
+                                    {c.name}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -104,30 +175,70 @@ function MyBetsPage() {
           ) : (
             finishedBets.map((ub) => {
               const series = ub.seriesId;
-              const points = calculateSeriesPoints(ub, series);
-              const isExpanded = !!expanded[ub._id];
+              const betId = ub._id;
+              const isExpanded = !!expanded[betId];
 
               return (
-                <div key={ub._id} className="bet-card" onClick={() => toggleExpand(ub._id)}>
-                  <div className="bet-summary">
-                    <span>סטטוס ההימור</span>
-                    <span className='activeOrNot'>הימור הסתיים</span>
-                  </div>
+                <div
+                  key={betId}
+                  className="mybet-card"
+                  onClick={() => toggleExpand(betId)}
+                >
+                  {/* Collapsed View */}
+                  {!isExpanded && (
+                    <div className="mybet-header">
+                      <div className="left-logos">
+                        <TeamLogo teamName={series.teamA} className="big-logo" />
+                        <TeamLogo teamName={series.teamB} className="big-logo" />
+                      </div>
+                      <div className="right-column">
+                        <span className="bet-status">הימור הסתיים</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="team-logos">
-                    <TeamLogo teamName={series.teamA} />
-                    <TeamLogo teamName={series.teamB} />
-                  </div>
-
+                  {/* Expanded Pink Panel - read-only form style */}
                   {isExpanded && (
-                    <div className="bet-details">
-                      <ul>
-                        {ub.bets.map((b, idx) => (
-                          <li key={idx}>
-                            <strong>{b.category}</strong> - {b.choiceName} (יחס: {b.oddsWhenPlaced})
-                          </li>
+                    <div className="mybet-expanded">
+                      <div className="top-bar">
+                        <div className="top-bar-center">
+                          <span className="bet-status">הימור הסתיים</span>
+                        </div>
+                        <FaTimes
+                          className="close-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(betId);
+                          }}
+                        />
+                      </div>
+
+                      <div className="teams-row">
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamB} className="team-logo" />
+                      </div>
+
+                      <div className="bet-details-pill">
+                        {series.betOptions.map((cat, i) => (
+                          <div key={i} className="bet-category">
+                            <h5>{cat.category}</h5>
+                            <div className="pill-container">
+                              {cat.choices.map((c, j) => {
+                                const selected = isChoiceSelected(ub, cat.category, c.name);
+                                return (
+                                  <div
+                                    key={j}
+                                    className={`pill ${selected ? 'selected' : ''}`}
+                                  >
+                                    {c.name}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   )}
                 </div>
