@@ -4,6 +4,7 @@ import TeamLogo from '../../components/TeamLogo';
 import { calculateSeriesPoints } from '../../utils/points';
 import { FaTimes } from 'react-icons/fa';
 import './MyBetsPage.scss';
+import Header2 from '../../components/Header2';
 
 function MyBetsPage() {
   const [userBets, setUserBets] = useState([]);
@@ -65,6 +66,7 @@ function MyBetsPage() {
   return (
     <div className="my-bets-page">
       <Background image="background2.png" />
+      <Header2/>
       <h2>ההימורים שלי</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 

@@ -3,6 +3,7 @@ import CountdownClock from '../../components/CountdownClock';
 import TeamLogo from '../../components/TeamLogo';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
 import Background from '../../components/Login-back';
+import Header from '../../components/Header';
 import './HomePage.scss';
 
 function HomePage() {
@@ -157,10 +158,11 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      <Header/>
       <Background image="background.png" />
 
       <div className="series-list">
-        <h2 className="bets">הימורים</h2>
+        <h2 className="bets">דף הבית</h2>
         {seriesList.length === 0 && <p>אין סדרות פתוחות כרגע.</p>}
 
         {seriesList.map((s) => {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Background from '../../components/Login-back';
+import Header from '../../components/Header';
 import './LeaguesPage.scss';
 
 function LeaguesPage() {
@@ -91,7 +92,7 @@ function LeaguesPage() {
   return (
     <div className="leagues-page container">
       <Background image="background3.png" />
-
+      <Header/>
       <h2>הליגות שלי</h2>
 
       <div className="league-list">

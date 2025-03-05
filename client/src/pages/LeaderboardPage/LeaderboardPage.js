@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Background from '../../components/Login-back';
 import './LeaderboardPage.scss';
+import Header from '../../components/Header';
 
 function LeaderboardPage() {
-  const { leagueId } = useParams(); // from /leagues/:leagueId/leaderboard
+  const { leagueId } = useParams(); 
   const [leagueName, setLeagueName] = useState('');
+  const [leagueCode, setLeagueCode] = useState('');
   const [members, setMembers] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -23,7 +25,8 @@ function LeaderboardPage() {
       if (!res.ok) {
         throw new Error(data.msg || 'Failed to fetch league leaderboard');
       }
-      setLeagueName(data.leagueName);
+      setLeagueName(data.leagueName || '');
+      setLeagueCode(data.leagueCode || '');
       setMembers(data.leaderboard || []);
     } catch (err) {
       console.error(err);
@@ -37,29 +40,37 @@ function LeaderboardPage() {
 
   return (
     <div className="league-leaderboard-page container">
+      <Header/>
       <Background image="background3.png" />
-      <h2>טבלת ניקוד - ליגה: {leagueName}</h2>
+
+      <div className="leaderboard-header">
+      <span className="arrow-right" onClick={() => navigate('/leagues')}>
+          &lt;
+        </span>
+        <h2 className="league-title">{leagueName}</h2>
+
+        {/* Show code if available */}
+        {leagueCode && <div className="league-code">{leagueCode} : קוד</div>}
+      </div>
+
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {members.length === 0 ? (
         <p>אין משתמשים להצגה בליגה זו.</p>
       ) : (
-        <table className="leaderboard-table">
-          <thead>
-            <tr>
-              <th>שם משתמש</th>
-              <th>נקודות</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((u) => (
-              <tr key={u._id} onClick={() => handleUserClick(u.username)}>
-                <td>{u.username}</td>
-                <td>{u.points}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="leaderboard-list">
+          {members.map((u, idx) => (
+            <div
+              key={u._id}
+              className="leaderboard-item"
+              onClick={() => handleUserClick(u.username)}
+            >
+              <span className="rank">{idx + 1}</span>
+              <span className="username">{u.username}</span>
+              <span className="points-label">{u.points}</span>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

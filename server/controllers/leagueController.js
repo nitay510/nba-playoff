@@ -98,6 +98,7 @@ exports.getLeagueLeaderboard = async (req, res) => {
     res.json({
       leagueId: league._id,
       leagueName: league.name,
+      leagueCode: league.code,
       leaderboard,
     });
   } catch (error) {
