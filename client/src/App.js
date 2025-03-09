@@ -10,6 +10,7 @@ import LeaderboardPage from './pages/LeaderboardPage/LeaderboardPage';
 import UserBetsPage from './pages/UserBetsPage/UserBetsPage';
 import LeaguesPage from './pages/LeaguesPage/LeaguesPage';
 import AdminFinishedPage from './pages/adminPage/AdminFinishedPage';
+import ChampionSelectionPage from './pages/registerPage/ChampionSelectionPage';
 import './styles/global.scss'; // Ensure global styles are imported
 
 function AppWrapper() {
@@ -24,6 +25,7 @@ function AppWrapper() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/choose-champion" element={<ChampionSelectionPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/my-bets" element={<MyBetsPage />} />

@@ -9,12 +9,8 @@ import './HomePage.scss';
 function HomePage() {
   const [seriesList, setSeriesList] = useState([]);
   const [userBets, setUserBets] = useState([]);
-  // track which cards are "open" => showing the place-bet design
-  const [openCards, setOpenCards] = useState({}); // { [seriesId]: bool }
-
-  // For the place-bet logic, we store local bets for each series:
-  // e.g. localBets[s._id] = [ { category, choiceName, oddsWhenPlaced }, ... ]
-  const [localBets, setLocalBets] = useState({}); // object: { seriesId: betArray }
+  const [openCards, setOpenCards] = useState({});
+  const [localBets, setLocalBets] = useState({});
 
   useEffect(() => {
     fetchUnlockedSeries();
@@ -44,19 +40,15 @@ function HomePage() {
     }
   };
 
-  // find the userBet doc for a given series
   const findUserBetDoc = (seriesId) =>
     userBets.find((b) => b.seriesId && b.seriesId._id === seriesId) || null;
 
-  // open or close the card for place-bet design
   const openCard = (seriesId) => {
     setOpenCards((prev) => ({ ...prev, [seriesId]: true }));
-    // if we already have a user bet doc => store it in localBets
     const userBetDoc = findUserBetDoc(seriesId);
     if (userBetDoc) {
       setLocalBets((prev) => ({ ...prev, [seriesId]: userBetDoc.bets }));
     } else {
-      // no bets yet => empty array
       setLocalBets((prev) => ({ ...prev, [seriesId]: [] }));
     }
   };
@@ -65,7 +57,7 @@ function HomePage() {
     setOpenCards((prev) => ({ ...prev, [seriesId]: false }));
   };
 
-  // place-bet logic: parseGamesNumber, syncGamesPick, handleChoiceSelect, etc.
+  // parse numeric for 'בכמה משחקים'
   const parseGamesNumber = (str = '') => {
     const match = str.match(/\d+/);
     return match ? match[0] : null;
@@ -88,7 +80,6 @@ function HomePage() {
     return updatedBets;
   };
 
-  // choose a pill for a given category => store in localBets for that series
   const handleChoiceSelect = (seriesId, category, choice) => {
     const prevBets = localBets[seriesId] || [];
     const idx = prevBets.findIndex((b) => b.category === category);
@@ -108,7 +99,6 @@ function HomePage() {
       };
     }
     updated = syncGamesPick(seriesId, updated);
-
     setLocalBets((prev) => ({ ...prev, [seriesId]: updated }));
   };
 
@@ -128,7 +118,6 @@ function HomePage() {
     return bet.choiceName === choiceName;
   };
 
-  // Save bet => POST to server => refresh user bets => close the card
   const handleSaveBet = async (seriesId) => {
     try {
       const currentBetArr = localBets[seriesId] || [];
@@ -145,7 +134,6 @@ function HomePage() {
     }
   };
 
-  // Countdown
   const getCountdownElem = (startDate) => {
     if (startDate) {
       const now = new Date();
@@ -158,7 +146,7 @@ function HomePage() {
 
   return (
     <div className="home-page">
-      <Header/>
+      <Header />
       <Background image="background.png" />
 
       <div className="series-list">
@@ -177,7 +165,6 @@ function HomePage() {
               key={s._id}
               className={`series-card ${hasBet ? 'has-bet' : 'no-bet'}`}
             >
-              {/* If not open, show original design */}
               {!isOpen && (
                 <div
                   className="series-header"
@@ -203,10 +190,8 @@ function HomePage() {
                 </div>
               )}
 
-              {/* If open, show place-bet design (pinkish) */}
               {isOpen && (
                 <div className="place-bet-inline">
-                  {/* top bar */}
                   <div className="top-bar">
                     <div className="top-bar-center">
                       <span style={{ opacity: 0.75 }}>סיום הימור בעוד</span>
@@ -218,34 +203,33 @@ function HomePage() {
                     />
                   </div>
 
-                  {/* teams row */}
                   <div className="teams-row">
                     <TeamLogo teamName={s.teamA} className="team-logo" />
                     <span className="teams-dash">-</span>
                     <TeamLogo teamName={s.teamB} className="team-logo" />
                   </div>
 
-                  {/* category pills */}
                   <div className="bet-options">
                     {s.betOptions.map((opt, i) => (
                       <div key={i} className="bet-category">
                         <h5>{opt.category}</h5>
                         <div className="pill-container">
                           {opt.choices.map((c, j) => {
-                            const selected = isChoiceSelected(
-                              s._id,
-                              opt.category,
-                              c.name
-                            );
+                            const selected = isChoiceSelected(s._id, opt.category, c.name);
+                            
+                            // NEW: If category == "מנצחת הסדרה", show odds in parentheses
+                            const displayName = 
+                              opt.category === 'מנצחת הסדרה'
+                                ? `${c.name} (${c.odds})`
+                                : c.name;
+                            
                             return (
                               <div
                                 key={j}
                                 className={`pill ${selected ? 'selected' : ''}`}
-                                onClick={() =>
-                                  handleChoiceSelect(s._id, opt.category, c)
-                                }
+                                onClick={() => handleChoiceSelect(s._id, opt.category, c)}
                               >
-                                {c.name}
+                                {displayName}
                               </div>
                             );
                           })}
@@ -254,7 +238,6 @@ function HomePage() {
                     ))}
                   </div>
 
-                  {/* bottom row: save/cancel */}
                   <div className="modal-actions">
                     <button
                       className="primary-btn"

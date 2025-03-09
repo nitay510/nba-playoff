@@ -80,15 +80,21 @@ exports.getAllBetsOfAnyUser = async (req, res) => {
   try {
     const { username } = req.params;
     const user = await User.findOne({ username });
+
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    // Sort newest to oldest
+    // Fetch user bets and sort from newest to oldest
     const bets = await UserBet.find({ userId: user._id })
       .sort({ _id: -1 })
       .populate('seriesId');
-    return res.json(bets);
+
+    // Return both bets and champions field
+    return res.json({
+      champions: user.champions, // Ensure this field exists in the User model
+      bets,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: 'Server error' });

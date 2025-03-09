@@ -23,7 +23,8 @@ function RegisterPage() {
 
       const data = await response.json();
       if (response.ok) {
-        handleLogin(); // Automatically log in the user after registration
+        // Automatically log in the user after registration
+        handleLogin();
       } else {
         setErrorMsg(data.msg || 'שגיאה בהרשמה');
       }
@@ -44,11 +45,14 @@ function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // Store username (so ChampionSelectionPage can retrieve it)
         localStorage.setItem('username', data.username);
+
         if (data.username === 'nitay510') {
           navigate('/admin');
         } else {
-          navigate('/home');
+          // Instead of /home, go to /choose-champion
+          navigate('/choose-champion');
         }
       } else {
         setErrorMsg(data.msg || 'שגיאה בהתחברות');
