@@ -1,12 +1,11 @@
 .league-leaderboard-page {
-  margin-top: 2rem; /* match home page spacing from top */
-  direction: rtl;
+  margin-top: 2rem; 
   position: relative;
+  margin-bottom: 55px;
 
   .leaderboard-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin: 0 2rem 1rem;
     .arrow-right {
       font-size: 2rem;     
@@ -15,10 +14,13 @@
       // any other styling or positioning you want
     }
     .league-code {
+    position: absolute;
+    font-size: 14px;
+    left: 1rem;
       font-size: 14px;
       font-weight: 400;
       color: #ccc; 
-      margin-right: 11rem;
+    
     }
 
     .league-title {
@@ -26,7 +28,7 @@
       font-weight: 600;
       color: #fff;
       margin-right: 0.5rem;
-      // "שם הטורניר"
+ 
     }
   }
 

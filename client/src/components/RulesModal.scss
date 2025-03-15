@@ -1,0 +1,64 @@
+.rules-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); // רקע שחור שקוף
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; // מעל כל התוכן
+  
+    .rules-modal {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      direction: rtl;
+      text-align: right;
+  
+      .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem; 
+        border: none;
+        background: none;
+        font-size: 1.3rem;
+        cursor: pointer;
+      }
+  
+      h2 {
+        text-align: center;
+        margin: 0 0 1rem 0;
+        font-size: 20px;
+      }
+  
+      h3 {
+        margin-top: 1rem;
+        font-size: 16px;
+        color: #000;
+      }
+  
+      .rules-content {
+        max-height: 60vh; // מאפשר גלילה אם ארוך
+        overflow-y: auto;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+  
+        p {
+          margin: 0.5rem 0;
+        }
+  
+        ul {
+          list-style: disc;
+          margin-right: 1.5rem;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+  

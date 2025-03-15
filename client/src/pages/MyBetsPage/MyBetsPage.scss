@@ -1,213 +1,236 @@
 .my-bets-page {
-    margin-top: 2rem; 
-    h2 {
-      margin-right: 2rem;
-      text-align: right;
-      font-size: 24px;
-      font-weight: 700;
+  margin-top: 2rem; 
+  position: relative;
+
+  h2 {
+    margin-right: 2rem;
+    text-align: right;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .toggle-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 2rem;
+
+    button {
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      background: none;
+      color: #fff;
+      font-weight: 400;
+      opacity: 40%;
+
+      &.active {
+        opacity: 100%;
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
     }
+  }
+
+  .mybet-card {
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+    transition: background-color 0.3s ease-in-out;
+    position: relative;
   
-    /* Toggle buttons container, if you still use .toggle-buttons in your code */
-    .toggle-buttons {
+
+    .mybet-header {
       display: flex;
-      gap: 1rem;
-      margin: 1rem 2rem;
-  
-      button {
-        border: none;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-weight: 500;
-  
-        &.active {
-          background: rgba(255, 255, 255, 0.6);
-          color: #000;
-        }
-      }
-    }
-  
-    /* The container for your bet cards (active or history) */
-    /* You can rename this to .mybet-list or keep it implicit */
-    .mybet-card {
-      height: auto; /* so the expanded card can grow */
-      border-radius: 10px;
-      margin-bottom: 2rem;
-      margin-left: 2rem;
-      margin-right: 2rem;
-      background: rgba(255, 255, 255, 0.20);
-      backdrop-filter: blur(6px);
-      transition: background-color 0.3s ease-in-out;
-      position: relative;
-      padding-bottom: 1rem; /* so we have space if expanded */
-  
-      /* If the user has a bet => .has-bet style; if not => .no-bet */
-      /* If you want to differentiate them in MyBets, you can keep or remove these. */
-      &.has-bet {
-        background: rgba(255, 255, 255, 0.6);
-      }
-      &.no-bet {
-        background: rgba(255, 255, 255, 0.2);
-      }
-  
-      /* Collapsed header (similar to .series-header) */
-      .mybet-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem;
-  
-        .left-logos {
-          display: flex;
-          gap: 20px;
-          order: 1;
-          .big-logo {
-            width: 60px; 
-            height: 60px;
-          }
-        }
-  
-        .right-column {
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+
+      /* We add reversed-header so we can do logos on the right, status on the left */
+      &.reversed-header {
+
+        /* For active bets => two-line approach */
+        .left-column.active-left {
           display: flex;
           flex-direction: column;
-  
+          align-items: flex-start;
+          gap: 2px; 
+
+          .status-title {
+            font-size: 12px;
+            color: #fff;
+            opacity: 0.6;
+          }
           .bet-status {
             font-size: 14px;
             font-weight: 400;
             color: #fff;
           }
         }
-      }
-  
-      /* The expanded pink-ish panel (similar to .place-bet-inline in HomePage) */
-      .mybet-expanded {
-        border-radius: 10px;
-        padding: 2rem;
-        direction: rtl;
-        color: #fff;
-        text-align: center;
-        animation: slideIn 0.5s ease-out forwards;
-        position: relative;
-        margin: 0 1rem 1rem;
-        background: rgba(255, 255, 255, 0.60);
 
-backdrop-filter: blur(12px);
-  
-        @keyframes slideIn {
-          from {
-            transform: translateY(-20px);
-            opacity: 0.4;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-  
-        /* The top bar with close icon, mimicking place-bet style */
-        .top-bar {
+        /* For history bets => single-line approach with points */
+        .left-column.history-left {
           display: flex;
-          justify-content: center;
-          position: relative;
-  
-          .top-bar-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.9rem;
-  
-            .bet-status {
-              font-size: 14px;
-              font-weight: 500;
-              color: #fff;
-            }
-          }
-  
-          .close-icon {
-            position: absolute;
-            top: -1rem;
-            right: -1rem;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: white;
-          }
-        }
-  
-        /* Row with two logos in the middle and a dash */
-        .teams-row {
-          display: flex;
+          flex-direction: row;
           align-items: center;
-          justify-content: center;
-          margin: 1rem 0;
-  
-          .team-logo {
-            width: auto;
-            height: 80px;
+          gap: 0.5rem; 
+
+          .bet-status {
+            font-size: 14px;
+            font-weight: 400;
+            color: #fff;
           }
-  
-          .teams-dash {
-            margin: 0 1rem;
-            font-size: 1.2rem;
-            color: #333;
+          .bet-points {
+            font-size: 20px;
+            font-weight: 400;
           }
         }
-  
-        /* We replicate a pill-based read-only form for showing user picks.
-           If you prefer to call it .bet-details-pill or something, do so. */
-        .bet-details-pill {
-          margin-top: 1rem;
-  
-          .bet-category {
-            margin-bottom: 1rem;
-  
-            h5 {
-              margin-bottom: 0.5rem;
-              font-weight: 600;
-              font-size: 12px;
-              color: rgba(11, 19, 30, 1);
-              text-align: right;
-              
-              .correct-icon {
-                color: green;
-                margin-right: 0.5rem;
-              }
-              .wrong-icon {
-                color: red;
-                margin-right: 0.5rem;
-              }
+
+        .right-logos {
+          display: flex;
+          gap: 20px;
+
+          .big-logo {
+            width: 60px;
+            height: 60px;
+          }
+        }
+      }
+    }
+
+    .mybet-expanded {
+      border-radius: 10px;
+      padding: 2rem;
+      direction: rtl;
+      color: #fff;
+      text-align: center;
+      animation: slideIn 0.5s ease-out forwards;
+      position: relative;
+     
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-20px);
+          opacity: 0.4;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .top-bar {
+        display: flex;
+        justify-content: center;
+        position: relative;
+
+        .top-bar-center {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 0.9rem;
+
+          .bet-status {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+          }
+          .bet-points {
+            margin-left: 0.5rem;
+            font-size: 20px;
+            font-weight: 700;
+          }
+        }
+
+        .close-icon {
+          position: absolute;
+          top: -1rem;
+          right: -1rem;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: white;
+        }
+      }
+
+      .teams-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 0;
+
+        &.reversed-row {
+          flex-direction: row-reverse;
+        }
+
+        .team-logo {
+          width: auto;
+          height: 80px;
+        }
+
+        .teams-dash {
+          margin: 0 1rem;
+          font-size: 1.2rem;
+          color: #333;
+        }
+      }
+
+      .bet-details-pill {
+        margin-top: 1rem;
+
+        .bet-category {
+          margin-bottom: 1rem;
+
+          h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 12px;
+            color: rgba(11, 19, 30, 1);
+            text-align: right;
+
+            .my-check-icon {
+              color: green;
+              font-size: 1.1rem;
+              margin-left: 0.3rem;
             }
-  
-            .pill-container {
-              display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
-              gap: 0.5rem;
-              justify-content: right;
+            .my-x-icon {
+              color: red;
+              font-size: 1.1rem;
+              margin-left: 0.3rem;
             }
-  
-            .pill {
-              background: #fff;
-              color: rgba(11, 19, 30, 1);
-              border-radius: 5px;
-              padding: 0.4rem 0.8rem;
-              cursor: default; /* read-only, no pointer events if you like */
-              text-align: center;
-              font-weight: 400;
-              font-size: 12px;
-              
-              &.actual {
-                border: 2px solid orange; // or some highlight to show the correct final choice
-              }
-              
-              &.selected {
-                background: rgba(11, 19, 30, 1);
-                color: #fff;
-              }
+          }
+
+          .pill-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+            gap: 0.5rem;
+            justify-content: right;
+          }
+
+          .pill {
+            background: #fff;
+            color: rgba(11, 19, 30, 1);
+            border-radius: 5px;
+            padding: 0.4rem 0.6rem;
+            text-align: center;
+            font-weight: 400;
+            font-size: 12px;
+
+            &.actual {
+              border: 2px solid orange;
+            }
+            &.selected {
+              background: rgba(11, 19, 30, 1);
+              color: #fff;
             }
           }
         }
       }
     }
   }
-  
+}

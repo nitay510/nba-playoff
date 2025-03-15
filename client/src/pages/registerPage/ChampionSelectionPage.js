@@ -5,7 +5,7 @@ import Background from '../../components/Login-back';
 import './championSelectionPage.scss';
 
 // Your 20 teams with odds
-// We will sort them ascending by 'odds' so the lowest is top-left
+// We'll sort them ascending by 'odds' so the lowest is top-left
 const TOP_20_TEAMS = [
   { name: 'קליבלנד קאבלירס', odds: 2.5 },
   { name: 'בוסטון סלטיקס', odds: 3.0 },
@@ -34,7 +34,6 @@ export default function ChampionSelectionPage() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [username, setUsername] = useState('');
 
-  // On mount, read username from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('username');
     if (!storedUser) {
@@ -45,7 +44,7 @@ export default function ChampionSelectionPage() {
     }
   }, [navigate]);
 
-  // Sort teams by ascending odds (lowest => top row)
+  // sort teams by ascending odds
   const sortedTeams = [...TOP_20_TEAMS].sort((a, b) => a.odds - b.odds);
 
   const handleSelectTeam = (teamName) => {
@@ -88,29 +87,30 @@ export default function ChampionSelectionPage() {
 
       <h1 className="page-title">מי תהיה האלופה ?</h1>
 
-      <div className="teams-grid">
-        {sortedTeams.map((team) => {
-          const isSelected = team.name === selectedTeam;
-          return (
-            <div
-              key={team.name}
-              className={`team-cell ${isSelected ? 'selected' : ''}`}
-              onClick={() => handleSelectTeam(team.name)}
-            >
-              <TeamLogo teamName={team.name} className="logo-img" />
-              <div className="team-odds-box">
-                <span className="team-odds">
-                  יחס: {team.odds}
-                </span>
+      {/* Main card containing both the teams grid and the centered button */}
+      <div className="main-card">
+        {/* Scrollable grid of teams */}
+        <div className="teams-grid">
+          {sortedTeams.map((team) => {
+            const isSelected = team.name === selectedTeam;
+            return (
+              <div
+                key={team.name}
+                className={`team-cell ${isSelected ? 'selected' : ''}`}
+                onClick={() => handleSelectTeam(team.name)}
+              >
+                <TeamLogo teamName={team.name} className="logo-img" />
+                <div className="team-odds-box">
+                  <span className="team-odds">יחס: {team.odds}</span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <button className="submit-btn" onClick={handleSubmitChampion}>
+          אישור
+        </button>
       </div>
-
-      <button className="submit-btn" onClick={handleSubmitChampion}>
-        אישור
-      </button>
     </div>
   );
 }

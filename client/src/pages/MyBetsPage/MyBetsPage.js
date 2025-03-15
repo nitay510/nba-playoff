@@ -9,8 +9,8 @@ import Header from '../../components/Header';
 function MyBetsPage() {
   const [userBets, setUserBets] = useState([]);
   const [error, setError] = useState('');
-  const [expanded, setExpanded] = useState({}); // track expanded panels
-  const [activePage, setActivePage] = useState('active'); // 'active' or 'history'
+  const [expanded, setExpanded] = useState({});
+  const [activePage, setActivePage] = useState('active');
 
   useEffect(() => {
     fetchAllUserBets();
@@ -33,7 +33,6 @@ function MyBetsPage() {
     }
   };
 
-  // Separate active and finished bets
   const activeBets = userBets.filter(
     (ub) => ub.seriesId && !ub.seriesId.isFinished && ub.seriesId.isLocked
   );
@@ -45,12 +44,11 @@ function MyBetsPage() {
     setExpanded((prev) => ({ ...prev, [betId]: !prev[betId] }));
   };
 
-  // Check if user SELECTED a given choice
+  // Return true if user SELECTED this choice
   const isChoiceSelected = (ub, category, choiceName) => {
     const catBet = ub.bets.find((b) => b.category === category);
     if (!catBet) return false;
 
-    // If "בכמה משחקים", compare numeric parts
     if (category === 'בכמה משחקים') {
       const extractNumbers = (str) => str.match(/\d+/g)?.join('') || '';
       return extractNumbers(catBet.choiceName) === extractNumbers(choiceName);
@@ -58,7 +56,7 @@ function MyBetsPage() {
     return catBet.choiceName === choiceName;
   };
 
-  // Check if a given choiceName is the ACTUAL finalChoice
+  // Return true if this choice is the ACTUAL final choice
   const isChoiceActual = (series, category, choiceName) => {
     const catSeries = series.betOptions.find((o) => o.category === category);
     if (!catSeries || !catSeries.finalChoice) return false;
@@ -70,24 +68,23 @@ function MyBetsPage() {
     return catSeries.finalChoice === choiceName;
   };
 
-  // For debug + correctness: user vs finalChoice
+  // Return true if user guessed category correctly
   const isCategoryCorrect = (ub, category) => {
     const catBet = ub.bets.find((b) => b.category === category);
     const catSeries = ub.seriesId?.betOptions?.find((o) => o.category === category);
     if (!catBet || !catSeries) return false;
 
-    console.log('Category:', category);
-    console.log('Series finalChoice:', catSeries.finalChoice);
-    console.log('User choice:', catBet.choiceName);
-
     return catSeries.finalChoice && catSeries.finalChoice === catBet.choiceName;
   };
+
+  // Format series points with a plus sign if > 0
+  const formatPoints = (points) => (points > 0 ? `${points}+` : `${points}`);
 
   return (
     <div className="my-bets-page">
       <Background image="background2.png" />
-      <Header/>
-
+      <Header />
+      <div className= "page-con">
       <h2>ההימורים שלי</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -126,13 +123,19 @@ function MyBetsPage() {
                 >
                   {/* Collapsed */}
                   {!isExpanded && (
-                    <div className="mybet-header">
-                      <div className="left-logos">
+                    <div className="mybet-header reversed-header">
+                      {/* left side => two lines: 
+                           1) "סטאטוס הימור"
+                           2) "הימור פעיל" */}
+                      <div className="left-column active-left">
+                        <span className="status-title">סטאטוס הימור</span>
+                        <span className="bet-status">הימור פעיל</span>
+                      </div>
+
+                      {/* right side => two team logos */}
+                      <div className="right-logos">
                         <TeamLogo teamName={series.teamA} className="big-logo" />
                         <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                      <div className="right-column">
-                        <span className="bet-status">הימור פעיל</span>
                       </div>
                     </div>
                   )}
@@ -153,10 +156,10 @@ function MyBetsPage() {
                         />
                       </div>
 
-                      <div className="teams-row">
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                        <span className="teams-dash">-</span>
+                      <div className="teams-row reversed-row">
                         <TeamLogo teamName={series.teamB} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
                       </div>
 
                       <div className="bet-details-pill">
@@ -198,11 +201,9 @@ function MyBetsPage() {
               const series = ub.seriesId;
               const betId = ub._id;
               const isExpanded = !!expanded[betId];
-              // total points from this series
               const pointsFromSeries = calculateSeriesPoints(ub, series);
-
-              // For the color styling (green if > 0, red if 0 or negative)
-              const pointsColor = pointsFromSeries > 0 ? 'green' : 'red';
+              const pointsString = formatPoints(pointsFromSeries);
+              const pointsColor = pointsFromSeries > 0 ? 'rgba(100, 206, 112, 1)' : 'rgba(238, 63, 63, 1)';
 
               return (
                 <div
@@ -212,17 +213,19 @@ function MyBetsPage() {
                 >
                   {/* Collapsed */}
                   {!isExpanded && (
-                    <div className="mybet-header">
-                      <div className="left-logos">
+                    <div className="mybet-header reversed-header">
+                      {/* left side => "סטאטוס הימור" and points side-by-side */}
+                      <div className="left-column history-left">
+                        <span className="bet-status">סטאטוס הימור</span>
+                        <span className="bet-points" style={{ color: pointsColor }}>
+                          {pointsString}
+                        </span>
+                      </div>
+
+                      {/* right side => two team logos */}
+                      <div className="right-logos">
                         <TeamLogo teamName={series.teamA} className="big-logo" />
                         <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                      <div className="right-column">
-                        <span className="bet-status">הימור הסתיים</span>
-                        {/* Show points from series in the collapsed too, colored */}
-                        <span style={{ color: pointsColor }}>
-                          {pointsFromSeries}
-                        </span>
                       </div>
                     </div>
                   )}
@@ -233,9 +236,11 @@ function MyBetsPage() {
                       <div className="top-bar">
                         <div className="top-bar-center">
                           <span className="bet-status">הימור הסתיים</span>
-                          {/* show points from series in top bar */}
-                          <span style={{ color: pointsColor, marginLeft: '0.5rem' }}>
-                            {pointsFromSeries}
+                          <span
+                            className="bet-points"
+                            style={{ color: pointsColor, marginLeft: '0.5rem' }}
+                          >
+                            {pointsString}
                           </span>
                         </div>
                         <FaTimes
@@ -247,10 +252,10 @@ function MyBetsPage() {
                         />
                       </div>
 
-                      <div className="teams-row">
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                        <span className="teams-dash">-</span>
+                      <div className="teams-row reversed-row">
                         <TeamLogo teamName={series.teamB} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
                       </div>
 
                       <div className="bet-details-pill">
@@ -260,14 +265,13 @@ function MyBetsPage() {
                           return (
                             <div key={i} className="bet-category">
                               <h5>
-                                {cat.category}{' '}
                                 {userCorrect ? (
-                                  <span className="correct-icon">✔</span>
+                                  <span className="my-check-icon">&#10003;</span>
                                 ) : (
-                                  <span className="wrong-icon">✘</span>
-                                )}
+                                  <span className="my-x-icon">&#10007;</span>
+                                )}{' '}
+                                {cat.category}
                               </h5>
-
                               <div className="pill-container">
                                 {cat.choices.map((c, j) => {
                                   const isUserPick = isChoiceSelected(ub, cat.category, c.name);
@@ -295,6 +299,7 @@ function MyBetsPage() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

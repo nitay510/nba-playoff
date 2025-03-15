@@ -40,9 +40,9 @@ function LeaderboardPage() {
 
   return (
     <div className="league-leaderboard-page container">
-      <Header/>
       <Background image="background3.png" />
-
+      <Header/>
+      <div className= "page-con">
       <div className="leaderboard-header">
       <span className="arrow-right" onClick={() => navigate('/leagues')}>
           &lt;
@@ -72,6 +72,7 @@ function LeaderboardPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

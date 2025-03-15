@@ -146,9 +146,10 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      
       <Header />
       <Background image="background.png" />
-
+      <div className= "page-con">
       <div className="series-list">
         <h2 className="bets">דף הבית</h2>
         {seriesList.length === 0 && <p>אין סדרות פתוחות כרגע.</p>}
@@ -257,6 +258,7 @@ function HomePage() {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

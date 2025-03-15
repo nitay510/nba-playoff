@@ -11,7 +11,13 @@ body {
   direction: rtl; /* ensure overall layout is right-to-left */
 }
 
-
+.page-con{
+  min-height: 100vh; 
+  /* Enough bottom space so the user can scroll
+     and won't go behind the nav (which is fixed). */
+  padding-bottom: 80px; /* match or exceed nav height */
+  box-sizing: border-box;
+}
 /* Buttons styling */
 button {
   cursor: pointer;

@@ -1,26 +1,39 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Header.scss'; // optional separate SCSS if you want
+import React, { useState } from 'react';
+import './Header.scss';
+import RulesModal from './RulesModal'; 
 
 function Header() {
-  const navigate = useNavigate();
+  const [showRules, setShowRules] = useState(false);
+
+  const handleOpenRules = () => {
+    setShowRules(true);
+  };
+
+  const handleCloseRules = () => {
+    setShowRules(false);
+  };
 
   return (
     <div className="app-header">
-              {/* Right side: question mark icon => navigate('/rules') */}
+      {/* אייקון סימן שאלה (למעשה, תמונה) מימין */}
       <img
-      src='/Question.png'
+        src="/Question.png"
+        alt="שאלות"
         className="header-question"
-        onClick={() => navigate('/rules')}
+        onClick={handleOpenRules}
       />
-     
-      {/* Left side: the logo from public folder */}
+
+      {/* לוגו משמאל */}
       <img
         src="/logo1.png"
         alt="App Logo"
         className="header-logo"
       />
 
+      {/* אם המשתמש לחץ => מציגים את RulesModal */}
+      {showRules && (
+        <RulesModal onClose={handleCloseRules} />
+      )}
     </div>
   );
 }

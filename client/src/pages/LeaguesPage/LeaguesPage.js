@@ -91,8 +91,10 @@ function LeaguesPage() {
 
   return (
     <div className="leagues-page container">
+      
       <Background image="background3.png" />
       <Header/>
+      <div className= "page-con">
       <h2>הליגות שלי</h2>
 
       <div className="league-list">
@@ -173,6 +175,7 @@ function LeaguesPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 .champion-selection-page {
-  position: relative; 
+  position: relative;
   margin-top: 12.5rem;
   text-align: center;
   direction: rtl;
@@ -11,16 +11,23 @@
     color: #fff;
   }
 
-  /* The grid container for the teams */
-  .teams-grid {
+  /* A card that includes the scrollable grid & the button */
+  .main-card {
     width: 80%;
     max-width: 500px;
-    margin: 2rem auto;
-    padding: 1rem;
+    margin: 2rem auto; /* center horizontally */
     background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(24px);
     border-radius: 12px;
-    /* A 3-column grid that can scroll if many items */
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  /* The grid container for the teams */
+  .teams-grid {
+    /* let it expand, but remain scrollable if necessary */
+    flex: 1; /* fill available space if you want a bigger scroll area */
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 1rem;
@@ -35,8 +42,7 @@
     padding: 0.5rem;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
-    display: flex
-;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -72,12 +78,13 @@
   }
 
   .submit-btn {
-    border: 1px solid rgba(255, 255, 255, 1);
+    align-self: center;
+    border: 1px solid rgb(255, 255, 255);
     color: #fff;
-    border: none;
-    border-radius: 10px;
+    border-radius: 4px;
     font-size: 18px;
-    padding: 0.8rem 2rem;
+    padding: 9px 120px;
+    background: none;
     cursor: pointer;
     transition: background-color 0.3s;
     margin-top: 1rem;

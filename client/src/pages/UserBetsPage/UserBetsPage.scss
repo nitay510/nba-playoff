@@ -1,35 +1,32 @@
 .user-bets-page {
   margin-top: 2rem;
   position: relative;
-
+  margin-bottom: 55px;
   .user-bets-header {
     display: flex;
     align-items: center;
-    justify-content: center; /* or space-between if you prefer */
     position: relative;
+    color: #fff;
+    margin-bottom: 1rem;
 
     .arrow-left {
-      position: absolute;
-      left: 1rem;
-      font-size: 2rem;
+      font-size: 3rem;
       color: #fff;
       cursor: pointer;
-      top: 0.2rem; /* adjust as needed */
+      margin-right: 1.5rem;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-right: 0.5rem;
     }
   }
 
-  h2 {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
   .champion-pick {
-    text-align: center;
+    margin-right: 2rem;
     color: #fff;
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
     font-size: 14px;
   }
 
@@ -39,23 +36,24 @@
     margin: 1rem 2rem;
 
     button {
+      font-size: 16px;
       border: none;
-      padding: 0.5rem 1rem;
       cursor: pointer;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.2);
+      background: none;
       color: #fff;
-      font-weight: 500;
+      font-weight: 400;
+      opacity: 40%;
 
       &.active {
-        background: rgba(255, 255, 255, 0.6);
-        color: #000;
+        opacity: 100%;
+        text-decoration: underline;
+        text-underline-offset: 5px;
       }
     }
   }
 
   .userbet-card {
-    height: auto;
     border-radius: 10px;
     margin-bottom: 2rem;
     margin-left: 2rem;
@@ -64,7 +62,6 @@
     backdrop-filter: blur(6px);
     transition: background-color 0.3s ease-in-out;
     position: relative;
-    padding-bottom: 1rem;
 
     .userbet-header {
       display: flex;
@@ -72,31 +69,50 @@
       justify-content: space-between;
       padding: 1rem;
 
-      .left-logos {
-        display: flex;
-        gap: 20px;
+      &.reversed-header {
+        /* left col for status + points; right col for logos */
+        .left-column.active-left {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
 
-        .big-logo {
-          width: 60px;
-          height: 60px;
-        }
-      }
-
-      .right-column {
-        display: flex;
-        flex-direction: row; /* so we can show status + points side by side */
-        align-items: center;
-        gap: 0.5rem;
-
-        .bet-status {
-          font-size: 14px;
-          font-weight: 400;
-          color: #fff;
+          .status-title {
+            font-size: 12px;
+            color: #fff;
+            opacity: 0.6;
+          }
+          .bet-status {
+            font-size: 14px;
+            font-weight: 400;
+            color: #fff;
+          }
         }
 
-        .bet-points {
-          font-size: 14px;
-          font-weight: 700; /* highlight points */
+        .left-column.history-left {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem; 
+
+          .bet-status {
+            font-size: 14px;
+            font-weight: 400;
+            color: #fff;
+          }
+          .bet-points {
+            font-size: 20px;
+            font-weight: 400;
+          }
+        }
+
+        .right-logos {
+          display: flex;
+          gap: 20px;
+
+          .big-logo {
+            width: 60px;
+            height: 60px;
+          }
         }
       }
     }
@@ -109,7 +125,6 @@
       text-align: center;
       animation: slideIn 0.5s ease-out forwards;
       position: relative;
-      margin: 0 1rem 1rem;
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(12px);
 
@@ -131,7 +146,7 @@
 
         .top-bar-center {
           display: flex;
-          flex-direction: row; /* to show status + points side by side */
+          flex-direction: column;
           align-items: center;
           font-size: 0.9rem;
 
@@ -140,10 +155,9 @@
             font-weight: 500;
             color: #fff;
           }
-
           .bet-points {
-            margin-right: 0.5rem;
-            font-size: 14px;
+            margin-left: 0.5rem;
+            font-size: 20px;
             font-weight: 700;
           }
         }
@@ -163,6 +177,10 @@
         align-items: center;
         justify-content: center;
         margin: 1rem 0;
+
+        &.reversed-row {
+          flex-direction: row-reverse;
+        }
 
         .team-logo {
           width: auto;
@@ -192,7 +210,7 @@
             .my-check-icon {
               color: green;
               font-size: 1.1rem;
-              margin-left: 0.3rem; /* move icon to left side if desired */
+              margin-left: 0.3rem;
             }
             .my-x-icon {
               color: red;
@@ -227,6 +245,17 @@
           }
         }
       }
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0.4;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
     }
   }
 }

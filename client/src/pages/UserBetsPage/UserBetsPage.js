@@ -12,10 +12,10 @@ function UserBetsPage() {
   const navigate = useNavigate();
 
   const [bets, setBets] = useState([]);
-  const [champion, setChampion] = useState(''); // store user's champion
+  const [champion, setChampion] = useState('');
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
-  const [activePage, setActivePage] = useState('active'); // or 'history'
+  const [activePage, setActivePage] = useState('active'); // 'active' or 'history'
 
   useEffect(() => {
     fetchUserBets();
@@ -31,7 +31,7 @@ function UserBetsPage() {
         throw new Error(data.msg || 'Failed to fetch user bets');
       }
       const data = await res.json();
-      // We assume data = { champions, bets }
+      // data => { champions, bets }
       setChampion(data.champions || '');
       setBets(Array.isArray(data.bets) ? data.bets : []);
     } catch (err) {
@@ -83,26 +83,21 @@ function UserBetsPage() {
   };
 
   // format series points with plus sign if > 0
-  const formatPoints = (points) => {
-    if (points > 0) return `+${points}`;
-    return `${points}`;
-  };
+  const formatPoints = (points) => (points > 0 ? `${points}+` : `${points}`);
 
   return (
     <div className="user-bets-page">
+      <div className= "page-con">
       <Background image="background2.png" />
       <Header />
 
       <div className="user-bets-header">
-        {/* arrow left => navigate(-1) */}
         <span className="arrow-left" onClick={() => navigate(-1)}>
-          &#8249; 
+          &#8249;
         </span>
-        {/* Title with username */}
         <h2>ההימורים של {username}</h2>
       </div>
 
-      {/* Show champion pick below the username */}
       {champion && (
         <p className="champion-pick">
           הימור אלופה: <strong>{champion}</strong>
@@ -143,16 +138,18 @@ function UserBetsPage() {
                   className="userbet-card"
                   onClick={() => toggleExpand(betId)}
                 >
-                  {/* Collapsed */}
+                  {/* Collapsed => reversed layout, two-line left column */}
                   {!isExpanded && (
-                    <div className="userbet-header">
-                      <div className="left-logos">
+                    <div className="userbet-header reversed-header">
+                      {/* left side => "סטאטוס הימור" + "הימור פעיל" */}
+                      <div className="left-column active-left">
+                        <span className="status-title">סטאטוס הימור</span>
+                        <span className="bet-status">הימור פעיל</span>
+                      </div>
+                      {/* right side => logos */}
+                      <div className="right-logos">
                         <TeamLogo teamName={series.teamA} className="big-logo" />
                         <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                      <div className="right-column">
-                        {/* Status + no points for active */}
-                        <span className="bet-status">הימור פעיל</span>
                       </div>
                     </div>
                   )}
@@ -173,10 +170,10 @@ function UserBetsPage() {
                         />
                       </div>
 
-                      <div className="teams-row">
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                        <span className="teams-dash">-</span>
+                      <div className="teams-row reversed-row">
                         <TeamLogo teamName={series.teamB} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
                       </div>
 
                       <div className="bet-details-pill">
@@ -219,10 +216,9 @@ function UserBetsPage() {
               const betId = ub._id;
               const isExpanded = !!expanded[betId];
 
-              // total points from this series
               const pointsFromSeries = calculateSeriesPoints(ub, series);
-              // with plus sign if > 0
               const pointsString = formatPoints(pointsFromSeries);
+              const pointsColor = pointsFromSeries > 0 ? 'rgba(100, 206, 112, 1)' : 'rgba(238, 63, 63, 1)';
 
               return (
                 <div
@@ -230,19 +226,18 @@ function UserBetsPage() {
                   className="userbet-card"
                   onClick={() => toggleExpand(betId)}
                 >
-                  {/* Collapsed */}
+                  {/* Collapsed => "סטאטוס הימור" + points side-by-side, logos on the right */}
                   {!isExpanded && (
-                    <div className="userbet-header">
-                      <div className="left-logos">
-                        <TeamLogo teamName={series.teamA} className="big-logo" />
-                        <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                      <div className="right-column">
-                        {/* status + points next to each other */}
-                        <span className="bet-status">הימור הסתיים</span>
-                        <span className="bet-points" style={{ color: pointsFromSeries > 0 ? 'green' : 'red' }}>
+                    <div className="userbet-header reversed-header">
+                      <div className="left-column history-left">
+                        <span className="bet-status">סטאטוס הימור</span>
+                        <span className="bet-points" style={{ color: pointsColor }}>
                           {pointsString}
                         </span>
+                      </div>
+                      <div className="right-logos">
+                        <TeamLogo teamName={series.teamA} className="big-logo" />
+                        <TeamLogo teamName={series.teamB} className="big-logo" />
                       </div>
                     </div>
                   )}
@@ -253,10 +248,7 @@ function UserBetsPage() {
                       <div className="top-bar">
                         <div className="top-bar-center">
                           <span className="bet-status">הימור הסתיים</span>
-                          <span
-                            className="bet-points"
-                            style={{ color: pointsFromSeries > 0 ? 'green' : 'red', marginLeft: '0.5rem' }}
-                          >
+                          <span className="bet-points" style={{ color: pointsColor, marginLeft: '0.5rem' }}>
                             {pointsString}
                           </span>
                         </div>
@@ -269,19 +261,17 @@ function UserBetsPage() {
                         />
                       </div>
 
-                      <div className="teams-row">
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                        <span className="teams-dash">-</span>
+                      <div className="teams-row reversed-row">
                         <TeamLogo teamName={series.teamB} className="team-logo" />
+                        <span className="teams-dash">-</span>
+                        <TeamLogo teamName={series.teamA} className="team-logo" />
                       </div>
 
                       <div className="bet-details-pill">
                         {series.betOptions.map((cat, i) => {
                           const userCorrect = isCategoryCorrect(ub, cat.category);
-
                           return (
                             <div key={i} className="bet-category">
-                              {/* move icons to left side => we do them before the category name */}
                               <h5>
                                 {userCorrect ? (
                                   <span className="my-check-icon">&#10003;</span>
@@ -290,7 +280,6 @@ function UserBetsPage() {
                                 )}{' '}
                                 {cat.category}
                               </h5>
-
                               <div className="pill-container">
                                 {cat.choices.map((c, j) => {
                                   const isUserPick = isChoiceSelected(ub, cat.category, c.name);
@@ -299,7 +288,6 @@ function UserBetsPage() {
                                   let pillClass = 'pill';
                                   if (isActualPick) pillClass += ' actual';
                                   if (isUserPick) pillClass += ' selected';
-
                                   return (
                                     <div key={j} className={pillClass}>
                                       {c.name}
@@ -319,6 +307,7 @@ function UserBetsPage() {
           )}
         </>
       )}
+    </div>
     </div>
   );
 }
