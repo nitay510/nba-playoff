@@ -33,6 +33,7 @@ function MyBetsPage() {
     }
   };
 
+  // Separate active and finished
   const activeBets = userBets.filter(
     (ub) => ub.seriesId && !ub.seriesId.isFinished && ub.seriesId.isLocked
   );
@@ -84,221 +85,228 @@ function MyBetsPage() {
     <div className="my-bets-page">
       <Background image="background2.png" />
       <Header />
-      <div className= "page-con">
-      <h2>ההימורים שלי</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Toggle Buttons */}
-      <div className="toggle-buttons">
-        <button
-          onClick={() => setActivePage('active')}
-          className={activePage === 'active' ? 'active' : ''}
-        >
-          פעילים
-        </button>
-        <button
-          onClick={() => setActivePage('history')}
-          className={activePage === 'history' ? 'active' : ''}
-        >
-          היסטוריה
-        </button>
-      </div>
+      <div className="page-con">
+        <h2>ההימורים שלי</h2>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Active Bets */}
-      {activePage === 'active' && (
-        <>
-          {activeBets.length === 0 ? (
-            <p>אין הימורים פעילים.</p>
-          ) : (
-            activeBets.map((ub) => {
-              const series = ub.seriesId;
-              const betId = ub._id;
-              const isExpanded = !!expanded[betId];
+        <div className="toggle-buttons">
+          <button
+            onClick={() => setActivePage('active')}
+            className={activePage === 'active' ? 'active' : ''}
+          >
+            פעילים
+          </button>
+          <button
+            onClick={() => setActivePage('history')}
+            className={activePage === 'history' ? 'active' : ''}
+          >
+            היסטוריה
+          </button>
+        </div>
 
-              return (
-                <div
-                  key={betId}
-                  className="mybet-card"
-                  onClick={() => toggleExpand(betId)}
-                >
-                  {/* Collapsed */}
-                  {!isExpanded && (
-                    <div className="mybet-header reversed-header">
-                      {/* left side => two lines: 
-                           1) "סטאטוס הימור"
-                           2) "הימור פעיל" */}
-                      <div className="left-column active-left">
-                        <span className="status-title">סטאטוס הימור</span>
-                        <span className="bet-status">הימור פעיל</span>
-                      </div>
+        {/* Active Bets */}
+        {activePage === 'active' && (
+          <>
+            {activeBets.length === 0 ? (
+              <p style={{ marginRight: '2rem' }}>אין הימורים פעילים.</p>
+            ) : (
+              activeBets.map((ub) => {
+                const series = ub.seriesId;
+                const betId = ub._id;
+                const isExpanded = !!expanded[betId];
 
-                      {/* right side => two team logos */}
-                      <div className="right-logos">
-                        <TeamLogo teamName={series.teamA} className="big-logo" />
-                        <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Expanded */}
-                  {isExpanded && (
-                    <div className="mybet-expanded">
-                      <div className="top-bar">
-                        <div className="top-bar-center">
+                return (
+                  <div
+                    key={betId}
+                    className="mybet-card"
+                    onClick={() => toggleExpand(betId)}
+                  >
+                    {/* Collapsed */}
+                    {!isExpanded && (
+                      <div className="mybet-header reversed-header">
+                        {/* left side => two lines: 
+                             1) "סטאטוס הימור"
+                             2) "הימור פעיל" */}
+                        <div className="left-column active-left">
+                          <span className="status-title">סטאטוס הימור</span>
                           <span className="bet-status">הימור פעיל</span>
                         </div>
-                        <FaTimes
-                          className="close-icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand(betId);
-                          }}
-                        />
-                      </div>
 
-                      <div className="teams-row reversed-row">
-                        <TeamLogo teamName={series.teamB} className="team-logo" />
-                        <span className="teams-dash">-</span>
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                      </div>
-
-                      <div className="bet-details-pill">
-                        {series.betOptions.map((cat, i) => (
-                          <div key={i} className="bet-category">
-                            <h5>{cat.category}</h5>
-                            <div className="pill-container">
-                              {cat.choices.map((c, j) => {
-                                const selected = isChoiceSelected(ub, cat.category, c.name);
-                                return (
-                                  <div
-                                    key={j}
-                                    className={`pill ${selected ? 'selected' : ''}`}
-                                  >
-                                    {c.name}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </>
-      )}
-
-      {/* History Bets */}
-      {activePage === 'history' && (
-        <>
-          {finishedBets.length === 0 ? (
-            <p>אין הימורים היסטוריים.</p>
-          ) : (
-            finishedBets.map((ub) => {
-              const series = ub.seriesId;
-              const betId = ub._id;
-              const isExpanded = !!expanded[betId];
-              const pointsFromSeries = calculateSeriesPoints(ub, series);
-              const pointsString = formatPoints(pointsFromSeries);
-              const pointsColor = pointsFromSeries > 0 ? 'rgba(100, 206, 112, 1)' : 'rgba(238, 63, 63, 1)';
-
-              return (
-                <div
-                  key={betId}
-                  className="mybet-card"
-                  onClick={() => toggleExpand(betId)}
-                >
-                  {/* Collapsed */}
-                  {!isExpanded && (
-                    <div className="mybet-header reversed-header">
-                      {/* left side => "סטאטוס הימור" and points side-by-side */}
-                      <div className="left-column history-left">
-                        <span className="bet-status">סטאטוס הימור</span>
-                        <span className="bet-points" style={{ color: pointsColor }}>
-                          {pointsString}
-                        </span>
-                      </div>
-
-                      {/* right side => two team logos */}
-                      <div className="right-logos">
-                        <TeamLogo teamName={series.teamA} className="big-logo" />
-                        <TeamLogo teamName={series.teamB} className="big-logo" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Expanded => final results */}
-                  {isExpanded && (
-                    <div className="mybet-expanded">
-                      <div className="top-bar">
-                        <div className="top-bar-center">
-                          <span className="bet-status">הימור הסתיים</span>
-                          <span
-                            className="bet-points"
-                            style={{ color: pointsColor, marginLeft: '0.5rem' }}
-                          >
-                            {pointsString}
-                          </span>
+                        {/* right side => two team logos */}
+                        <div className="right-logos">
+                          <TeamLogo teamName={series.teamA} className="big-logo" />
+                          <TeamLogo teamName={series.teamB} className="big-logo" />
                         </div>
-                        <FaTimes
-                          className="close-icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand(betId);
-                          }}
-                        />
                       </div>
+                    )}
 
-                      <div className="teams-row reversed-row">
-                        <TeamLogo teamName={series.teamB} className="team-logo" />
-                        <span className="teams-dash">-</span>
-                        <TeamLogo teamName={series.teamA} className="team-logo" />
-                      </div>
+                    {/* Expanded */}
+                    {isExpanded && (
+                      <div className="mybet-expanded">
+                        <div className="top-bar">
+                          <div className="top-bar-center">
+                            <span className="bet-status">הימור פעיל</span>
+                          </div>
+                          <FaTimes
+                            className="close-icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExpand(betId);
+                            }}
+                          />
+                        </div>
 
-                      <div className="bet-details-pill">
-                        {series.betOptions.map((cat, i) => {
-                          const userCorrect = isCategoryCorrect(ub, cat.category);
+                        <div className="teams-row reversed-row">
+                          <TeamLogo teamName={series.teamB} className="team-logo" />
+                          <span className="teams-dash">-</span>
+                          <TeamLogo teamName={series.teamA} className="team-logo" />
+                        </div>
 
-                          return (
+                        <div className="bet-details-pill">
+                          {series.betOptions.map((cat, i) => (
                             <div key={i} className="bet-category">
-                              <h5>
-                                {userCorrect ? (
-                                  <span className="my-check-icon">&#10003;</span>
-                                ) : (
-                                  <span className="my-x-icon">&#10007;</span>
-                                )}{' '}
-                                {cat.category}
-                              </h5>
+                              <h5>{cat.category}</h5>
                               <div className="pill-container">
                                 {cat.choices.map((c, j) => {
-                                  const isUserPick = isChoiceSelected(ub, cat.category, c.name);
-                                  const isActualPick = isChoiceActual(series, cat.category, c.name);
-
-                                  let pillClass = 'pill';
-                                  if (isActualPick) pillClass += ' actual';
-                                  if (isUserPick) pillClass += ' selected';
+                                  const selected = isChoiceSelected(ub, cat.category, c.name);
                                   return (
-                                    <div key={j} className={pillClass}>
+                                    <div
+                                      key={j}
+                                      className={`pill ${selected ? 'selected' : ''}`}
+                                    >
                                       {c.name}
                                     </div>
                                   );
                                 })}
                               </div>
                             </div>
-                          );
-                        })}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </>
-      )}
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </>
+        )}
+
+        {/* History Bets */}
+        {activePage === 'history' && (
+          <>
+            {finishedBets.length === 0 ? (
+              <p style={{ marginRight: '2rem' }}>אין הימורים היסטוריים.</p>
+            ) : (
+              finishedBets.map((ub) => {
+                const series = ub.seriesId;
+                const betId = ub._id;
+                const isExpanded = !!expanded[betId];
+
+                // get points + color
+                const pointsFromSeries = calculateSeriesPoints(ub, series);
+                const pointsString = formatPoints(pointsFromSeries);
+                const pointsColor = pointsFromSeries > 0 ? 'rgba(100, 206, 112, 1)' : 'rgba(238, 63, 63, 1)';
+
+                // 1) Set border color based on points (green/red):
+                const borderStyle = { border: `2px solid ${pointsColor}` };
+
+                return (
+                  <div
+                    key={betId}
+                    className="mybet-card"
+                    onClick={() => toggleExpand(betId)}
+                    style={borderStyle} // apply the border color here
+                  >
+                    {/* Collapsed */}
+                    {!isExpanded && (
+                      <div className="mybet-header reversed-header">
+                        {/* left side => "סטאטוס הימור" and points side-by-side */}
+                        <div className="left-column history-left">
+                          <span className="bet-status">סטאטוס הימור</span>
+                          <span className="bet-points" style={{ color: pointsColor }}>
+                            {pointsString}
+                          </span>
+                        </div>
+
+                        {/* right side => two team logos */}
+                        <div className="right-logos">
+                          <TeamLogo teamName={series.teamA} className="big-logo" />
+                          <TeamLogo teamName={series.teamB} className="big-logo" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Expanded => final results */}
+                    {isExpanded && (
+                      <div className="mybet-expanded">
+                        <div className="top-bar">
+                          <div className="top-bar-center">
+                            <span className="bet-status">הימור הסתיים</span>
+                            <span
+                              className="bet-points"
+                              style={{ color: pointsColor, marginLeft: '0.5rem' }}
+                            >
+                              {pointsString}
+                            </span>
+                          </div>
+                          <FaTimes
+                            className="close-icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExpand(betId);
+                            }}
+                          />
+                        </div>
+
+                        <div className="teams-row reversed-row">
+                          <TeamLogo teamName={series.teamB} className="team-logo" />
+                          <span className="teams-dash">-</span>
+                          <TeamLogo teamName={series.teamA} className="team-logo" />
+                        </div>
+
+                        <div className="bet-details-pill">
+                          {series.betOptions.map((cat, i) => {
+                            const userCorrect = isCategoryCorrect(ub, cat.category);
+
+                            return (
+                              <div key={i} className="bet-category">
+                                <h5>
+                                  {/* 2) update the V / X to better icons or style */}
+                                  {userCorrect ? (
+                                    <span className="my-check-icon">✓</span> // changed from &#10003;
+                                  ) : (
+                                    <span className="my-x-icon">✗</span> // changed from &#10007;
+                                  )}{' '}
+                                  {cat.category}
+                                </h5>
+                                <div className="pill-container">
+                                  {cat.choices.map((c, j) => {
+                                    const isUserPick = isChoiceSelected(ub, cat.category, c.name);
+                                    const isActualPick = isChoiceActual(series, cat.category, c.name);
+
+                                    let pillClass = 'pill';
+                                    if (isActualPick) pillClass += ' actual';
+                                    if (isUserPick) pillClass += ' selected';
+                                    return (
+                                      <div key={j} className={pillClass}>
+                                        {c.name}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </>
+        )}
       </div>
     </div>
   );

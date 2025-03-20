@@ -21,7 +21,7 @@ function NavBar() {
           <NavLink to="/my-bets" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <div className="nav-icon-wrapper">
               <TbHistory className="nav-icon" />
-              <span className="nav-text">הימורים שלי</span>
+              <span className="nav-text">הימורים</span>
             </div>
           </NavLink>
         </li>

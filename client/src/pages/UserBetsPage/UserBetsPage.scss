@@ -13,7 +13,8 @@
       font-size: 3rem;
       color: #fff;
       cursor: pointer;
-      margin-right: 1.5rem;
+      margin-right: 2rem;
+      margin-bottom: 1rem;
     }
 
     h2 {
@@ -55,7 +56,7 @@
 
   .userbet-card {
     border-radius: 10px;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     margin-left: 2rem;
     margin-right: 2rem;
     background: rgba(255, 255, 255, 0.2);
@@ -125,7 +126,7 @@
       text-align: center;
       animation: slideIn 0.5s ease-out forwards;
       position: relative;
-      background: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(12px);
 
       @keyframes slideIn {
@@ -208,12 +209,12 @@
             text-align: right;
 
             .my-check-icon {
-              color: green;
+              color: rgba(100, 206, 112, 1);
               font-size: 1.1rem;
               margin-left: 0.3rem;
             }
             .my-x-icon {
-              color: red;
+              color: rgba(238, 63, 63, 1);
               font-size: 1.1rem;
               margin-left: 0.3rem;
             }
@@ -229,14 +230,14 @@
           .pill {
             background: #fff;
             color: rgba(11, 19, 30, 1);
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 0.4rem 0.8rem;
             text-align: center;
             font-weight: 400;
             font-size: 12px;
 
             &.actual {
-              border: 2px solid orange;
+              border: 3px solid rgb(137, 40, 126, 1);
             }
             &.selected {
               background: rgba(11, 19, 30, 1);

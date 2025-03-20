@@ -1,6 +1,9 @@
 /* global.scss */
 @import './variables'; // optional if you store variables separately
 html,
+h2{
+  margin-block-start:5px;
+}
 body {
   margin: 0;
   padding: 0;

@@ -8,10 +8,11 @@
     align-items: center;
     margin: 0 2rem 1rem;
     .arrow-right {
-      font-size: 2rem;     
-      color: #fff;         
-      cursor: pointer;     
-      // any other styling or positioning you want
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      margin-right: 0.5rem;
     }
     .league-code {
     position: absolute;
@@ -20,6 +21,8 @@
       font-size: 14px;
       font-weight: 400;
       color: #ccc; 
+      margin-bottom: 1rem;
+      margin-left: 1rem;
     
     }
 
@@ -41,7 +44,6 @@
     .leaderboard-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       background: rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       padding: 0.6rem 1rem;
@@ -55,12 +57,16 @@
       .points-label {
         font-size: 12px;
         font-weight: 400;
-        color: #ccc;
+        position: absolute;
+        right: 20rem;
+        color: white;
       }
 
       .username {
         font-size: 14px;
         font-weight: 400;
+        position: absolute;
+        right: 6rem;
         color: #fff;
       }
 

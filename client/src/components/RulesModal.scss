@@ -12,8 +12,7 @@
   
     .rules-modal {
       position: relative;
-      width: 90%;
-      max-width: 400px;
+      width: 80%;
       background: #fff;
       border-radius: 16px;
       padding: 1.5rem;
@@ -34,10 +33,14 @@
         text-align: center;
         margin: 0 0 1rem 0;
         font-size: 20px;
+        color: black;
+        margin-block-end: 5px;
+        margin-block-start: 20px;
       }
   
       h3 {
         margin-top: 1rem;
+        text-align: right;
         font-size: 16px;
         color: #000;
       }
