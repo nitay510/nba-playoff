@@ -2,19 +2,26 @@
  * server.js
  * Located in /server folder
  **************************************************/
-require('dotenv').config();
+// Optional: If you still want local .env usage in dev only:
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-// Import your routes (assuming /server/routes)
+// Import your routes
 const authRoutes = require('./routes/authRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
 const leagueRoutes = require('./routes/leagueRoutes');
 const userBetRoutes = require('./routes/userBetRoutes');
 
+/***************************************************
+ * Express App Setup
+ **************************************************/
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,7 +30,7 @@ const PORT = process.env.PORT || 5000;
  **************************************************/
 app.use(
   cors({
-    origin: 'http://localhost:3000', // or your client domain
+    origin: 'http://localhost:3000', // or your final front-end domain
     credentials: true,
   })
 );
@@ -34,10 +41,7 @@ app.use(cookieParser());
  * MongoDB Connection
  **************************************************/
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -51,11 +55,11 @@ app.use('/api/leagues', leagueRoutes);
 
 /***************************************************
  * Serve React Build
- * The build is in ../client/build
  **************************************************/
+// If you have a React build in ../client/build:
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
-// Catch-all: return index.html if an unknown route is hit
+// Catch-all: if route not found in API, serve React index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
 });
