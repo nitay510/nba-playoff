@@ -57,11 +57,11 @@ app.use('/api/leagues', leagueRoutes);
  * Serve React Build
  **************************************************/
 // If you have a React build in ../client/build:
-app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+app.use(express.static(path.join(__dirname, 'build')));
 
 // Catch-all: if route not found in API, serve React index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 /***************************************************
