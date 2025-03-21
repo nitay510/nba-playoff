@@ -80,7 +80,7 @@ function ResultsModal({ series, onClose, onResultsSaved }) {
         finalChoice: fr.finalChoice,
       }));
 
-      const res = await fetch(`http://localhost:5000/api/series/${series._id}/results`, {
+      const res = await fetch(`https://nba-playoff-eyd5.onrender.com/api/series/${series._id}/results`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

@@ -25,7 +25,7 @@ function LeaguesPage() {
 
   const fetchMyLeagues = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/leagues/mine', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/mine', {
         credentials: 'include',
       });
       const data = await res.json();
@@ -38,7 +38,7 @@ function LeaguesPage() {
   // Create league logic (unchanged)
   const handleCreateLeague = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/leagues/create', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/create', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +61,7 @@ function LeaguesPage() {
   // Inline join logic
   const handleJoinLeague = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/leagues/join', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/join', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

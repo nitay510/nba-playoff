@@ -62,7 +62,7 @@ export default function ChampionSelectionPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/set-champion', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/set-champion', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

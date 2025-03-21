@@ -18,7 +18,7 @@ function LeaderboardPage() {
 
   const fetchLeagueLeaderboard = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/leagues/${leagueId}/leaderboard`, {
+      const res = await fetch(`https://nba-playoff-eyd5.onrender.com/api/leagues/${leagueId}/leaderboard`, {
         credentials: 'include',
       });
       const data = await res.json();

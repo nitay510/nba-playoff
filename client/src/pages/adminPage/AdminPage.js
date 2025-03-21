@@ -22,7 +22,7 @@ function AdminPage() {
 
   const fetchUnfinishedSeries = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/series', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/series', {
         credentials: 'include',
       });
       const data = await res.json();

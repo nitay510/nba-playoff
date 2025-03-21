@@ -35,7 +35,7 @@ function HomePage() {
         return;
       }
 
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +59,7 @@ function HomePage() {
   // 2) Fetch unlocked series
   const fetchUnlockedSeries = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/series');
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/series');
       const data = await res.json();
       const unlocked = data.filter((s) => !s.isLocked);
       setSeriesList(unlocked);
@@ -71,7 +71,7 @@ function HomePage() {
   // 3) Fetch user bets
   const fetchUserBets = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/user-bets', {
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets', {
         credentials: 'include',
       });
       const data = await res.json();
@@ -168,7 +168,7 @@ function HomePage() {
   const handleSaveBet = async (seriesId) => {
     try {
       const currentBetArr = localBets[seriesId] || [];
-      await fetch(`http://localhost:5000/api/user-bets/${seriesId}`, {
+      await fetch(`https://nba-playoff-eyd5.onrender.com/api/user-bets/${seriesId}`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
