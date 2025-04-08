@@ -4,31 +4,6 @@ import TeamLogo from '../../components/TeamLogo';
 import Background from '../../components/Login-back';
 import './championSelectionPage.scss';
 
-// Your 20 teams with odds
-// We'll sort them ascending by 'odds' so the lowest is top-left
-const TOP_20_TEAMS = [
-  { name: 'קליבלנד קאבלירס', odds: 2.5 },
-  { name: 'בוסטון סלטיקס', odds: 3.0 },
-  { name: 'מילווקי באקס', odds: 3.2 },
-  { name: 'אינדיאנה פייסרס', odds: 4.5 },
-  { name: 'ניו יורק ניקס', odds: 7.0 },
-  { name: 'אטלנטה הוקס', odds: 9.0 },
-  { name: 'מיאמי היט', odds: 11.0 },
-  { name: 'דטרויט פיסטונס', odds: 15.0 },
-  { name: 'אורלנדו מגיק', odds: 20.0 },
-  { name: 'שיקאגו בולס', odds: 25.0 },
-  { name: 'אוקלהומה סיטי', odds: 2.2 },
-  { name: 'דנבר נאגטס', odds: 3.5 },
-  { name: 'ממפיס גריזליס', odds: 4.0 },
-  { name: 'סקרמנטו קינגס', odds: 6.0 },
-  { name: 'לוס אנגלס לייקרס', odds: 8.0 },
-  { name: 'לוס אנגלס קליפרס', odds: 10.0 },
-  { name: 'גולדן סטייט ווריוורס', odds: 12.0 },
-  { name: 'יוסטון רוקטס', odds: 14.0 },
-  { name: 'מינסוטה טימברוולבס', odds: 18.0 },
-  { name: 'דאלאס מאבריקס', odds: 25.0 },
-];
-
 export default function ChampionSelectionPage() {
   const navigate = useNavigate();
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -37,15 +12,36 @@ export default function ChampionSelectionPage() {
   useEffect(() => {
     const storedUser = localStorage.getItem('username');
     if (!storedUser) {
-      // if no user, go back to login or something
       navigate('/');
     } else {
       setUsername(storedUser);
     }
   }, [navigate]);
 
-  // sort teams by ascending odds
-  const sortedTeams = [...TOP_20_TEAMS].sort((a, b) => a.odds - b.odds);
+  // Final odds (already computed by the rule: <40 => ×3, >=40 => ×2).
+  // Then we list them in ascending order of final odds.
+  const TEAMS = [
+    { name: 'בוסטון סלטיקס', odds: 4 },
+    { name: 'אוקלהומה סיטי', odds: 3 },
+    { name: 'קליבלנד קאבלירס', odds: 6 },
+    { name: 'לוס אנגלס לייקרס', odds: 8 },
+    { name: 'דנבר נאגטס', odds: 9 },
+    { name: 'גולדן סטייט ווריוורס', odds: 11 },
+    { name: 'מילווקי באקס', odds: 20 },
+    { name: 'סקרמנטו קינגס', odds: 100 },
+    { name: 'ניו יורק ניקס', odds: 12 },
+    { name: 'ממפיס גריזליס', odds: 20 },
+    { name: 'מיאמי היט', odds: 100 },
+    { name: 'לוס אנגלס קליפרס', odds: 25 },
+    { name: 'מינסוטה טימברוולבס', odds: 20 },
+    { name: 'יוסטון רוקטס', odds: 25 },
+    { name: 'אינדיאנה פייסרס', odds: 30 },
+    { name: 'אורלנדו מגיק', odds: 50 },
+    { name: 'דטרויט פיסטונס', odds: 30 },
+    { name: 'אטלנטה הוקס', odds: 100 },
+    { name: 'שיקאגו בולס', odds: 100 },
+    { name: 'דאלאס מאבריקס', odds: 100 },
+  ];
 
   const handleSelectTeam = (teamName) => {
     setSelectedTeam(teamName);
@@ -73,7 +69,6 @@ export default function ChampionSelectionPage() {
         alert(data.msg || 'שגיאה בעדכון האלוף');
         return;
       }
-      // On success => /home
       navigate('/home');
     } catch (error) {
       console.error('Set champion error:', error);
@@ -84,14 +79,11 @@ export default function ChampionSelectionPage() {
   return (
     <div className="champion-selection-page">
       <Background image="open-screen.png" />
-
       <h1 className="page-title">מי תהיה האלופה ?</h1>
 
-      {/* Main card containing both the teams grid and the centered button */}
       <div className="main-card">
-        {/* Scrollable grid of teams */}
         <div className="teams-grid">
-          {sortedTeams.map((team) => {
+          {TEAMS.map((team) => {
             const isSelected = team.name === selectedTeam;
             return (
               <div
@@ -101,7 +93,8 @@ export default function ChampionSelectionPage() {
               >
                 <TeamLogo teamName={team.name} className="logo-img" />
                 <div className="team-odds-box">
-                  <span className="team-odds">יחס: {team.odds}</span>
+                  {/* Show to 1 or 2 decimal places if you wish */}
+                  <span className="team-odds">יחס: {team.odds.toFixed(2)}</span>
                 </div>
               </div>
             );

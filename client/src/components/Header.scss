@@ -1,12 +1,17 @@
 .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 2rem;
-    
+  align-items: center;
+  position: fixed;
+  display: flex
+;
+  justify-content: space-between;
+  padding: .5rem 2rem;
   
     .header-logo {
-      height: 40px; /* adjust */
+      app-header .header-logo {
+        margin-bottom: 5px;
+        margin-right: 25vh;
+        height: 40px;
+    }
     }
   
     .header-question {

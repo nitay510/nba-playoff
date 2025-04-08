@@ -16,8 +16,7 @@ body {
 
 .page-con{
   min-height: 100vh; 
-  /* Enough bottom space so the user can scroll
-     and won't go behind the nav (which is fixed). */
+  padding-top: 60px;
   padding-bottom: 80px; /* match or exceed nav height */
   box-sizing: border-box;
 }
