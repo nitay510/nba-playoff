@@ -9,6 +9,13 @@ export default function WelcomePopup() {
   
     // We define 3 slides:
     const slides = [
+        {
+            // NEW – welcome slide without an image
+            title: 'ברוכים הבאים ל‑FinalBet',
+            text : 'אתגר הימורי הפלייאוף החדש של ישראל! \nבחרו מנצחות, צברו נקודות והתחרו מול החברים.',
+            image: null,               // אין תמונה
+          },
+        
       {
         title: 'מהמרים על סדרות',
         text: 'בחרו מנצחת בכל סדרה, הוסיפו הימורים נוספים וצברו נקודות.',
