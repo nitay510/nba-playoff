@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Background from '../../components/Login-back';
-import WelcomePopup from '../../components/WelcomePopup';   /* NEW */
+import WelcomePopup from '../../components/WelcomePopup';
 import './LoginPage.scss';
 
 function LoginPage() {
   const navigate = useNavigate();
+
+  /* form state */
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  /********************************************************
+   * AUTO‑LOGIN
+   * ------------------------------------------------------
+   * – on component mount we look for a saved username
+   *   in localStorage (saved after a successful login).
+   * – if found → skip the form and redirect immediately.
+   * – JWT cookie that you already set on the server will
+   *   still be sent with every fetch, so protected routes
+   *   remain secure. This step only hides the login page.
+   ********************************************************/
+  useEffect(() => {
+    const savedUser = localStorage.getItem('username');
+    if (!savedUser) return;                    // first visit → show form
+
+    if (savedUser === 'nitay510') navigate('/admin');
+    else navigate('/home');
+  }, [navigate]);
+
+  /* normal login flow */
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -19,7 +40,7 @@ function LoginPage() {
         'https://nba-playoff-eyd5.onrender.com/api/auth/login',
         {
           method: 'POST',
-          credentials: 'include',
+          credentials: 'include', // keeps the JWT cookie
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
         }
@@ -70,7 +91,9 @@ function LoginPage() {
 
         <div className="register-container2">
           <p className="register-text">עדיין אין לך חשבון?</p>
-          <Link to="/register" className="register-link">הירשם עכשיו</Link>
+          <Link to="/register" className="register-link">
+            הירשם עכשיו
+          </Link>
         </div>
       </form>
     </div>
