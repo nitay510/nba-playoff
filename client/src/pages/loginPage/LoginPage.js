@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './LoginPage.scss';
 import Background from '../../components/Login-back';
+import WelcomePopup from '../../components/WelcomePopup';   /* NEW */
+import './LoginPage.scss';
+
 function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -11,41 +13,42 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-  
+
     try {
-      const response = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        // Save username in local storage
-        localStorage.setItem('username', data.username);
-  
-        // Check if it's nitay510
-        if (data.username === 'nitay510') {
-          navigate('/admin');
-        } else {
-          navigate('/home');
+      const response = await fetch(
+        'https://nba-playoff-eyd5.onrender.com/api/auth/login',
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
         }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('username', data.username);
+
+        if (data.username === 'nitay510') navigate('/admin');
+        else navigate('/home');
       } else {
         setErrorMsg(data.msg || 'שגיאה בהתחברות');
       }
-    } catch (error) {
+    } catch {
       setErrorMsg('שגיאה בהתחברות לשרת');
     }
   };
 
   return (
     <div className="main-container login-container">
-        <Background image="open-screen.png" />
+      <Background image="open-screen.png" />
+
+      {/* first‑visit welcome pop‑up */}
+      <WelcomePopup />
+
       <h2 className="title-small">התחברות</h2>
+
       <form onSubmit={handleLogin} className="login-form">
         <label>שם משתמש</label>
         <input
@@ -64,11 +67,11 @@ function LoginPage() {
         {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
         <button type="submit">התחבר</button>
-        <div className="register-container2">
-  <p className="register-text">עדיין אין לך חשבון?</p>
-  <Link to="/register" className="register-link">הירשם עכשיו</Link>
-</div>
 
+        <div className="register-container2">
+          <p className="register-text">עדיין אין לך חשבון?</p>
+          <Link to="/register" className="register-link">הירשם עכשיו</Link>
+        </div>
       </form>
     </div>
   );
