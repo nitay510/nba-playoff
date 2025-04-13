@@ -3,7 +3,6 @@ import React from "react";
 const Background = ({ image }) => {
   const backgroundStyle = {
     position: "fixed",
-    top: 0,
     left: 0,
     width: "100vw",
     height: "100vh",

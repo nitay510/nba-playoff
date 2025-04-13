@@ -1,17 +1,25 @@
 .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 2rem;
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  align-items: center;
+  width: 100vw;
+  display: flex
+;
+  /* justify-content: space-between; */
+  /* padding: .5rem 2rem; */
+  background: black;
     
   
     .header-logo {
-      height: 40px; /* adjust */
+      margin-top: 1.5rem;
+      margin-right: 65vw;
+      height: 40px;
     }
   
     .header-question {
-      margin-bottom: 2rem;
       cursor: pointer;
+      margin-right: 1rem;
       // style color, spacing, etc.
     }
   }
