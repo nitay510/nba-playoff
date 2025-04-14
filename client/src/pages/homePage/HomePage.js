@@ -23,6 +23,12 @@ function HomePage() {
 
   /* ───────── helpers ───────── */
 
+  /* 0) odds formatter → always one decimal */
+  const formatOdds = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? n.toFixed(1) : val;
+  };
+
   /* 1) user info */
   const fetchMyUserInfo = async () => {
     try {
@@ -208,7 +214,7 @@ function HomePage() {
                             {opt.choices.map((c, j) => {
                               const selected = isChoiceSelected(s._id, opt.category, c.name);
                               const display  = opt.category === 'מנצחת הסדרה'
-                                ? `${c.name} (${c.odds})`
+                                ? `${c.name} (${formatOdds(c.odds)})`
                                 : c.name;
 
                               return (
