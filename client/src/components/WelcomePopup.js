@@ -64,7 +64,7 @@ export default function WelcomePopup() {
       <div className="tutorial-box" onClick={(e) => e.stopPropagation()}>
       <img src="/logo1.png" alt="App Logo" className="header-logo" />
         <h2>{title}</h2>
-        <p>{text}</p>
+        <p className='text1'>{text}</p>
 
         <div className="tutorial-image">
           {/* only render <img> if we have an image path */}
@@ -75,7 +75,7 @@ export default function WelcomePopup() {
           {isLast ? 'אני רוצה להתחיל!' : 'המשך'}
         </button>
         {!isLast && (
-            <button className="next-btn" onClick={close}>
+            <button className="skip-btn" onClick={close}>
               דלג
             </button>
           )}

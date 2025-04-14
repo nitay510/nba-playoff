@@ -17,18 +17,22 @@
     height: 100%;
     width: 100%;
     .button-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1.5rem;
+      display: grid
+      ;
+          justify-content: center;
+          gap: 17px;
+          position: fixed;
+          right: 12%;
     }
     .header-logo{
-      width:80px;
+      margin-top: 30px;
       align-self: center;
+      width: 80px;
     }
     h2 {
       margin-bottom: 0.5rem;
       font-size: 22px;
-      margin-top: 30%;
+      margin-top: 5%;
     }
   
     p {
@@ -52,21 +56,24 @@
       color: #0B131E;
       background: #fff;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 16px;
+      padding: 0.7rem 7rem;
+      font-family: 'Almoni Neue';
     }
     .skip-btn {
       background: #0B131E;
       color: #fff;
       border: white;
-      padding: 0.6rem 1.2rem;
+      padding: .6rem 8.2rem;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.9rem;
     }
   }
   
-
+.text1 { 
+  margin-right: 10%;
+  width: 80%;
+}
   

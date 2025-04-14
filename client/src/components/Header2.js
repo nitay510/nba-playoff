@@ -4,15 +4,13 @@ import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { BsClipboard2 } from 'react-icons/bs';
 import { MdOutlineContactSupport } from 'react-icons/md';
 import { RxExit } from 'react-icons/rx';
-import RulesModal from './RulesModal';
-import ContactModal from './ContactModal';
 import './Header.scss';
 
 function Header2() {
   const navigate = useNavigate();
 
   const [menuOpen,    setMenuOpen]   = useState(false);
-  const [showRules,   setShowRules]  = useState(false);
+
   const [showContact, setShowContact] = useState(false);
 
   const username = localStorage.getItem('username') || 'שם משתמש';
@@ -50,26 +48,17 @@ function Header2() {
 
             {/* items – icon first, then text */}
             <button
-              className="menu-item"
-              onClick={() => {
-                setShowRules(true);
-                setMenuOpen(false);
-              }}
-            >
-              <BsClipboard2 />
-              <span>חוקי המשחק</span>
-            </button>
+  className="menu-item"
+  onClick={() => {
+    navigate('/rules');
+    setMenuOpen(false);
+  }}
+>
+  <BsClipboard2 />
+  <span>חוקי המשחק</span>
+</button>
 
-            <button
-              className="menu-item"
-              onClick={() => {
-                setShowContact(true);
-                setMenuOpen(false);
-              }}
-            >
-              <MdOutlineContactSupport />
-              <span>צור קשר</span>
-            </button>
+
 
             <button className="menu-item" onClick={handleLogout}>
               {/* flip for RTL exit arrow */}
