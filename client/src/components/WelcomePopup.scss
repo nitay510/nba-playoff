@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 1rem 80px;          /* bottom padding for iPhone home‑bar */
+  padding-bottom: 50px;
   direction: rtl;
   text-align: center;
 }
@@ -39,13 +39,13 @@ h2 {
 
 /* responsive image */
 .tutorial-image {
-  margin-bottom: 1rem;
 
   img {
     width: 100%;
     max-width: 320px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    height: 400px;
   }
 }
 
@@ -59,10 +59,12 @@ h2 {
 .next-btn,
 .skip-btn {
   border-radius: 8px;
-  font-family: 'Almoni Neue', sans-serif;
+  font-family: Almoni Neue, sans-serif;
   font-size: 16px;
-  padding: 0.7rem 0;
-  width: 100%;
+  margin-right: 5%;
+  margin-bottom: 20px;
+  padding: .7rem 0;
+  width: 80%;
 }
 
 .next-btn {
