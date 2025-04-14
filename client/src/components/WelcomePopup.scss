@@ -1,76 +1,77 @@
-.tutorial-overlay {
-  display: flex
-  ;
-      inset: 0;
-      position: fixed;
-      z-index: 2000;
-      
-  }
-  
-  .tutorial-box {
-    background: #0b131e;
-    border-radius: 12px;
-    color: white;
-    direction: rtl;
-    position: relative;
-    text-align: center;
-    padding-bottom: 50px;
-    .button-row {
-      display: grid
-      ;
-          justify-content: center;
-          gap: 17px;
-    }
-    .header-logo{
-      margin-top: 30px;
-      align-self: center;
-      width: 80px;
-    }
-    h2 {
-      margin-bottom: 0.5rem;
-      font-size: 22px;
-      margin-top: 5%;
-    }
-  
-    p {
-      font-size: 16px;
-      margin-bottom: 1rem;
-    }
-  
-    .tutorial-image {
-      img {
-        width: 80%;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      }
-      .tutorial-image:empty {
-        display: none;
-      }
-    }
-  
-    .next-btn {
-      background: #fff;
-      border-radius: 8px;
-      color: #0b131e;
-      cursor: pointer;
-      font-family: 'Almoni Neue';
-      font-size: 16px;
-      padding: .7rem 7rem;
-    }
-    .skip-btn {
-      background: #0b131e;
-      border: 1px solid;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 16px;
-      font-family: 'Almoni Neue';
-      padding: .6rem 8.2rem;
-    }
-  }
-  
-.text1 { 
-  margin-right: 10%;
+/* full‑screen page */
+.tutorial-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #0b131e;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem 80px;          /* bottom padding for iPhone home‑bar */
+  direction: rtl;
+  text-align: center;
+}
+
+/* small top logo */
+.page-logo {
+  width: 80px;
+  margin: 30px auto 0;
+}
+
+/* wrapper to limit width */
+.tutorial-content {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 5%;
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-text {
+  font-size: 16px;
+  white-space: pre-line;         /* keep \n line‑breaks */
+  margin: 0 auto 1rem;
   width: 80%;
 }
-  
+
+/* responsive image */
+.tutorial-image {
+  margin-bottom: 1rem;
+
+  img {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.button-row {
+  display: grid;
+  gap: 17px;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.next-btn,
+.skip-btn {
+  border-radius: 8px;
+  font-family: 'Almoni Neue', sans-serif;
+  font-size: 16px;
+  padding: 0.7rem 0;
+  width: 100%;
+}
+
+.next-btn {
+  background: #fff;
+  color: #0b131e;
+}
+
+.skip-btn {
+  background: #0b131e;
+  color: #fff;
+  border: 1px solid #fff;
+}
