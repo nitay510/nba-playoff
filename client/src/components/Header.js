@@ -1,39 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBars } from 'react-icons/fa';      // hamburger icon
+import { FaBars } from 'react-icons/fa';   //  ← FA icon via react‑icons
 import RulesModal from './RulesModal';
 import './Header.scss';
 
 function Header() {
   const navigate = useNavigate();
-
   const [openMenu, setOpenMenu] = useState(false);
   const [showRules, setShowRules] = useState(false);
 
-  /* logout */
+  /* ───────── helpers ───────── */
   const handleLogout = async () => {
     try {
       await fetch(
         'https://nba-playoff-eyd5.onrender.com/api/auth/logout',
         { method: 'POST', credentials: 'include' }
       );
-    } catch (_) { /* ignore network errors */ }
+    } catch (_) {}
     localStorage.removeItem('username');
     navigate('/');
   };
 
-  /* mailto */
   const handleContact = () => {
     window.location.href =
       'mailto:nitay510@gmail.com?subject=FinalBet%20Support';
   };
 
+  /* ───────── render ───────── */
   return (
     <div className="app-header">
-      {/* menu icon – right side */}
+      {/* hamburger icon (right) */}
       <FaBars
         className="menu-icon"
-        onClick={() => setOpenMenu((prev) => !prev)}
+        onClick={() => setOpenMenu((p) => !p)}
       />
 
       {/* dropdown */}
@@ -55,7 +54,7 @@ function Header() {
         </ul>
       )}
 
-      {/* logo – left side */}
+      {/* logo (left) */}
       <img src="/logo1.png" alt="App Logo" className="header-logo" />
 
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
