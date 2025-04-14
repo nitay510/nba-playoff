@@ -49,19 +49,13 @@ h2 {
   }
 }
 
-.button-row {
-  display: grid;
-  gap: 17px;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
+
 
 .next-btn,
 .skip-btn {
   border-radius: 8px;
   font-family: Almoni Neue, sans-serif;
   font-size: 16px;
-  margin-right: 5%;
   margin-bottom: 20px;
   padding: .7rem 0;
   width: 80%;
