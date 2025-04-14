@@ -22,7 +22,7 @@
           justify-content: center;
           gap: 17px;
           position: fixed;
-          right: 12%;
+          right: 14%;
     }
     .header-logo{
       margin-top: 30px;
@@ -53,22 +53,23 @@
     }
   
     .next-btn {
-      color: #0B131E;
       background: #fff;
-      border: none;
+      border-radius: 8px;
+      color: #0b131e;
       cursor: pointer;
-      font-size: 16px;
-      padding: 0.7rem 7rem;
       font-family: 'Almoni Neue';
+      font-size: 16px;
+      padding: .7rem 7rem;
     }
     .skip-btn {
-      background: #0B131E;
-      color: #fff;
-      border: white;
-      padding: .6rem 8.2rem;
+      background: #0b131e;
+      border: 1px solid;
       border-radius: 8px;
+      color: #fff;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 16px;
+      font-family: 'Almoni Neue';
+      padding: .6rem 8.2rem;
     }
   }
   

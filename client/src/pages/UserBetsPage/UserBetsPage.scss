@@ -3,11 +3,13 @@
   position: relative;
   margin-bottom: 55px;
   .user-bets-header {
-    display: flex;
     align-items: center;
-    position: relative;
     color: #fff;
-    margin-bottom: 1rem;
+    display: flex
+;
+    position: relative;
+    margin-top: 10px;
+    height: 40px;
 
     .arrow-left {
       font-size: 3rem;
@@ -27,7 +29,6 @@
   .champion-pick {
     margin-right: 2rem;
     color: #fff;
-    margin-bottom: 3rem;
     font-size: 14px;
   }
 
@@ -37,7 +38,7 @@
     margin: 1rem 2rem;
 
     button {
-      font-size: 16px;
+      font-size: 18px;
       border: none;
       cursor: pointer;
       border-radius: 6px;
@@ -45,6 +46,7 @@
       color: #fff;
       font-weight: 400;
       opacity: 40%;
+      font-family: 'Almoni Neue';
 
       &.active {
         opacity: 100%;

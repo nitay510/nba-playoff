@@ -5,7 +5,7 @@ import TeamLogo from '../../components/TeamLogo';
 import { calculateSeriesPoints } from '../../utils/points';
 import { FaTimes } from 'react-icons/fa';
 import './UserBetsPage.scss';
-import Header from '../../components/Header';
+import Header2 from '../../components/Header2';
 
 function UserBetsPage() {
   const { username } = useParams();
@@ -92,7 +92,7 @@ function UserBetsPage() {
     <div className="user-bets-page">
       <div className="page-con">
         <Background image="background2.png" />
-        <Header />
+        <Header2/>
 
         <div className="user-bets-header">
           <span className="arrow-left" onClick={() => navigate(-1)}>

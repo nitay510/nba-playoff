@@ -1,9 +1,10 @@
 import React from 'react';
 import './RulesPage.scss';
-
+import Header from '../../components/Header';
 export default function RulesPage() {
   return (
     <div className="rules-page">
+            <Header />
       <div className="rules-container">
         <h2>חוקי המשחק</h2>
 

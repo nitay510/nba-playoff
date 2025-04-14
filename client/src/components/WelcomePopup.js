@@ -72,7 +72,7 @@ export default function WelcomePopup() {
         </div>
         <div className="button-row">
         <button className="next-btn" onClick={handleNext}>
-          {isLast ? 'אני רוצה להתחיל!' : 'המשך'}
+          {isLast ? 'להרשמה' : 'המשך'}
         </button>
         {!isLast && (
             <button className="skip-btn" onClick={close}>

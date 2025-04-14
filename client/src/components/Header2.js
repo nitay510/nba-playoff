@@ -11,7 +11,7 @@ function Header2() {
 
   const [menuOpen,    setMenuOpen]   = useState(false);
 
-  const [showContact, setShowContact] = useState(false);
+ 
 
   const username = localStorage.getItem('username') || 'שם משתמש';
 
@@ -69,8 +69,6 @@ function Header2() {
         </>
       )}
 
-      {showRules   && <RulesModal   onClose={() => setShowRules(false)} />}
-      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
     </>
   );
 }
