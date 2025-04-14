@@ -1,18 +1,42 @@
 .app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 2rem;
-    
-  
-    .header-logo {
-      height: 40px; /* adjust */
-    }
-  
-    .header-question {
-      margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+
+  /* NEW – menu icon */
+  .menu-icon {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+  }
+
+  .header-logo {
+    height: 40px;
+  }
+
+  /* NEW – dropdown menu */
+  .header-dropdown {
+    position: absolute;
+    top: 60px;          /* just under the header */
+    right: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+
+    li {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
       cursor: pointer;
-      // style color, spacing, etc.
+      white-space: nowrap;
+
+      &:hover {
+        background: #f3f3f3;
+      }
     }
   }
-  
+}
