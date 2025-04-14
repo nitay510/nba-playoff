@@ -13,21 +13,30 @@ function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
 
   /********************************************************
-   * AUTO‑LOGIN
+   * SMART AUTO‑LOGIN
    * ------------------------------------------------------
-   * – on component mount we look for a saved username
-   *   in localStorage (saved after a successful login).
-   * – if found → skip the form and redirect immediately.
-   * – JWT cookie that you already set on the server will
-   *   still be sent with every fetch, so protected routes
-   *   remain secure. This step only hides the login page.
+   * 1. Look for username in localStorage.
+   * 2. Ping /api/auth/me to be sure the JWT cookie is
+   *    still valid.  If not → clean localStorage.
    ********************************************************/
   useEffect(() => {
     const savedUser = localStorage.getItem('username');
-    if (!savedUser) return;                    // first visit → show form
+    if (!savedUser) return;          // first visit → show form
 
-    if (savedUser === 'nitay510') navigate('/admin');
-    else navigate('/home');
+    fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
+      credentials: 'include',
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !data.username) {
+          localStorage.removeItem('username'); // cookie expired
+          return;
+        }
+        // cookie valid → redirect
+        if (data.username === 'nitay510') navigate('/admin');
+        else navigate('/home');
+      })
+      .catch(() => localStorage.removeItem('username'));
   }, [navigate]);
 
   /* normal login flow */
@@ -36,23 +45,20 @@ function LoginPage() {
     setErrorMsg('');
 
     try {
-      const response = await fetch(
+      const res = await fetch(
         'https://nba-playoff-eyd5.onrender.com/api/auth/login',
         {
           method: 'POST',
-          credentials: 'include', // keeps the JWT cookie
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
         }
       );
+      const data = await res.json();
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (res.ok) {
         localStorage.setItem('username', data.username);
-
-        if (data.username === 'nitay510') navigate('/admin');
-        else navigate('/home');
+        data.username === 'nitay510' ? navigate('/admin') : navigate('/home');
       } else {
         setErrorMsg(data.msg || 'שגיאה בהתחברות');
       }
@@ -65,7 +71,7 @@ function LoginPage() {
     <div className="main-container login-container">
       <Background image="open-screen.png" />
 
-      {/* first‑visit welcome pop‑up */}
+      {/* first‑visit tutorial / welcome */}
       <WelcomePopup />
 
       <h2 className="title-small">התחברות</h2>

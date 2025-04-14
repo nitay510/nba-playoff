@@ -69,7 +69,31 @@ exports.login = async (req, res) => {
       return res.status(500).json({ msg: 'שגיאה בשרת' });
     }
   };
+/**  NEW – verify token and return basic user info  */
+exports.me = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('username');
+    if (!user) return res.status(401).json({ msg: 'Unauthorized' });
+
+    return res.json({ username: user.username });
+  } catch {
+    return res.status(401).json({ msg: 'Unauthorized' });
+  }
+};
+
+/**  NEW – logout: clear cookie  */
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+  });
+  return res.json({ msg: 'התנתקת בהצלחה' });
+};
   exports.setChampion = async (req, res) => {
     try {
       const { username, champion } = req.body; // Get username & champion from request

@@ -3,27 +3,47 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResultsModal from './ResultsModal';
 import './AdminFinshedPage.scss';
+
 function AdminFinishedPage() {
   const navigate = useNavigate();
   const [seriesList, setSeriesList] = useState([]);
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [currentSeries, setCurrentSeries] = useState(null);
 
+  /* ───────────────────────────────
+     fetch finished series once
+  ──────────────────────────────── */
   useEffect(() => {
     fetchFinishedSeries();
   }, []);
 
   const fetchFinishedSeries = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/series', {
-        credentials: 'include',
-      });
+      const res = await fetch(
+        'https://nba-playoff-eyd5.onrender.com/api/series',
+        { credentials: 'include' }
+      );
       const data = await res.json();
-      // filter for "finished" => e.g. isFinished = true
-      const finished = data.filter((s) => s.isFinished);
-      setSeriesList(finished);
-    } catch (error) {
-      console.error(error);
+      setSeriesList(data.filter((s) => s.isFinished));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /* ───────────────────────────────
+     logout → clear localStorage + cookie
+  ──────────────────────────────── */
+  const handleLogout = async () => {
+    try {
+      await fetch(
+        'https://nba-playoff-eyd5.onrender.com/api/auth/logout',
+        { method: 'POST', credentials: 'include' }
+      );
+    } catch (_) {
+      /* even if the request fails we still clear localStorage */
+    } finally {
+      localStorage.removeItem('username');
+      navigate('/');
     }
   };
 
@@ -39,11 +59,18 @@ function AdminFinishedPage() {
 
   return (
     <div className="admin-finished container">
-      <h2>סדרות שהסתיימו</h2>
+      {/* top bar: back + logout */}
+      <div className="admin-header">
+        <button className="back-btn" onClick={() => navigate('/admin')}>
+          חזרה לסדרות פעילות
+        </button>
 
-      <button className="back-btn" onClick={() => navigate('/admin')}>
-        חזרה לסדרות פעילות
-      </button>
+        <button className="logout-btn" onClick={handleLogout}>
+          התנתקות
+        </button>
+      </div>
+
+      <h2>סדרות שהסתיימו</h2>
 
       <div className="series-list">
         {seriesList.length === 0 ? (
@@ -51,17 +78,19 @@ function AdminFinishedPage() {
         ) : (
           seriesList.map((s) => (
             <div key={s._id} className="series-card">
-              <h3>{s.teamA} נגד {s.teamB}</h3>
+              <h3>
+                {s.teamA} נגד {s.teamB}
+              </h3>
               <p>
                 תאריך התחלה:{' '}
-                {s.startDate ? new Date(s.startDate).toLocaleString('he-IL') : '---'}
+                {s.startDate
+                  ? new Date(s.startDate).toLocaleString('he-IL')
+                  : '---'}
               </p>
               <p>נעול? {s.isLocked ? 'כן' : 'לא'}</p>
               <p>הסתיים? כן</p>
 
-              <button onClick={() => openResultsModal(s)}>
-                ערוך תוצאות
-              </button>
+              <button onClick={() => openResultsModal(s)}>ערוך תוצאות</button>
             </div>
           ))
         )}
