@@ -1,0 +1,73 @@
+/* full‑screen dimmed backdrop */
+.contact-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* white card */
+  .contact-modal {
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.8rem 2rem;
+    position: relative;
+    direction: rtl;
+    text-align: right;
+  
+    h3 {
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      font-size: 1.25rem;
+      color: #0b131e;
+    }
+  
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.85rem;
+      color: #333;
+    }
+  
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      resize: none;
+    }
+  
+    .send-btn {
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 0;
+      background: #0b131e;
+      color: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+  
+      &:hover {
+        background: #1c2736;
+      }
+    }
+  
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  }
+  
