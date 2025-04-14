@@ -1,4 +1,3 @@
-/* full‑screen dimmed backdrop */
 .contact-backdrop {
     position: fixed;
     inset: 0;
@@ -9,7 +8,6 @@
     z-index: 1000;
   }
   
-  /* white card */
   .contact-modal {
     width: 90%;
     max-width: 420px;
@@ -20,54 +18,26 @@
     direction: rtl;
     text-align: right;
   
-    h3 {
-      margin-top: 0;
-      margin-bottom: 1.2rem;
-      font-size: 1.25rem;
-      color: #0b131e;
-    }
+    h3 { margin-top: 0; margin-bottom: 1rem; }
   
-    label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.85rem;
-      color: #333;
-    }
+    label { font-size: 0.85rem; margin-bottom: 0.2rem; display: block; }
   
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-      resize: none;
+    input, textarea {
+      width: 100%; padding: 0.5rem; margin-bottom: 1rem;
+      border: 1px solid #ccc; border-radius: 6px; resize: none;
     }
   
     .send-btn {
-      width: 100%;
-      border: none;
-      border-radius: 6px;
-      padding: 0.6rem 0;
-      background: #0b131e;
-      color: #fff;
-      font-size: 0.95rem;
-      cursor: pointer;
-  
-      &:hover {
-        background: #1c2736;
-      }
+      width: 100%; padding: 0.6rem 0;
+      border: none; border-radius: 6px;
+      background: #0B131E; color: #fff; cursor: pointer;
     }
   
+    .thank-you { margin: 1.5rem 0; font-size: 1rem; }
+  
     .close-btn {
-      position: absolute;
-      top: 8px;
-      left: 10px;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
+      position: absolute; top: 8px; left: 10px;
+      background: none; border: none; font-size: 1.2rem; cursor: pointer;
     }
   }
   

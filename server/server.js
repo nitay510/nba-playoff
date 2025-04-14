@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // Import your routes
+const contactRoutes = require('./routes/contactRoutes');
 const authRoutes = require('./routes/authRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
 const leagueRoutes = require('./routes/leagueRoutes');
@@ -49,6 +50,7 @@ mongoose
  * API Routes
  **************************************************/
 app.use('/api/auth', authRoutes);
+app.use('/api/contact',    contactRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/user-bets', userBetRoutes);
 app.use('/api/leagues', leagueRoutes);
