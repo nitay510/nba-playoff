@@ -1,4 +1,3 @@
-// client/src/pages/adminPage/AdminFinishedPage.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ResultsModal from './ResultsModal';
@@ -10,9 +9,7 @@ function AdminFinishedPage() {
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [currentSeries, setCurrentSeries] = useState(null);
 
-  /* ───────────────────────────────
-     fetch finished series once
-  ──────────────────────────────── */
+  /* fetch finished series once */
   useEffect(() => {
     fetchFinishedSeries();
   }, []);
@@ -30,9 +27,7 @@ function AdminFinishedPage() {
     }
   };
 
-  /* ───────────────────────────────
-     logout → clear localStorage + cookie
-  ──────────────────────────────── */
+  /* logout – clear cookie + localStorage */
   const handleLogout = async () => {
     try {
       await fetch(
@@ -40,7 +35,7 @@ function AdminFinishedPage() {
         { method: 'POST', credentials: 'include' }
       );
     } catch (_) {
-      /* even if the request fails we still clear localStorage */
+      /* even if request fails we still clear storage */
     } finally {
       localStorage.removeItem('username');
       navigate('/');
@@ -59,7 +54,7 @@ function AdminFinishedPage() {
 
   return (
     <div className="admin-finished container">
-      {/* top bar: back + logout */}
+      {/* top bar */}
       <div className="admin-header">
         <button className="back-btn" onClick={() => navigate('/admin')}>
           חזרה לסדרות פעילות
