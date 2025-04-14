@@ -1,23 +1,21 @@
 .tutorial-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+  display: flex
+  ;
+      inset: 0;
+      position: fixed;
+      z-index: 2000;
   }
   
   .tutorial-box {
-    width: 90%;
-    max-width: 400px;
-    background: #fff;
-    color:#0B131E;
+    background: #0b131e;
     border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    position: relative;
+    color: white;
     direction: rtl;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+    height: 100%;
+    width: 100%;
   
     h2 {
       margin-bottom: 0.5rem;
@@ -32,7 +30,7 @@
     .tutorial-image {
       margin-bottom: 1rem;
       img {
-        height: 500px;
+        width: 80%;
         border-radius: 8px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       }

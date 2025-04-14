@@ -60,9 +60,8 @@ export default function WelcomePopup() {
   };
 
   return (
-    <div className="tutorial-overlay" onClick={close}>
+    <div className="tutorial-overlay" >
       <div className="tutorial-box" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={close}>×</button>
 
         <h2>{title}</h2>
         <p>{text}</p>
@@ -73,8 +72,13 @@ export default function WelcomePopup() {
         </div>
 
         <button className="next-btn" onClick={handleNext}>
-          {isLast ? 'להרשמה' : 'הבא'}
+          {isLast ? 'אני רוצה להתחיל!' : 'המשך'}
         </button>
+        {!isLast && (
+            <button className="next-btn" onClick={close}>
+              דלג
+            </button>
+          )}
       </div>
     </div>
   );

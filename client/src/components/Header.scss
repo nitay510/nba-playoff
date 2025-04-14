@@ -86,7 +86,7 @@
     font-size: 32px;
     margin-right: 20px;
   }
-  .user-name   { font-weight: 700; font-size: 1rem; }
+  .user-name   { font-weight: 700; font-size: 1rem; margin-right: 10px;}
 
 
 
@@ -101,13 +101,13 @@
   font-size: 0.95rem;
   color: #0b131e;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem 1.4rem;
   cursor: pointer;
   border-bottom: 1px solid #e6e6e6;
 
-  svg { font-size: 1.1rem; }
+  svg { font-size: 1.1rem;
+    margin-left: 10px; }
 
   font-family: 'Almoni Neue', sans-serif;
   font-weight: 400;
