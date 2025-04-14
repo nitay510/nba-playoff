@@ -98,12 +98,12 @@ function UserBetsPage() {
           <span className="arrow-left" onClick={() => navigate(-1)}>
             &#8249;
           </span>
-          <h2>ההימורים של {username}</h2>
+          <h2>הניחושים של {username}</h2>
         </div>
 
         {champion && (
           <p className="champion-pick">
-            הימור אלופה: <strong>{champion}</strong>
+            ניחוש אלופה: <strong>{champion}</strong>
           </p>
         )}
 
@@ -128,7 +128,7 @@ function UserBetsPage() {
         {activePage === 'active' && (
           <>
             {activeBets.length === 0 ? (
-              <p style={{ marginRight: '2rem' }}>אין הימורים פעילים.</p>
+              <p style={{ marginRight: '2rem' }}>אין ניחושים פעילים.</p>
             ) : (
               activeBets.map((ub) => {
                 const series = ub.seriesId;
@@ -145,8 +145,8 @@ function UserBetsPage() {
                     {!isExpanded && (
                       <div className="userbet-header reversed-header">
                         <div className="left-column active-left">
-                          <span className="status-title">סטאטוס הימור</span>
-                          <span className="bet-status">הימור פעיל</span>
+                          <span className="status-title">סטאטוס ניחוש</span>
+                          <span className="bet-status">ניחוש פעיל</span>
                         </div>
                         <div className="right-logos">
                           <TeamLogo teamName={series.teamA} className="big-logo" />
@@ -160,7 +160,7 @@ function UserBetsPage() {
                       <div className="userbet-expanded">
                         <div className="top-bar">
                           <div className="top-bar-center">
-                            <span className="bet-status">הימור פעיל</span>
+                            <span className="bet-status">ניחוש פעיל</span>
                           </div>
                           <FaTimes
                             className="close-icon"
@@ -210,7 +210,7 @@ function UserBetsPage() {
         {activePage === 'history' && (
           <>
             {finishedBets.length === 0 ? (
-              <p style={{ marginRight: '2rem' }}>אין הימורים היסטוריים.</p>
+              <p style={{ marginRight: '2rem' }}>אין ניחושים היסטוריים.</p>
             ) : (
               finishedBets.map((ub) => {
                 const series = ub.seriesId;
@@ -232,11 +232,11 @@ function UserBetsPage() {
                     onClick={() => toggleExpand(betId)}
                     style={borderStyle} // apply the green/red border
                   >
-                    {/* Collapsed => "סטאטוס הימור" + points */}
+                    {/* Collapsed => "סטאטוס ניחוש" + points */}
                     {!isExpanded && (
                       <div className="userbet-header reversed-header">
                         <div className="left-column history-left">
-                          <span className="bet-status">סטאטוס הימור</span>
+                          <span className="bet-status">סטאטוס ניחוש</span>
                           <span className="bet-points" style={{ color: pointsColor }}>
                             {pointsString}
                           </span>
@@ -253,7 +253,7 @@ function UserBetsPage() {
                       <div className="userbet-expanded">
                         <div className="top-bar">
                           <div className="top-bar-center">
-                            <span className="bet-status">הימור הסתיים</span>
+                            <span className="bet-status">ניחוש הסתיים</span>
                             <span
                               className="bet-points"
                               style={{ color: pointsColor, marginLeft: '0.5rem' }}

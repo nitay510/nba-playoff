@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  FaBars,
-  FaClipboardList,
-  FaRegComments,
-  FaSignOutAlt,
-  FaUserCircle,
-} from 'react-icons/fa';
+import { FaBars, FaUserCircle } from 'react-icons/fa';
+import { BsClipboard2 } from 'react-icons/bs';
+import { MdOutlineContactSupport } from 'react-icons/md';
+import { RxExit } from 'react-icons/rx';
 import RulesModal from './RulesModal';
 import ContactModal from './ContactModal';
 import './Header.scss';
@@ -34,25 +31,24 @@ function Header() {
 
   return (
     <>
-      {/* ---------- header bar (unchanged) ---------- */}
+      {/* top bar (unchanged) */}
       <div className="app-header">
         <FaBars className="menu-icon" onClick={() => setMenuOpen(true)} />
         <img src="/logo1.png" alt="App Logo" className="header-logo" />
       </div>
 
-      {/* ---------- slide‑in menu ---------- */}
+      {/* slide‑in menu */}
       {menuOpen && (
         <>
           <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />
           <aside className="side-menu">
-            {/* purple top */}
+            {/* purple header */}
             <div className="menu-top">
               <FaUserCircle className="avatar" />
               <span className="user-name">{username}</span>
-              <div className="top-sep" />
             </div>
 
-            {/* items */}
+            {/* items – icon first, then text */}
             <button
               className="menu-item"
               onClick={() => {
@@ -60,8 +56,8 @@ function Header() {
                 setMenuOpen(false);
               }}
             >
+              <BsClipboard2 />
               <span>חוקי המשחק</span>
-              <FaClipboardList />
             </button>
 
             <button
@@ -71,14 +67,14 @@ function Header() {
                 setMenuOpen(false);
               }}
             >
+              <MdOutlineContactSupport />
               <span>צור קשר</span>
-              <FaRegComments />
             </button>
 
             <button className="menu-item" onClick={handleLogout}>
+              {/* flip for RTL exit arrow */}
+              <RxExit style={{ transform: 'scaleX(-1)' }} />
               <span>התנתק</span>
-              {/* flip icon for RTL “exit” arrow */}
-              <FaSignOutAlt style={{ transform: 'scaleX(-1)' }} />
             </button>
           </aside>
         </>

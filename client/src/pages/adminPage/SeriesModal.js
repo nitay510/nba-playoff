@@ -149,7 +149,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
           onChange={(e) => setStartDateStr(e.target.value)}
         />
 
-        <h4 className="bet-options-header">אפשרויות הימור</h4>
+        <h4 className="bet-options-header">אפשרויות ניחוש</h4>
         {betOptions.map((opt, i) => (
           <div key={i} className="bet-category">
             <strong className="bet-category-title">{opt.category}</strong>
@@ -190,7 +190,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
         ))}
 
         <button className="add-category-btn" onClick={addNewCategory}>
-          + הוסף קטגוריית הימור
+          + הוסף קטגוריית ניחוש
         </button>
 
         <div className="modal-actions">

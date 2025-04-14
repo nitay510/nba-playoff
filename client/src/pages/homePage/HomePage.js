@@ -180,9 +180,9 @@ function HomePage() {
 
                     <div className="right-column">
                       {hasBet && <FaCheckCircle className="check-icon" />}
-                      <div className="top-line"><span style={{ opacity: 0.75 }}>סיום הימור בעוד</span></div>
+                      <div className="top-line"><span style={{ opacity: 0.75 }}>סיום ניחוש בעוד</span></div>
                       {hasBet
-                        ? <span className="bet-confirmed">הימור בוצע</span>
+                        ? <span className="bet-confirmed">ניחוש בוצע</span>
                         : <div className="countdown-line">{countdownElem(s.startDate)}</div>}
                     </div>
                   </div>
@@ -193,7 +193,7 @@ function HomePage() {
                   <div className="place-bet-inline">
                     <div className="top-bar">
                       <div className="top-bar-center">
-                        <span style={{ opacity: 0.75 }}>סיום הימור בעוד</span>
+                        <span style={{ opacity: 0.75 }}>סיום ניחוש בעוד</span>
                         <div className="countdown-text">{countdownElem(s.startDate)}</div>
                       </div>
                       <FaTimes className="close-icon" onClick={() => closeCard(s._id)} />

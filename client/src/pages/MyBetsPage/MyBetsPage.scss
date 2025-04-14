@@ -12,11 +12,11 @@
 
   .toggle-buttons {
     display: flex;
-    gap: 1rem;
-    margin: 1rem 2rem;
+    gap: 0.5rem;
+    margin: 1rem 1.6rem;
 
     button {
-      font-size: 16px;
+      font-size: 18px;
       border: none;
       cursor: pointer;
       border-radius: 6px;
@@ -24,6 +24,7 @@
       color: #fff;
       font-weight: 400;
       opacity: 40%;
+      font-family: 'Almoni Neue';
 
       &.active {
         opacity: 100%;
