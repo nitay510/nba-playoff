@@ -114,19 +114,18 @@
 
       .create-btn {
         background: #0b131e;
+        font-family: 'Almoni Neue', sans-serif;
         color: #fff;
         width: 75.5%;
         border: none;
         border-radius: 6px;
         margin-bottom: 2rem;
-        font-size: 1rem;
+        font-size: 14px;
         padding: 0.5rem;
         margin-right: 3rem;
         text-align: center;
 
-        &:hover {
-          background: #333;
-        }
+       
       }
     }
   }
@@ -187,7 +186,8 @@
           color: #fff;
           border: none;
           border-radius: 6px;
-          font-size: 1rem;
+          font-family: 'Almoni Neue', sans-serif;
+          font-size: 14px;
           padding: 0.5rem 1rem;
           cursor: pointer;
         }

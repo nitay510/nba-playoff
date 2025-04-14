@@ -142,7 +142,7 @@ function LeaguesPage() {
         {!showJoinForm ? (
           // Condensed "join" with search icon
           <div className="join-condensed" onClick={() => setShowJoinForm(true)}>
-            <span className="join-text">הצטרף לטורניר קיים</span>
+            <span className="join-text">הצטרף לליגה קיימת </span>
             <span className="search-icon"><FaSearch/></span>
           </div>
         ) : (
@@ -150,7 +150,7 @@ function LeaguesPage() {
             {/* top row with "search icon" and "הצטרף לטורניר קיים" text */}
             <div className="header-row-join" onClick={() => setShowJoinForm(false)}>
   
-              <h3>הצטרף לטורניר קיים</h3>
+              <h3>הצטרף לליגה קיימת</h3>
               <span className="search-icon"><FaSearch/></span>
             </div>
 

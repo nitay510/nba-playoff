@@ -83,14 +83,13 @@
     color: #fff;
     border-radius: 4px;
     font-size: 18px;
+    font-family: 'Almoni Neue', sans-serif;
     padding: 9px 120px;
     background: none;
     cursor: pointer;
     transition: background-color 0.3s;
     margin-top: 1rem;
 
-    &:hover {
-      background: #444;
-    }
+
   }
 }

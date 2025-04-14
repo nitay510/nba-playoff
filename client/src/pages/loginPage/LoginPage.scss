@@ -59,6 +59,7 @@
         border-radius: 4px;
     padding: 9px 0px;
         color:  rgba(255, 255, 255, 1);
+        font-family: 'Almoni Neue', sans-serif;
 font-weight: 600;
 font-size: 16px;
 line-height: 23.52px;
@@ -68,9 +69,7 @@ margin-right: 2rem;
     margin-left: 2rem;
     background: rgba(255, 255, 255, 0.1);
 
-        &:hover {
-          background-color: darken($primary-color, 10%);
-        }
+  
       }
     }
   
@@ -104,9 +103,7 @@ margin-right: 2rem;
       text-decoration-skip-ink: auto;
       
     
-      &:hover {
-        text-decoration: underline;
-      }
+
     }
     
   }

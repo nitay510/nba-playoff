@@ -62,9 +62,7 @@
       margin-left: 1rem;
       background: rgba(255, 255, 255, 0.1);
 
-      &:hover {
-        background-color: darken($primary-color, 10%);
-      }
+
     }
   }
 
@@ -96,8 +94,6 @@
     text-decoration-thickness: Auto;
     text-decoration-skip-ink: auto;
 
-    &:hover {
-      text-decoration: underline;
-    }
+
   }
 }
