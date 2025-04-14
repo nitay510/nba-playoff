@@ -13,7 +13,6 @@ exports.createSeries = async (req, res) => {
       betOptions,
       startDate,
     });
-
     return res.status(201).json(newSeries);
   } catch (err) {
     console.error(err);
