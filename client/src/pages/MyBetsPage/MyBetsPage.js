@@ -196,7 +196,7 @@ function MyBetsPage() {
         {activePage === 'history' && (
           <>
             {finishedBets.length === 0 ? (
-              <p style={{ marginRight: '2rem' }}>אין ניחושים היסטוריים.</p>
+              <p style={{ marginRight: '2rem' }}> היסטוריית ניחושים ריקה.</p>
             ) : (
               finishedBets.map((ub) => {
                 const series = ub.seriesId;

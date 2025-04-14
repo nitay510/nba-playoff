@@ -1,16 +1,13 @@
 .rules-page {
     background-color: #0b131e;
-    color: white;
-    min-height: 100vh;
-    padding: 2rem;
-    direction: rtl;
-    text-align: right;
+    margin-top: 2rem;
+    margin-bottom: 55px;
   }
   
   .rules-container {
-    max-width: 800px;
-    margin: 0 auto;
-  
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding: 2rem;
     h2 {
       text-align: center;
       font-size: 24px;

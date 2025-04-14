@@ -32,7 +32,7 @@ function Header2() {
       {/* top bar (unchanged) */}
       <div className="app-header">
         <FaBars className="menu-icon" onClick={() => setMenuOpen(true)} />
-        <img src="/logo1.png" alt="App Logo" className="header-logo" />
+        <img src="/logo2.png" alt="App Logo" className="header-logo" />
       </div>
 
       {/* slide‑in menu */}
