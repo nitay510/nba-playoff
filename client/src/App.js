@@ -20,7 +20,7 @@ function AppWrapper() {
   const location = useLocation();
 
   // If the path is "/" (login) or "/register", we hide the nav
-  const hideNav = location.pathname === '/' || location.pathname === '/register' || location.pathname === '/choose-champion' || location.pathname === '/admin'|| location.pathname === '/admin/finished';
+  const hideNav = location.pathname === '/' || location.pathname === '/register' || location.pathname === '/choose-champion' || location.pathname === '/admin'|| location.pathname === '/admin/finished'|| location.pathname === '/welcome';
 
   return (
     <div className="app-content">
