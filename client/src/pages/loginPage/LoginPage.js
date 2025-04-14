@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Background from '../../components/Login-back';
-import WelcomePopup from '../../components/WelcomePopup';
 import './LoginPage.scss';
 
 function LoginPage() {
@@ -20,21 +19,26 @@ function LoginPage() {
    *    still valid.  If not → clean localStorage.
    ********************************************************/
   useEffect(() => {
+    /* 1) tutorial not seen? go to /welcome */
+    if (!localStorage.getItem('tutorialSeen')) {
+      navigate('/welcome');
+      return;
+    }
+  
+    /* 2) auto‑login check (unchanged) */
     const savedUser = localStorage.getItem('username');
-    if (!savedUser) return;          // first visit → show form
-
+    if (!savedUser) return;
+  
     fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
       credentials: 'include',
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data || !data.username) {
-          localStorage.removeItem('username'); // cookie expired
+          localStorage.removeItem('username');
           return;
         }
-        // cookie valid → redirect
-        if (data.username === 'nitay510') navigate('/admin');
-        else navigate('/home');
+        data.username === 'nitay510' ? navigate('/admin') : navigate('/home');
       })
       .catch(() => localStorage.removeItem('username'));
   }, [navigate]);
@@ -71,8 +75,7 @@ function LoginPage() {
     <div className="main-container login-container">
       <Background image="open-screen.png" />
 
-      {/* first‑visit tutorial / welcome */}
-      <WelcomePopup />
+
 
       <h2 className="title-small">התחברות</h2>
 
