@@ -13,12 +13,12 @@ export default function WelcomePopup() {
       // first slide has no image
       title: 'ברוכים הבאים',
       text: 'אתגר ניחושי הפלייאוף החדש של ישראל!\nבחרו מנצחת, צברו נקודות והתחרו מול החברים.',
-      image: null,
+      image: '/onboarding/Frame.png',
     },
     {
       title: 'מנחשים את התוצאות',
       text: 'מי תנצח? בכמה משחקים? וניחושי בונוס',
-      image: '/onboarding/Frame1.pnf',
+      image: '/onboarding/Frame1.png',
     },
     {
       title: 'צוברים נקודות',
@@ -62,7 +62,7 @@ export default function WelcomePopup() {
   return (
     <div className="tutorial-overlay" >
       <div className="tutorial-box" onClick={(e) => e.stopPropagation()}>
-
+      <img src="/logo1.png" alt="App Logo" className="header-logo" />
         <h2>{title}</h2>
         <p>{text}</p>
 
@@ -70,7 +70,7 @@ export default function WelcomePopup() {
           {/* only render <img> if we have an image path */}
           {image && <img src={image} alt="tutorial step" />}
         </div>
-
+        <div className="button-row">
         <button className="next-btn" onClick={handleNext}>
           {isLast ? 'אני רוצה להתחיל!' : 'המשך'}
         </button>
@@ -79,6 +79,7 @@ export default function WelcomePopup() {
               דלג
             </button>
           )}
+      </div>
       </div>
     </div>
   );

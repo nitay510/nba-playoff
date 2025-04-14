@@ -16,14 +16,23 @@
     text-align: center;
     height: 100%;
     width: 100%;
-  
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+    .header-logo{
+      width:80px;
+      align-self: center;
+    }
     h2 {
       margin-bottom: 0.5rem;
-      font-size: 1.3rem;
+      font-size: 22px;
+      margin-top: 30%;
     }
   
     p {
-      font-size: 0.9rem;
+      font-size: 16px;
       margin-bottom: 1rem;
     }
   
@@ -40,9 +49,18 @@
     }
   
     .next-btn {
+      color: #0B131E;
+      background: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .skip-btn {
       background: #0B131E;
       color: #fff;
-      border: none;
+      border: white;
       padding: 0.6rem 1.2rem;
       border-radius: 8px;
       cursor: pointer;
@@ -50,13 +68,5 @@
     }
   }
   
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    left: 14px;
-    border: none;
-    background: none;
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
+
   
