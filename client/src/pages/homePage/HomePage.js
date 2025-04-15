@@ -6,7 +6,7 @@ import Background       from '../../components/Login-back';
 import Header           from '../../components/Header';
 import './HomePage.scss';
 
-function HomePage() {
+export default function HomePage() {
   /* ───────── state ───────── */
   const [myInfo,     setMyInfo]     = useState({ username: '', points: 0, champion: '' });
   const [seriesList, setSeriesList] = useState([]);
@@ -14,33 +14,33 @@ function HomePage() {
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
 
-  /* ───────── invite handling ───────── */
-  const inviteRef = useRef(localStorage.getItem('pendingLeague')); // null or code
+  /* ───────── pending‑invite code ───────── */
+  const inviteRef = useRef(localStorage.getItem('pendingLeague')); // null or '01c1d0'
 
-  /* once username known – attempt join league */
+  /* once username known – attempt join */
   useEffect(() => {
+    console.log(myInfo)
     if (!myInfo.username || !inviteRef.current) return;
-
     (async () => {
       try {
-        await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/join', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username:   myInfo.username,
-            leagueCode: inviteRef.current,   // 01c1d0
-          }),
-        });
+        const res = await fetch(
+          'https://nba-playoff-eyd5.onrender.com/api/leagues/join',
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: inviteRef.current }),
+          }
+        );
+        /* success if 200‑range; ignore errors silently */
+      } finally {
         localStorage.removeItem('pendingLeague');
-        inviteRef.current = null;            // joined → clear flag
-      } catch {
-        /* ignore, will retry next visit */
+        inviteRef.current = null;
       }
     })();
   }, [myInfo.username]);
 
-  /* ───────── lifecycle ───────── */
+  /* ───────── initial data ───────── */
   useEffect(() => {
     fetchMyUserInfo();
     fetchUnlockedSeries();
@@ -59,12 +59,15 @@ function HomePage() {
       const username = localStorage.getItem('username');
       if (!username) return;
 
-      const res  = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username }),
-      });
+      const res = await fetch(
+        'https://nba-playoff-eyd5.onrender.com/api/auth/me',
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
+        }
+      );
       if (!res.ok) return;
       const data = await res.json();
       setMyInfo({
@@ -72,37 +75,48 @@ function HomePage() {
         points:   data.points   || 0,
         champion: data.champion || '',
       });
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const fetchUnlockedSeries = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/series');
+      const res  = await fetch('https://nba-playoff-eyd5.onrender.com/api/series');
       const data = await res.json();
-      const unlockedSorted = data
-        .filter((s) => !s.isLocked)
-        .sort((a, b) => new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15));
-      setSeriesList(unlockedSorted);
-    } catch (err) { console.error(err); }
+      setSeriesList(
+        data
+          .filter((s) => !s.isLocked)
+          .sort(
+            (a, b) =>
+              new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15)
+          )
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const fetchUserBets = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets', {
-        credentials: 'include',
-      });
+      const res  = await fetch(
+        'https://nba-playoff-eyd5.onrender.com/api/user-bets',
+        { credentials: 'include' }
+      );
       const data = await res.json();
       setUserBets(Array.isArray(data) ? data : []);
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /* ───────── betting helpers (unchanged) ───────── */
   const findUserBetDoc = (id) =>
     userBets.find((b) => b.seriesId && b.seriesId._id === id) || null;
 
-  const parseGamesNumber = (str='') => (str.match(/\d+/) || [null])[0];
+  const parseGamesNumber = (str = '') => (str.match(/\d+/) || [null])[0];
 
-  const openCard  = (id) => {
+  const openCard = (id) => {
     setOpenCards((p) => ({ ...p, [id]: true }));
     const doc = findUserBetDoc(id);
     setLocalBets((p) => ({ ...p, [id]: doc ? doc.bets : [] }));
@@ -147,21 +161,26 @@ function HomePage() {
 
   const handleSaveBet = async (seriesId) => {
     try {
-      await fetch(`https://nba-playoff-eyd5.onrender.com/api/user-bets/${seriesId}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bets: localBets[seriesId] || [] }),
-      });
+      await fetch(
+        `https://nba-playoff-eyd5.onrender.com/api/user-bets/${seriesId}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bets: localBets[seriesId] || [] }),
+        }
+      );
       await fetchUserBets();
       closeCard(seriesId);
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const countdownElem = (startDate) =>
-    startDate && new Date(startDate) > new Date()
-      ? <CountdownClock startDate={startDate} />
-      : null;
+    startDate && new Date(startDate) > new Date() ? (
+      <CountdownClock startDate={startDate} />
+    ) : null;
 
   /* ───────── render ───────── */
   return (
@@ -172,9 +191,18 @@ function HomePage() {
       <div className="page-con">
         {/* info bar */}
         <div className="info-bar">
-          <div className="info-item"><small>שם משתמש</small><p>{myInfo.username}</p></div>
-          <div className="info-item"><small>הניקוד שלי</small><p>{myInfo.points}</p></div>
-          <div className="info-item"><small>האלופה שלי</small><p>{myInfo.champion || '---'}</p></div>
+          <div className="info-item">
+            <small>שם משתמש</small>
+            <p>{myInfo.username}</p>
+          </div>
+          <div className="info-item">
+            <small>הניקוד שלי</small>
+            <p>{myInfo.points}</p>
+          </div>
+          <div className="info-item">
+            <small>האלופה שלי</small>
+            <p>{myInfo.champion || '---'}</p>
+          </div>
         </div>
 
         <div className="series-list">
@@ -308,5 +336,3 @@ function HomePage() {
     </div>
   );
 }
-
-export default HomePage;
