@@ -35,7 +35,7 @@ export default function WelcomePopup() {
 
   const finish = () => {
     localStorage.setItem('tutorialSeen', 'true');
-    navigate('/register');
+    navigate('/');
   };
 
   return (

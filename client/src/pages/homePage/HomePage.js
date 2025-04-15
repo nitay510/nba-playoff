@@ -156,7 +156,7 @@ function HomePage() {
         {/* top info bar */}
         <div className="info-bar">
           <div className="info-item"><small>שם משתמש</small><p>{myInfo.username}</p></div>
-          <div className="info-item"><small>הנקוד שלי</small><p>{myInfo.points}</p></div>
+          <div className="info-item"><small>הניקוד שלי</small><p>{myInfo.points}</p></div>
           <div className="info-item"><small>האלופה שלי</small><p>{myInfo.champion || '---'}</p></div>
         </div>
 

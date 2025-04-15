@@ -24,6 +24,7 @@
           background: rgba(255, 255, 255, 0.6);
           backdrop-filter: blur(12px);
           text-align: center;
+          justify-content: space-between;
 
       h3 {
         font-size: 18px;
@@ -33,8 +34,10 @@
       p {
         font-size: 14px;
         font-weight: 400;
-        position: absolute;
-        right: 15rem;
+        font-size: 14px;
+        font-weight: 400;
+        margin-left: 10px;
+      
         opacity: 0.6;
       }
     }
@@ -159,7 +162,7 @@
       background: rgba(255, 255, 255, 0.2);
       border-radius: 10px;
       position: relative;
-      padding: 1rem;
+      padding-bottom: 1rem;
 
       .header-row-join {
         display: flex;

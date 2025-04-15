@@ -11,7 +11,7 @@
       font-size: 2rem;
       color: #fff;
       cursor: pointer;
-      margin-bottom: 1rem;
+      
       margin-right: 0.5rem;
     }
     .league-code {
@@ -21,7 +21,7 @@
       font-size: 14px;
       font-weight: 400;
       color: #ccc; 
-      margin-bottom: 1rem;
+
       margin-left: 1rem;
     
     }
@@ -44,6 +44,7 @@
     .leaderboard-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       background: rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       padding: 0.6rem 1rem;
@@ -57,8 +58,7 @@
       .points-label {
         font-size: 12px;
         font-weight: 400;
-        position: absolute;
-        right: 20rem;
+    
         color: white;
       }
 
