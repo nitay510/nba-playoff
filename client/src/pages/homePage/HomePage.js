@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import CountdownClock   from '../../components/CountdownClock';
-import TeamLogo         from '../../components/TeamLogo';
+import { useNavigate }        from 'react-router-dom';   // ← NEW
+import CountdownClock         from '../../components/CountdownClock';
+import TeamLogo               from '../../components/TeamLogo';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
-import Background       from '../../components/Login-back';
-import Header           from '../../components/Header';
+import Background             from '../../components/Login-back';
+import Header                 from '../../components/Header';
 import './HomePage.scss';
 
 export default function HomePage() {
+  const navigate = useNavigate();                        // ← NEW
+
   /* ───────── state ───────── */
   const [myInfo,     setMyInfo]     = useState({ username: '', points: 0, champion: '' });
   const [seriesList, setSeriesList] = useState([]);
@@ -14,25 +17,27 @@ export default function HomePage() {
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
 
+  /* ───────── redirect if no username ───────── */
+  useEffect(() => {
+    if (!localStorage.getItem('username')) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   /* ───────── pending‑invite code ───────── */
   const inviteRef = useRef(localStorage.getItem('pendingLeague')); // null or '01c1d0'
 
   /* once username known – attempt join */
   useEffect(() => {
-    console.log(myInfo)
     if (!myInfo.username || !inviteRef.current) return;
     (async () => {
       try {
-        const res = await fetch(
-          'https://nba-playoff-eyd5.onrender.com/api/leagues/join',
-          {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: inviteRef.current }),
-          }
-        );
-        /* success if 200‑range; ignore errors silently */
+        await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/join', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: inviteRef.current }),
+        });
       } finally {
         localStorage.removeItem('pendingLeague');
         inviteRef.current = null;
@@ -59,15 +64,12 @@ export default function HomePage() {
       const username = localStorage.getItem('username');
       if (!username) return;
 
-      const res = await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/auth/me',
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
-        }
-      );
+      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username }),
+      });
       if (!res.ok) return;
       const data = await res.json();
       setMyInfo({
@@ -75,9 +77,7 @@ export default function HomePage() {
         points:   data.points   || 0,
         champion: data.champion || '',
       });
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const fetchUnlockedSeries = async () => {
@@ -87,36 +87,27 @@ export default function HomePage() {
       setSeriesList(
         data
           .filter((s) => !s.isLocked)
-          .sort(
-            (a, b) =>
-              new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15)
-          )
+          .sort((a, b) => new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15))
       );
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const fetchUserBets = async () => {
     try {
-      const res  = await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/user-bets',
-        { credentials: 'include' }
-      );
+      const res  = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets',
+                               { credentials: 'include' });
       const data = await res.json();
       setUserBets(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   /* ───────── betting helpers (unchanged) ───────── */
   const findUserBetDoc = (id) =>
     userBets.find((b) => b.seriesId && b.seriesId._id === id) || null;
 
-  const parseGamesNumber = (str = '') => (str.match(/\d+/) || [null])[0];
+  const parseGamesNumber = (str='') => (str.match(/\d+/) || [null])[0];
 
-  const openCard = (id) => {
+  const openCard  = (id) => {
     setOpenCards((p) => ({ ...p, [id]: true }));
     const doc = findUserBetDoc(id);
     setLocalBets((p) => ({ ...p, [id]: doc ? doc.bets : [] }));
@@ -161,26 +152,21 @@ export default function HomePage() {
 
   const handleSaveBet = async (seriesId) => {
     try {
-      await fetch(
-        `https://nba-playoff-eyd5.onrender.com/api/user-bets/${seriesId}`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bets: localBets[seriesId] || [] }),
-        }
-      );
+      await fetch(`https://nba-playoff-eyd5.onrender.com/api/user-bets/${seriesId}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bets: localBets[seriesId] || [] }),
+      });
       await fetchUserBets();
       closeCard(seriesId);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const countdownElem = (startDate) =>
-    startDate && new Date(startDate) > new Date() ? (
-      <CountdownClock startDate={startDate} />
-    ) : null;
+    startDate && new Date(startDate) > new Date()
+      ? <CountdownClock startDate={startDate} />
+      : null;
 
   /* ───────── render ───────── */
   return (
@@ -191,18 +177,9 @@ export default function HomePage() {
       <div className="page-con">
         {/* info bar */}
         <div className="info-bar">
-          <div className="info-item">
-            <small>שם משתמש</small>
-            <p>{myInfo.username}</p>
-          </div>
-          <div className="info-item">
-            <small>הניקוד שלי</small>
-            <p>{myInfo.points}</p>
-          </div>
-          <div className="info-item">
-            <small>האלופה שלי</small>
-            <p>{myInfo.champion || '---'}</p>
-          </div>
+          <div className="info-item"><small>שם משתמש</small><p>{myInfo.username}</p></div>
+          <div className="info-item"><small>הניקוד שלי</small><p>{myInfo.points}</p></div>
+          <div className="info-item"><small>האלופה שלי</small><p>{myInfo.champion || '---'}</p></div>
         </div>
 
         <div className="series-list">
@@ -216,17 +193,10 @@ export default function HomePage() {
             const isOpen = !!openCards[s._id];
 
             return (
-              <div
-                key={s._id}
-                className={`series-card ${hasBet ? 'has-bet' : 'no-bet'}`}
-              >
+              <div key={s._id} className={`series-card ${hasBet ? 'has-bet' : 'no-bet'}`}>
                 {/* collapsed */}
                 {!isOpen && (
-                  <div
-                    className="series-header"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => openCard(s._id)}
-                  >
+                  <div className="series-header" style={{ cursor: 'pointer' }} onClick={() => openCard(s._id)}>
                     <div className="left-logos">
                       <TeamLogo teamName={s.teamA} className="big-logo" />
                       <TeamLogo teamName={s.teamB} className="big-logo" />
@@ -234,16 +204,10 @@ export default function HomePage() {
 
                     <div className="right-column">
                       {hasBet && <FaCheckCircle className="check-icon" />}
-                      <div className="top-line">
-                        <span style={{ opacity: 0.75 }}>סיום ניחוש בעוד</span>
-                      </div>
-                      {hasBet ? (
-                        <span className="bet-confirmed">ניחוש בוצע</span>
-                      ) : (
-                        <div className="countdown-line">
-                          {countdownElem(s.startDate)}
-                        </div>
-                      )}
+                      <div className="top-line"><span style={{ opacity: 0.75 }}>סיום ניחוש בעוד</span></div>
+                      {hasBet
+                        ? <span className="bet-confirmed">ניחוש בוצע</span>
+                        : <div className="countdown-line">{countdownElem(s.startDate)}</div>}
                     </div>
                   </div>
                 )}
@@ -254,14 +218,9 @@ export default function HomePage() {
                     <div className="top-bar">
                       <div className="top-bar-center">
                         <span style={{ opacity: 0.75 }}>סיום ניחוש בעוד</span>
-                        <div className="countdown-text">
-                          {countdownElem(s.startDate)}
-                        </div>
+                        <div className="countdown-text">{countdownElem(s.startDate)}</div>
                       </div>
-                      <FaTimes
-                        className="close-icon"
-                        onClick={() => closeCard(s._id)}
-                      />
+                      <FaTimes className="close-icon" onClick={() => closeCard(s._id)} />
                     </div>
 
                     <div className="teams-row">
@@ -273,35 +232,20 @@ export default function HomePage() {
                     <div className="bet-options">
                       {s.betOptions.map((opt, i) => (
                         <div key={i} className="bet-category">
-                          <h5>
-                            {opt.category === 'מנצחת הסדרה'
-                              ? 'מנצחת הסדרה (יחס)'
-                              : opt.category}
-                          </h5>
+                          <h5>{opt.category === 'מנצחת הסדרה' ? 'מנצחת הסדרה (יחס)' : opt.category}</h5>
 
                           <div className="pill-container">
                             {opt.choices.map((c, j) => {
-                              const selected = isChoiceSelected(
-                                s._id,
-                                opt.category,
-                                c.name
-                              );
-                              const display =
-                                opt.category === 'מנצחת הסדרה'
-                                  ? `${c.name} (${formatOdds(c.odds)})`
-                                  : c.name;
+                              const selected = isChoiceSelected(s._id, opt.category, c.name);
+                              const display  = opt.category === 'מנצחת הסדרה'
+                                ? `${c.name} (${formatOdds(c.odds)})`
+                                : c.name;
 
                               return (
                                 <div
                                   key={j}
                                   className={`pill ${selected ? 'selected' : ''}`}
-                                  onClick={() =>
-                                    handleChoiceSelect(
-                                      s._id,
-                                      opt.category,
-                                      c
-                                    )
-                                  }
+                                  onClick={() => handleChoiceSelect(s._id, opt.category, c)}
                                 >
                                   {display}
                                 </div>
@@ -313,18 +257,8 @@ export default function HomePage() {
                     </div>
 
                     <div className="modal-actions">
-                      <button
-                        className="primary-btn"
-                        onClick={() => handleSaveBet(s._id)}
-                      >
-                        שמור
-                      </button>
-                      <button
-                        className="cancel-btn"
-                        onClick={() => closeCard(s._id)}
-                      >
-                        בטל
-                      </button>
+                      <button className="primary-btn" onClick={() => handleSaveBet(s._id)}>שמור</button>
+                      <button className="cancel-btn"  onClick={() => closeCard(s._id)}>בטל</button>
                     </div>
                   </div>
                 )}
