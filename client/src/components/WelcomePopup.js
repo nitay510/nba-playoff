@@ -35,6 +35,10 @@ export default function WelcomePopup() {
 
   const finish = () => {
     localStorage.setItem('tutorialSeen', 'true');
+    navigate('/register');
+  };
+  const skip = () => {
+    localStorage.setItem('tutorialSeen', 'true');
     navigate('/');
   };
 
@@ -61,7 +65,7 @@ export default function WelcomePopup() {
           </button>
 
           {!isLast && (
-            <button className="skip-btn" onClick={finish}>
+            <button className="skip-btn" onClick={skip}>
               דלג
             </button>
           )}
