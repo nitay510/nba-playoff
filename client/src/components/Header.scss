@@ -35,7 +35,7 @@
       font-size: 0.9rem;
       cursor: pointer;
       white-space: nowrap;
-      color: #0B131E;
+      color: #000000;
 
       &:hover {
         background: #f3f3f3;
@@ -75,7 +75,7 @@
 
 /* purple header section */
 .menu-top {
-  background: #7b2680;
+  background: rgba(217, 74, 20, 1);
   color: #fff;
   padding: 1.4rem 0 1.2rem;
   align-items: center;
@@ -99,7 +99,7 @@
   border: none;
   outline: none;
   font-size: 0.95rem;
-  color: #0b131e;
+  color: #000000;
   display: flex;
   align-items: center;
   padding: 1rem 1.4rem;
