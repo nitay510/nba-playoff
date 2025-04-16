@@ -14,4 +14,7 @@ router.post('/join', requireAuth, leagueController.joinLeague);
 
 router.get('/:leagueId/leaderboard', requireAuth, leagueController.getLeagueLeaderboard);
 
+router.get('/:leagueId/my-rank', requireAuth, leagueController.getMyRank);
+
+
 module.exports = router;

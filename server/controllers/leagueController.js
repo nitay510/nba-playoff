@@ -106,3 +106,30 @@ exports.getLeagueLeaderboard = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
+
+exports.getMyRank = async (req, res) => {
+  try {
+    const { leagueId } = req.params;
+    const userId       = req.user._id;
+
+    /* bring league members with points only */
+    const league = await League.findById(leagueId)
+      .populate({ path: 'members', select: 'points' });
+
+    if (!league) return res.status(404).json({ msg: 'League not found' });
+
+    /* sort members by points desc */
+    const sorted = league.members
+      .sort((a, b) => b.points - a.points)
+      .map((u) => u._id.toString());
+
+    const rank  = sorted.indexOf(userId.toString()) + 1; // 1‑based
+    const total = sorted.length;
+
+    /* if user not in league – return only total */
+    return res.json({ rank: rank || null, total });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+};
