@@ -39,12 +39,14 @@ exports.login = async (req, res) => {
       // 1. Find the user by username
       const user = await User.findOne({ username });
       if (!user) {
+        console.log("3");
         return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
       }
   
       // 2. Compare the given password with the user's hashed password
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
+        console.log("4");
         return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
       }
   
@@ -73,14 +75,17 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   try {
     const token = req.cookies.token;
-    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
-
+    if (!token) {
+      console.log(token);
+      return res.status(401).json({ msg: 'Unauthorized' });
+    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select('username');
     if (!user) return res.status(401).json({ msg: 'Unauthorized' });
 
     return res.json({ username: user.username });
   } catch {
+    console.log("2");
     return res.status(401).json({ msg: 'Unauthorized' });
   }
 };
@@ -128,7 +133,6 @@ exports.logout = (req, res) => {
     exports.getMyInfo = async (req, res) => {
       try {
         const { username } = req.body;
-        console.log(username)
         const user = await User.findOne({ username });
         if (!user) {
           return res.status(404).json({ msg: 'משתמש לא נמצא' });
