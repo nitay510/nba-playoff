@@ -156,7 +156,7 @@ export default function HomePage() {
               <p>{myInfo.champion}</p>
             ) : (
               <button className="choose-champ-btn" onClick={()=>navigate('/choose-champion')}>
-                בחר אלופה
+                בחר
               </button>
             )}
           </div>
