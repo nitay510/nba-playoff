@@ -5,25 +5,25 @@ const League = require('../models/League');
 
 exports.register = async (req, res) => {
   try {
-    const { username, password,email } = req.body;
+    const { username: rawUsername, password, email } = req.body;
+    const username = rawUsername.trim();
 
-    // Check if username is taken
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ msg: 'שם המשתמש כבר קיים' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
-    const newUser = new User({ username, password: hashedPassword,email });
+    const newUser = new User({ username, password: hashedPassword, email });
     await newUser.save();
+
     const israelLeague = await League.findOne({ name: 'ישראל' });
-if (israelLeague && !israelLeague.members.includes(newUser._id)) {
-  israelLeague.members.push(newUser._id);
-  await israelLeague.save();
-}
+    if (israelLeague && !israelLeague.members.includes(newUser._id)) {
+      israelLeague.members.push(newUser._id);
+      await israelLeague.save();
+    }
+
     return res.status(201).json({ msg: 'המשתמש נוצר בהצלחה' });
   } catch (error) {
     console.error(error);
@@ -33,57 +33,44 @@ if (israelLeague && !israelLeague.members.includes(newUser._id)) {
 
 // server/controllers/authController.js
 exports.login = async (req, res) => {
-  try {
-    let { username, password } = req.body;
-
-    // 1. Clean the username input
-    const trimmedUsername = username.trim();
-
-    // 2. Try to find user with exact trimmed username
-    let user = await User.findOne({ username: trimmedUsername });
-
-    // 3. If not found, try common variants with spaces accidentally saved
-    if (!user) {
-      const variants = [
-        ` ${trimmedUsername}`,
-        `${trimmedUsername} `,
-        ` ${trimmedUsername} `
-      ];
-
-      user = await User.findOne({ username: { $in: variants } });
+    try {
+      const { username, password } = req.body;
+  
+      // 1. Find the user by username
+      const trimUser = username.trim();
+      const user = await User.findOne({ username:trimUser });
+      if (!user) {
+       
+        return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+      }
+  
+      // 2. Compare the given password with the user's hashed password
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) {
+        return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+      }
+  
+      // 3. Create a JWT token (valid for 1 day)
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '1d',
+      });
+  
+      // 4. Set the token in an httpOnly cookie
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: false, // Set to true if you're using HTTPS
+        sameSite: 'lax', // or 'strict'
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
+  
+      // 5. Return success and the username so the client can store it
+      return res.json({ msg: 'התחברת בהצלחה', username: user.username });
+  
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ msg: 'שגיאה בשרת' });
     }
-
-    if (!user) {
-      return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
-    }
-
-    // 4. Check password
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
-    }
-
-    // 5. Create JWT
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    });
-
-    // 6. Send token in cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    res.status(200).json({ msg: 'התחברת בהצלחה' });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'שגיאת שרת' });
-  }
-};
-
+  };
 /**  NEW – verify token and return basic user info  */
 exports.me = async (req, res) => {
   try {
@@ -145,28 +132,13 @@ exports.logout = (req, res) => {
     };
     exports.getMyInfo = async (req, res) => {
       try {
-        let { username } = req.body;
-        const trimmedUsername = username.trim();
-    
-        // נסה קודם את השם בלי רווחים
-        let user = await User.findOne({ username: trimmedUsername });
-    
-        // אם לא נמצא, נסה גרסאות עם רווחים בטעות
-        if (!user) {
-          const variants = [
-            ` ${trimmedUsername}`,
-            `${trimmedUsername} `,
-            ` ${trimmedUsername} `
-          ];
-          user = await User.findOne({ username: { $in: variants } });
-        }
-    
+        const { username } = req.body;
+        const user = await User.findOne({ username });
         if (!user) {
           return res.status(404).json({ msg: 'משתמש לא נמצא' });
         }
-    
         return res.json({
-          username: user.username.trim(), // מחזיר בלי רווחים מיותרים
+          username: user.username,
           points: user.points,
           champion: user.champions,
         });
@@ -175,3 +147,4 @@ exports.logout = (req, res) => {
         return res.status(500).json({ msg: 'שגיאה בשרת' });
       }
     };
+    

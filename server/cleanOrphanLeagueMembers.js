@@ -1,30 +1,26 @@
-/* scripts/cleanOrphanLeagueMembers.js */
+/* scripts/trimUsernames.js */
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const User   = require('./models/User');
-const League = require('./models/League');
+const User = require('./models/User');
 
 (async () => {
   await mongoose.connect(process.env.MONGO_URI);
 
-  const leagues = await League.find();
-  let totalRemoved = 0;
+  const users = await User.find();
+  let trimmedCount = 0;
 
-  for (const lg of leagues) {
-    /* keep only members whose _id exists in users collection */
-    const validIds = await User.find({ _id: { $in: lg.members } }).distinct('_id');
-    const before   = lg.members.length;
-    lg.members     = validIds;
-    const removed  = before - validIds.length;
-    if (removed) {
-      await lg.save();
-      console.log(`League "${lg.name}" – removed ${removed} orphan member(s)`);
-      totalRemoved += removed;
+  for (const user of users) {
+    const trimmedUsername = user.username.trim();
+    if (trimmedUsername !== user.username) {
+      console.log(`Trimming username "${user.username}" → "${trimmedUsername}"`);
+      user.username = trimmedUsername;
+      await user.save();
+      trimmedCount++;
     }
   }
 
-  console.log(`\nDone. Total removed: ${totalRemoved}`);
+  console.log(`\nDone. Total usernames trimmed: ${trimmedCount}`);
   await mongoose.disconnect();
   process.exit();
 })();
