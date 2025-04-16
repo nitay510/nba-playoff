@@ -145,13 +145,28 @@ exports.logout = (req, res) => {
     };
     exports.getMyInfo = async (req, res) => {
       try {
-        const { username } = req.body;
-        const user = await User.findOne({ username });
+        let { username } = req.body;
+        const trimmedUsername = username.trim();
+    
+        // נסה קודם את השם בלי רווחים
+        let user = await User.findOne({ username: trimmedUsername });
+    
+        // אם לא נמצא, נסה גרסאות עם רווחים בטעות
+        if (!user) {
+          const variants = [
+            ` ${trimmedUsername}`,
+            `${trimmedUsername} `,
+            ` ${trimmedUsername} `
+          ];
+          user = await User.findOne({ username: { $in: variants } });
+        }
+    
         if (!user) {
           return res.status(404).json({ msg: 'משתמש לא נמצא' });
         }
+    
         return res.json({
-          username: user.username,
+          username: user.username.trim(), // מחזיר בלי רווחים מיותרים
           points: user.points,
           champion: user.champions,
         });
@@ -160,4 +175,3 @@ exports.logout = (req, res) => {
         return res.status(500).json({ msg: 'שגיאה בשרת' });
       }
     };
-    
