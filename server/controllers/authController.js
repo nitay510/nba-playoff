@@ -39,6 +39,7 @@ exports.login = async (req, res) => {
       // 1. Find the user by username
       const user = await User.findOne({ username });
       if (!user) {
+        console.log(username);
         console.log("3");
         return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
       }
