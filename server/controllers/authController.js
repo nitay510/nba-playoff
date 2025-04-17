@@ -64,7 +64,7 @@ exports.login = async (req, res) => {
         httpOnly: true,
         secure: false, // Set to true if you're using HTTPS
         sameSite: 'lax', // or 'strict'
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        maxAge: 24 * 60 * 60 * 10000, // 10 day
       });
   
       // 5. Return success and the username so the client can store it
