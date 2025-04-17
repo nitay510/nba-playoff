@@ -80,7 +80,7 @@ function LoginPage() {
       <h2 className="title-small">התחברות</h2>
 
       <form onSubmit={handleLogin} className="login-form">
-        <label>שם משתמש</label>
+        <label>שם משתמש/אימייל</label>
         <input
           type="text"
           value={username}

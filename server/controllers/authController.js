@@ -34,14 +34,18 @@ exports.register = async (req, res) => {
 // server/controllers/authController.js
 exports.login = async (req, res) => {
     try {
-      const { username, password } = req.body;
+      let { username, password } = req.body;
+      username = (username || '').trim();   
+      password = password || '';
   
-      // 1. Find the user by username
-      const trimUser = username.trim();
-      const user = await User.findOne({ username:trimUser });
+      /* חיפוש משתמש */
+      let user = await User.findOne({ username });
       if (!user) {
-       
-        return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+        // ייתכן שהוקלד אימייל בשדה שם‑משתמש
+        user = await User.findOne({ email: username.toLowerCase() });
+        if (!user) {
+          return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+        }
       }
   
       // 2. Compare the given password with the user's hashed password
