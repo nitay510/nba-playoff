@@ -1,26 +1,37 @@
-/* scripts/trimUsernames.js */
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const User = require('./models/User');
+const uri = process.env.MONGO_URI;
+if (!uri) {
+  console.error('❌  Missing MONGO_URI in .env');
+  process.exit(1);
+}
+
+// • הגדרת מודל מינימלית (שם האוסף “users”)
+const userSchema = new mongoose.Schema({
+  champions: { type: String }
+}, { collection: 'users' });
+
+const User = mongoose.model('User', userSchema);
 
 (async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  try {
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+    console.log('✓ Connected');
 
-  const users = await User.find();
-  let trimmedCount = 0;
+    // תנאי: champions == null || '' || לא קיים
+    const count = await User.countDocuments({
+      $or: [
+        { champions: { $exists: false } },
+        { champions: null },
+        { champions: '' }
+      ]
+    });
 
-  for (const user of users) {
-    const trimmedUsername = user.username.trim();
-    if (trimmedUsername !== user.username) {
-      console.log(`Trimming username "${user.username}" → "${trimmedUsername}"`);
-      user.username = trimmedUsername;
-      await user.save();
-      trimmedCount++;
-    }
+    console.log(`\n— ${count} משתמשים עדיין לא בחרו אלופה —\n`);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    mongoose.connection.close();
   }
-
-  console.log(`\nDone. Total usernames trimmed: ${trimmedCount}`);
-  await mongoose.disconnect();
-  process.exit();
 })();

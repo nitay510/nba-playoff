@@ -80,7 +80,6 @@ exports.me = async (req, res) => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      console.log(token);
       return res.status(401).json({ msg: 'Unauthorized' });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -89,7 +88,7 @@ exports.me = async (req, res) => {
 
     return res.json({ username: user.username });
   } catch {
-    console.log("2");
+
     return res.status(401).json({ msg: 'Unauthorized' });
   }
 };

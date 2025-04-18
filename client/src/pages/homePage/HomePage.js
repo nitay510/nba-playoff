@@ -1,16 +1,23 @@
+/******************************************************
+ * client/src/pages/homePage/HomePage.js              *
+ * ‑‑ שינוי יחיד: סדר הסדרות                          *
+ *   ➊ מייצרים orderedSeries — קודם ללא‑הימור,        *
+ *      ואז לפי startDate.                            *
+ *****************************************************/
+
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate }        from 'react-router-dom';
-import CountdownClock         from '../../components/CountdownClock';
-import TeamLogo               from '../../components/TeamLogo';
+import { useNavigate }     from 'react-router-dom';
+import CountdownClock      from '../../components/CountdownClock';
+import TeamLogo            from '../../components/TeamLogo';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
-import Background             from '../../components/Login-back';
-import Header                 from '../../components/Header';
+import Background          from '../../components/Login-back';
+import Header              from '../../components/Header';
 import './HomePage.scss';
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  /* redirect guest → login */
+  /* ───────── redirect guest ───────── */
   useEffect(() => {
     if (!localStorage.getItem('username')) navigate('/', { replace: true });
   }, [navigate]);
@@ -22,9 +29,8 @@ export default function HomePage() {
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
 
-  /* ───────── invite code ───────── */
+  /* ───────── invite code once ───────── */
   const inviteRef = useRef(localStorage.getItem('pendingLeague'));
-
   useEffect(() => {
     if (!myInfo.username || !inviteRef.current) return;
     (async () => {
@@ -42,14 +48,13 @@ export default function HomePage() {
     })();
   }, [myInfo.username]);
 
-  /* initial fetches */
+  /* ───────── initial fetches ───────── */
   useEffect(() => {
     fetchMyUserInfo();
     fetchUnlockedSeries();
     fetchUserBets();
   }, []);
 
-  /* helpers */
   const formatOdds = (v) => (Number.isFinite(+v) ? (+v).toFixed(1) : v);
 
   const fetchMyUserInfo = async () => {
@@ -73,77 +78,79 @@ export default function HomePage() {
       const r = await fetch('https://nba-playoff-eyd5.onrender.com/api/series');
       const d = await r.json();
       setSeriesList(
-        d.filter((s) => !s.isLocked)
-         .sort((a, b) => new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15))
+        d.filter((s) => !s.isLocked)                    // only unlocked
       );
     } catch (e) { console.error(e); }
   };
 
   const fetchUserBets = async () => {
     try {
-      const r = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets',
-                            { credentials: 'include' });
+      const r  = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets',
+                             { credentials: 'include' });
       const d = await r.json();
       setUserBets(Array.isArray(d) ? d : []);
     } catch (e) { console.error(e); }
   };
 
-  /* betting helpers (unchanged) */
-  const findDoc = (id) => userBets.find((b) => b.seriesId?._id === id) || null;
-  const numStr  = (s='') => (s.match(/\d+/) || [null])[0];
+  /* ───────── betting helpers (ללא שינוי) ───────── */
+  const findDoc = (id) => userBets.find((b)=>(b.seriesId?._id===id)) || null;
+  const numStr  = (s='') => (s.match(/\d+/)||[null])[0];
 
-  const openCard  = (id) => {
-    setOpenCards((p) => ({ ...p, [id]: true }));
-    setLocalBets((p) => ({ ...p, [id]: findDoc(id)?.bets || [] }));
+  const openCard  = (id)=>{
+    setOpenCards((p)=>({...p,[id]:true}));
+    setLocalBets((p)=>({...p,[id]:findDoc(id)?.bets||[]}));
   };
-  const closeCard = (id) => setOpenCards((p) => ({ ...p, [id]: false }));
+  const closeCard = (id)=>setOpenCards((p)=>({...p,[id]:false}));
 
-  const syncGames = (sid, bets) => {
-    const w = bets.find((b) => b.category === 'מנצחת הסדרה');
-    const g = bets.find((b) => b.category === 'בכמה משחקים');
-    if (!w || !g) return bets;
-    const n = numStr(g.choiceName);
-    return n ? bets.map((b)=>
-      b.category==='בכמה משחקים'?{...b,choiceName:`${w.choiceName} ב${n}`}:b
-    ):bets;
+  const syncGames=(sid,b)=>{
+    const w=b.find(x=>x.category==='מנצחת הסדרה');
+    const g=b.find(x=>x.category==='בכמה משחקים');
+    if(!w||!g) return b;
+    const n=numStr(g.choiceName);
+    return n?b.map(x=>x.category==='בכמה משחקים'?{...x,choiceName:`${w.choiceName} ב${n}`}:x):b;
   };
 
-  const select = (sid, cat, choice) => {
-    const prev = localBets[sid] || [];
-    const idx  = prev.findIndex((b)=>b.category===cat);
-    const upd  = idx===-1
-      ? [...prev,{category:cat,choiceName:choice.name,oddsWhenPlaced:choice.odds}]
-      : prev.map((b,i)=>i===idx?{...b,choiceName:choice.name,oddsWhenPlaced:choice.odds}:b);
-    setLocalBets((p)=>({...p,[sid]:syncGames(sid,upd)}));
+  const select=(sid,cat,ch)=>{
+    const prev=localBets[sid]||[];
+    const idx =prev.findIndex(x=>x.category===cat);
+    const upd =idx===-1?[...prev,{category:cat,choiceName:ch.name,oddsWhenPlaced:ch.odds}]
+                       :prev.map((x,i)=>i===idx?{...x,choiceName:ch.name,oddsWhenPlaced:ch.odds}:x);
+    setLocalBets(p=>({...p,[sid]:syncGames(sid,upd)}));
   };
 
-  const isSel = (sid,cat,name)=>{
-    const b=(localBets[sid]||[]).find((x)=>x.category===cat);
-    if(!b) return false;
+  const isSel=(sid,cat,name)=>{
+    const b=(localBets[sid]||[]).find(x=>x.category===cat); if(!b) return false;
     if(cat==='מנצחת הסדרה') return b.choiceName===name;
     if(cat==='בכמה משחקים') return numStr(b.choiceName)===numStr(name);
     return b.choiceName===name;
   };
 
-  const saveBet = async (sid)=>{
+  const saveBet=async(sid)=>{
     try{
       await fetch(`https://nba-playoff-eyd5.onrender.com/api/user-bets/${sid}`,{
         method:'POST',credentials:'include',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({bets:localBets[sid]||[]})
       });
-      await fetchUserBets();
-      closeCard(sid);
+      await fetchUserBets(); closeCard(sid);
     }catch(e){console.error(e);}
   };
 
   const cd = (d)=>d&&new Date(d)>new Date()?<CountdownClock startDate={d}/> : null;
 
-  /* ───────── UI ───────── */
+  /* ---------- ❶   ORDER: no‑bet first, then by startDate ---------- */
+  const orderedSeries = [...seriesList].sort((a,b)=>{
+    const aBet = !!findDoc(a._id);
+    const bBet = !!findDoc(b._id);
+    if (aBet !== bBet) return aBet ? 1 : -1;                     // no‑bet first
+    return new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15);
+  });
+
+  /* ───────── render ───────── */
   return (
     <div className="home-page">
-      <Header />
-      <Background image="background.png" />
+      <Header/>
+      <Background image="background.png"/>
 
       <div className="page-con">
         {/* info bar */}
@@ -152,21 +159,17 @@ export default function HomePage() {
           <div className="info-item"><small>הניקוד שלי</small><p>{myInfo.points}</p></div>
           <div className="info-item">
             <small>האלופה שלי</small>
-            {myInfo.champion ? (
-              <p>{myInfo.champion}</p>
-            ) : (
-              <button className="choose-champ-btn" onClick={()=>navigate('/choose-champion')}>
-                בחר
-              </button>
-            )}
+            {myInfo.champion
+              ? <p>{myInfo.champion}</p>
+              : <button className="choose-champ-btn" onClick={()=>navigate('/choose-champion')}>בחר</button>}
           </div>
         </div>
 
         <div className="series-list">
           <h2 className="bets">דף הבית</h2>
-          {seriesList.length===0 && <p style={{marginRight:'2rem'}}>אין סדרות פתוחות כרגע.</p>}
+          {orderedSeries.length===0 && <p style={{marginRight:'2rem'}}>אין סדרות פתוחות כרגע.</p>}
 
-          {seriesList.map((s)=> {
+          {orderedSeries.map((s)=>{
             const hasBet = !!findDoc(s._id);
             const isOpen = !!openCards[s._id];
 
@@ -182,8 +185,9 @@ export default function HomePage() {
                     <div className="right-column">
                       {hasBet && <FaCheckCircle className="check-icon"/>}
                       <div className="top-line"><span style={{opacity:.75}}>סיום ניחוש בעוד</span></div>
-                      {hasBet ? <span className="bet-confirmed">ניחוש בוצע</span>
-                               : <div className="countdown-line">{cd(s.startDate)}</div>}
+                      {hasBet
+                        ? <span className="bet-confirmed">ניחוש בוצע</span>
+                        : <div className="countdown-line">{cd(s.startDate)}</div>}
                     </div>
                   </div>
                 )}
@@ -217,9 +221,7 @@ export default function HomePage() {
                                 : c.name;
                               return (
                                 <div key={j} className={`pill ${sel?'selected':''}`}
-                                     onClick={()=>select(s._id,opt.category,c)}>
-                                  {txt}
-                                </div>
+                                     onClick={()=>select(s._id,opt.category,c)}>{txt}</div>
                               );
                             })}
                           </div>
