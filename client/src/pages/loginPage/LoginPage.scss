@@ -95,16 +95,18 @@ margin-right: 2rem;
       font-weight: 400;
       font-size: 14px;
       line-height: 20.58px;
-      letter-spacing: 0%;
-      text-align: right;
       text-decoration: underline;
-      text-decoration-style: solid;
-      text-decoration-thickness: Auto;
-      text-decoration-skip-ink: auto;
-      
-    
-
     }
-    
+
+    .forgot-link-wrap {
+      text-align: center;
+      margin: 0.5rem 0 0.25rem;
+    }
+    .forgot-link {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-decoration: underline;
+      &:hover { color: #fff; }
+    }
   }
-  
+}

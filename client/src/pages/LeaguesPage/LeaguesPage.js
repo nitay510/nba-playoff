@@ -23,7 +23,7 @@ function LeaguesPage() {
 
   const fetchMyLeagues = async () => {
     try {
-      const res  = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/mine',
+      const res  = await fetch('/api/leagues/mine',
                                { credentials: 'include' });
       const data = await res.json();
       setLeagues(data);
@@ -32,7 +32,7 @@ function LeaguesPage() {
       const rankPromises = data.map(async (lg) => {
         try {
           const r = await fetch(
-            `https://nba-playoff-eyd5.onrender.com/api/leagues/${lg._id}/my-rank`,
+            `/api/leagues/${lg._id}/my-rank`,
             { credentials: 'include' }
           );
           if (!r.ok) throw new Error('no rank');
@@ -56,7 +56,7 @@ function LeaguesPage() {
   /* create league (unchanged) */
   const handleCreateLeague = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/create', {
+      const res = await fetch('/api/leagues/create', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: leagueName }),
@@ -71,7 +71,7 @@ function LeaguesPage() {
   /* join league (unchanged) */
   const handleJoinLeague = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/join', {
+      const res = await fetch('/api/leagues/join', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: joinCode }),

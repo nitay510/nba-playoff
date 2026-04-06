@@ -66,11 +66,11 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
         startDate,
       };
 
-      let url = 'https://nba-playoff-eyd5.onrender.com/api/series';
+      let url = '/api/series';
       let method = 'POST';
 
       if (existingSeries) {
-        url = `https://nba-playoff-eyd5.onrender.com/api/series/${existingSeries._id}`;
+        url = `/api/series/${existingSeries._id}`;
         method = 'PUT';
       }
 

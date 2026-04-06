@@ -8,6 +8,8 @@ import {
 
 import NavBar                    from './components/NavBar';
 import LoginPage                 from './pages/loginPage/LoginPage';
+import ForgotPasswordPage        from './pages/loginPage/ForgotPasswordPage';
+import ResetPasswordPage         from './pages/loginPage/ResetPasswordPage';
 import RegisterPage              from './pages/registerPage/RegisterPage';
 import ChampionSelectionPage     from './pages/registerPage/ChampionSelectionPage';
 import HomePage                  from './pages/homePage/HomePage';
@@ -40,6 +42,8 @@ function AppWrapper() {
   const hideNav =
     location.pathname === '/' ||
     location.pathname === '/register' ||
+    location.pathname === '/forgot-password' ||
+    location.pathname === '/reset-password' ||
     location.pathname === '/choose-champion' ||
     location.pathname.startsWith('/admin') ||
     location.pathname === '/welcome';
@@ -48,6 +52,8 @@ function AppWrapper() {
     <div className="app-content">
       <Routes>
         <Route path="/"                         element={<LoginPage />} />
+        <Route path="/forgot-password"          element={<ForgotPasswordPage />} />
+        <Route path="/reset-password"           element={<ResetPasswordPage />} />
         <Route path="/register"                 element={<RegisterPage />} />
         <Route path="/choose-champion"          element={<ChampionSelectionPage />} />
         <Route path="/home"                     element={<HomePage />} />

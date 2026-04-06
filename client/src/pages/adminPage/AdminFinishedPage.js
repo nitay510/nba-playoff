@@ -17,7 +17,7 @@ function AdminFinishedPage() {
   const fetchFinishedSeries = async () => {
     try {
       const res = await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/series',
+        '/api/series',
         { credentials: 'include' }
       );
       const data = await res.json();
@@ -31,7 +31,7 @@ function AdminFinishedPage() {
   const handleLogout = async () => {
     try {
       await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/auth/logout',
+        '/api/auth/logout',
         { method: 'POST', credentials: 'include' }
       );
     } catch (_) {

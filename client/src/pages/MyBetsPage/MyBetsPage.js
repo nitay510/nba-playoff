@@ -18,7 +18,7 @@ function MyBetsPage() {
 
   const fetchAllUserBets = async () => {
     try {
-      const res = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets/all', {
+      const res = await fetch('/api/user-bets/all', {
         credentials: 'include',
       });
       if (!res.ok) {

@@ -1,23 +1,38 @@
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const League = require('../models/League');
+const User    = require('../models/User');
+const bcrypt  = require('bcryptjs');
+const jwt     = require('jsonwebtoken');
+const crypto  = require('crypto');
+const League  = require('../models/League');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
+const COOKIE_OPTS = () => ({
+  httpOnly: true,
+  secure:   process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+});
+
+/* ── register ── */
 exports.register = async (req, res) => {
   try {
-    const { username: rawUsername, password, email } = req.body;
-    const username = rawUsername.trim();
+    const { username: rawUsername, password, email: rawEmail } = req.body;
+    const username = (rawUsername || '').trim();
+    const email    = (rawEmail || '').trim().toLowerCase();
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ msg: 'שם המשתמש כבר קיים' });
-    }
+    if (!username) return res.status(400).json({ msg: 'שם משתמש נדרש' });
+    if (!email || !email.includes('@')) return res.status(400).json({ msg: 'אימייל תקין נדרש' });
+    if (!password || password.length < 6) return res.status(400).json({ msg: 'סיסמה חייבת להכיל לפחות 6 תווים' });
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) return res.status(400).json({ msg: 'שם המשתמש כבר קיים' });
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) return res.status(400).json({ msg: 'האימייל כבר רשום במערכת' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({ username, password: hashedPassword, email });
     await newUser.save();
 
+    // Auto-join the Israel league
     const israelLeague = await League.findOne({ name: 'ישראל' });
     if (israelLeague && !israelLeague.members.includes(newUser._id)) {
       israelLeague.members.push(newUser._id);
@@ -31,123 +46,142 @@ exports.register = async (req, res) => {
   }
 };
 
-// server/controllers/authController.js
+/* ── login ── */
 exports.login = async (req, res) => {
-    try {
-      let { username, password } = req.body;
-      username = (username || '').trim();   
-      password = password || '';
-  
-      /* חיפוש משתמש */
-      let user = await User.findOne({ username });
-      if (!user) {
-        // ייתכן שהוקלד אימייל בשדה שם‑משתמש
-        user = await User.findOne({ email: username.toLowerCase() });
-        if (!user) {
-          return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
-        }
-      }
-  
-      // 2. Compare the given password with the user's hashed password
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) {
-        return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
-      }
-  
-      // 3. Create a JWT token (valid for 1 day)
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '1d',
-      });
-  
-      // 4. Set the token in an httpOnly cookie
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: false, // Set to true if you're using HTTPS
-        sameSite: 'lax', // or 'strict'
-        maxAge: 24 * 60 * 60 * 10000, // 10 day
-      });
-  
-      // 5. Return success and the username so the client can store it
-      return res.json({ msg: 'התחברת בהצלחה', username: user.username });
-  
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ msg: 'שגיאה בשרת' });
-    }
-  };
-/**  NEW – verify token and return basic user info  */
+  try {
+    let { username, password } = req.body;
+    username = (username || '').trim();
+    password = password || '';
+
+    let user = await User.findOne({ username });
+    if (!user) user = await User.findOne({ email: username.toLowerCase() });
+    if (!user) return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ msg: 'שם משתמש או סיסמה שגויים' });
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '10d' });
+
+    res.cookie('token', token, {
+      ...COOKIE_OPTS(),
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({ msg: 'התחברת בהצלחה', username: user.username });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'שגיאה בשרת' });
+  }
+};
+
+/* ── me (GET) – verify cookie ── */
 exports.me = async (req, res) => {
   try {
     const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ msg: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ msg: 'Unauthorized' });
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('username');
+    const user    = await User.findById(decoded.userId).select('username');
     if (!user) return res.status(401).json({ msg: 'Unauthorized' });
-
     return res.json({ username: user.username });
   } catch {
-
     return res.status(401).json({ msg: 'Unauthorized' });
   }
 };
 
-/**  NEW – logout: clear cookie  */
+/* ── getMyInfo (POST) ── */
+exports.getMyInfo = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ msg: 'משתמש לא נמצא' });
+    return res.json({ username: user.username, points: user.points, champion: user.champions });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: 'שגיאה בשרת' });
+  }
+};
+
+/* ── logout ── */
 exports.logout = (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-  });
+  res.clearCookie('token', COOKIE_OPTS());
   return res.json({ msg: 'התנתקת בהצלחה' });
 };
-  exports.setChampion = async (req, res) => {
-    try {
-      const { username, champion } = req.body; // Get username & champion from request
-  
-      // Find user by username
-      const user = await User.findOne({ username });
-  
-      if (!user) {
-        return res.status(404).json({ msg: 'המשתמש לא נמצא' });
-      }
-  
-      // Update the champion field
-      user.champions = champion;
-      await user.save();
-  
-      return res.status(200).json({ msg: 'אלוף עודכן בהצלחה', champion: user.champions });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ msg: 'שגיאה בעדכון האלוף' });
-    }
-  };
 
-  exports.getAllUsers = async (req, res) => {
-    try {
+/* ── setChampion ── */
+exports.setChampion = async (req, res) => {
+  try {
+    const { username, champion } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ msg: 'המשתמש לא נמצא' });
+    user.champions = champion;
+    await user.save();
+    return res.status(200).json({ msg: 'אלוף עודכן בהצלחה', champion: user.champions });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'שגיאה בעדכון האלוף' });
+  }
+};
+
+/* ── getAllUsers ── */
+exports.getAllUsers = async (req, res) => {
+  try {
     const users = await User.find().sort({ points: -1 });
     return res.status(200).json(users);
-    } catch (error) {
+  } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: 'שגיאה בקבלת המשתמשים' });
+  }
+};
+
+/* ── forgotPassword ── */
+exports.forgotPassword = async (req, res) => {
+  try {
+    const email = (req.body.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ msg: 'אימייל נדרש' });
+
+    const user = await User.findOne({ email });
+
+    // Always respond with success to prevent email enumeration
+    if (!user) {
+      return res.json({ msg: 'אם האימייל קיים במערכת, נשלח אליו קישור לאיפוס סיסמה' });
     }
-    };
-    exports.getMyInfo = async (req, res) => {
-      try {
-        const { username } = req.body;
-        const user = await User.findOne({ username });
-        if (!user) {
-          return res.status(404).json({ msg: 'משתמש לא נמצא' });
-        }
-        return res.json({
-          username: user.username,
-          points: user.points,
-          champion: user.champions,
-        });
-      } catch (err) {
-        console.error(err);
-        return res.status(500).json({ msg: 'שגיאה בשרת' });
-      }
-    };
-    
+
+    const token  = crypto.randomBytes(32).toString('hex');
+    user.resetToken       = token;
+    user.resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await user.save();
+
+    await sendPasswordResetEmail(email, token);
+
+    return res.json({ msg: 'אם האימייל קיים במערכת, נשלח אליו קישור לאיפוס סיסמה' });
+  } catch (error) {
+    console.error('[forgotPassword]', error);
+    return res.status(500).json({ msg: 'שגיאה בשליחת המייל. נסה שוב מאוחר יותר.' });
+  }
+};
+
+/* ── resetPassword ── */
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) return res.status(400).json({ msg: 'נתונים חסרים' });
+    if (password.length < 6) return res.status(400).json({ msg: 'סיסמה חייבת להכיל לפחות 6 תווים' });
+
+    const user = await User.findOne({
+      resetToken:       token,
+      resetTokenExpiry: { $gt: new Date() }, // not expired
+    });
+
+    if (!user) return res.status(400).json({ msg: 'הקישור לא תקין או פג תוקפו' });
+
+    user.password        = await bcrypt.hash(password, 10);
+    user.resetToken      = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    return res.json({ msg: 'הסיסמה עודכנה בהצלחה. ניתן להתחבר עכשיו.' });
+  } catch (error) {
+    console.error('[resetPassword]', error);
+    return res.status(500).json({ msg: 'שגיאה בשרת' });
+  }
+};

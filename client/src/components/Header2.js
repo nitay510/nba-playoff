@@ -19,7 +19,7 @@ function Header2() {
   const handleLogout = async () => {
     try {
       await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/auth/logout',
+        '/api/auth/logout',
         { method: 'POST', credentials: 'include' }
       );
     } catch (_) {}

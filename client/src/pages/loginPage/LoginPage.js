@@ -29,7 +29,7 @@ function LoginPage() {
     const savedUser = localStorage.getItem('username');
     if (!savedUser) return;
   
-    fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
+    fetch('/api/auth/me', {
       credentials: 'include',
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -50,7 +50,7 @@ function LoginPage() {
 
     try {
       const res = await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/auth/login',
+        '/api/auth/login',
         {
           method: 'POST',
           credentials: 'include',
@@ -98,11 +98,13 @@ function LoginPage() {
 
         <button type="submit">התחבר</button>
 
+        <div className="forgot-link-wrap">
+          <Link to="/forgot-password" className="forgot-link">שכחתי סיסמה</Link>
+        </div>
+
         <div className="register-container2">
           <p className="register-text">עדיין אין לך חשבון?</p>
-          <Link to="/register" className="register-link">
-            הירשם עכשיו
-          </Link>
+          <Link to="/register" className="register-link">הירשם עכשיו</Link>
         </div>
       </form>
     </div>

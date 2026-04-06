@@ -12,7 +12,7 @@ function ContactModal({ onClose }) {
     e.preventDefault();
     try {
       const res = await fetch(
-        'https://nba-playoff-eyd5.onrender.com/api/contact',
+        '/api/contact',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -1,10 +1,3 @@
-/******************************************************
- * client/src/pages/homePage/HomePage.js              *
- * ‑‑ שינוי יחיד: סדר הסדרות                          *
- *   ➊ מייצרים orderedSeries — קודם ללא‑הימור,        *
- *      ואז לפי startDate.                            *
- *****************************************************/
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate }     from 'react-router-dom';
 import CountdownClock      from '../../components/CountdownClock';
@@ -17,27 +10,24 @@ import './HomePage.scss';
 export default function HomePage() {
   const navigate = useNavigate();
 
-  /* ───────── redirect guest ───────── */
   useEffect(() => {
     if (!localStorage.getItem('username')) navigate('/', { replace: true });
   }, [navigate]);
 
-  /* ───────── state ───────── */
   const [myInfo,     setMyInfo]     = useState({ username: '', points: 0, champion: '' });
   const [seriesList, setSeriesList] = useState([]);
   const [userBets,   setUserBets]   = useState([]);
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
 
-  /* ───────── invite code once ───────── */
+  /* join league from invite link */
   const inviteRef = useRef(localStorage.getItem('pendingLeague'));
   useEffect(() => {
     if (!myInfo.username || !inviteRef.current) return;
     (async () => {
       try {
-        await fetch('https://nba-playoff-eyd5.onrender.com/api/leagues/join', {
-          method: 'POST',
-          credentials: 'include',
+        await fetch('/api/leagues/join', {
+          method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: inviteRef.current }),
         });
@@ -48,10 +38,9 @@ export default function HomePage() {
     })();
   }, [myInfo.username]);
 
-  /* ───────── initial fetches ───────── */
   useEffect(() => {
     fetchMyUserInfo();
-    fetchUnlockedSeries();
+    fetchAllActiveSeries();
     fetchUserBets();
   }, []);
 
@@ -61,9 +50,8 @@ export default function HomePage() {
     const username = localStorage.getItem('username');
     if (!username) return;
     try {
-      const r = await fetch('https://nba-playoff-eyd5.onrender.com/api/auth/me', {
-        method: 'POST',
-        credentials: 'include',
+      const r = await fetch('/api/auth/me', {
+        method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username }),
       });
@@ -73,84 +61,103 @@ export default function HomePage() {
     } catch (e) { console.error(e); }
   };
 
-  const fetchUnlockedSeries = async () => {
+  /* Fetch all non-finished series (locked AND unlocked) */
+  const fetchAllActiveSeries = async () => {
     try {
-      const r = await fetch('https://nba-playoff-eyd5.onrender.com/api/series');
+      const r = await fetch('/api/series');
       const d = await r.json();
-      setSeriesList(
-        d.filter((s) => !s.isLocked)                    // only unlocked
-      );
+      setSeriesList(d.filter((s) => !s.isFinished));
     } catch (e) { console.error(e); }
   };
 
   const fetchUserBets = async () => {
     try {
-      const r  = await fetch('https://nba-playoff-eyd5.onrender.com/api/user-bets',
-                             { credentials: 'include' });
+      const r = await fetch('/api/user-bets', { credentials: 'include' });
       const d = await r.json();
       setUserBets(Array.isArray(d) ? d : []);
     } catch (e) { console.error(e); }
   };
 
-  /* ───────── betting helpers (ללא שינוי) ───────── */
-  const findDoc = (id) => userBets.find((b)=>(b.seriesId?._id===id)) || null;
-  const numStr  = (s='') => (s.match(/\d+/)||[null])[0];
+  const findDoc  = (id) => userBets.find((b) => b.seriesId?._id === id) || null;
+  const numStr   = (s = '') => (s.match(/\d+/) || [null])[0];
 
-  const openCard  = (id)=>{
-    setOpenCards((p)=>({...p,[id]:true}));
-    setLocalBets((p)=>({...p,[id]:findDoc(id)?.bets||[]}));
+  const openCard  = (id) => {
+    setOpenCards((p) => ({ ...p, [id]: true }));
+    setLocalBets((p) => ({ ...p, [id]: findDoc(id)?.bets || [] }));
   };
-  const closeCard = (id)=>setOpenCards((p)=>({...p,[id]:false}));
+  const closeCard = (id) => setOpenCards((p) => ({ ...p, [id]: false }));
 
-  const syncGames=(sid,b)=>{
-    const w=b.find(x=>x.category==='מנצחת הסדרה');
-    const g=b.find(x=>x.category==='בכמה משחקים');
-    if(!w||!g) return b;
-    const n=numStr(g.choiceName);
-    return n?b.map(x=>x.category==='בכמה משחקים'?{...x,choiceName:`${w.choiceName} ב${n}`}:x):b;
-  };
-
-  const select=(sid,cat,ch)=>{
-    const prev=localBets[sid]||[];
-    const idx =prev.findIndex(x=>x.category===cat);
-    const upd =idx===-1?[...prev,{category:cat,choiceName:ch.name,oddsWhenPlaced:ch.odds}]
-                       :prev.map((x,i)=>i===idx?{...x,choiceName:ch.name,oddsWhenPlaced:ch.odds}:x);
-    setLocalBets(p=>({...p,[sid]:syncGames(sid,upd)}));
+  const syncGames = (sid, b) => {
+    const w = b.find((x) => x.category === 'מנצחת הסדרה');
+    const g = b.find((x) => x.category === 'בכמה משחקים');
+    if (!w || !g) return b;
+    const n = numStr(g.choiceName);
+    return n ? b.map((x) => x.category === 'בכמה משחקים' ? { ...x, choiceName: `${w.choiceName} ב${n}` } : x) : b;
   };
 
-  const isSel=(sid,cat,name)=>{
-    const b=(localBets[sid]||[]).find(x=>x.category===cat); if(!b) return false;
-    if(cat==='מנצחת הסדרה') return b.choiceName===name;
-    if(cat==='בכמה משחקים') return numStr(b.choiceName)===numStr(name);
-    return b.choiceName===name;
+  const select = (sid, cat, ch) => {
+    const prev = localBets[sid] || [];
+    const idx  = prev.findIndex((x) => x.category === cat);
+    const upd  = idx === -1
+      ? [...prev, { category: cat, choiceName: ch.name, oddsWhenPlaced: ch.odds }]
+      : prev.map((x, i) => i === idx ? { ...x, choiceName: ch.name, oddsWhenPlaced: ch.odds } : x);
+    setLocalBets((p) => ({ ...p, [sid]: syncGames(sid, upd) }));
   };
 
-  const saveBet=async(sid)=>{
-    try{
-      await fetch(`https://nba-playoff-eyd5.onrender.com/api/user-bets/${sid}`,{
-        method:'POST',credentials:'include',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({bets:localBets[sid]||[]})
+  const isSel = (sid, cat, name) => {
+    const b = (localBets[sid] || []).find((x) => x.category === cat);
+    if (!b) return false;
+    if (cat === 'מנצחת הסדרה') return b.choiceName === name;
+    if (cat === 'בכמה משחקים') return numStr(b.choiceName) === numStr(name);
+    return b.choiceName === name;
+  };
+
+  const saveBet = async (sid) => {
+    try {
+      await fetch(`/api/user-bets/${sid}`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bets: localBets[sid] || [] }),
       });
-      await fetchUserBets(); closeCard(sid);
-    }catch(e){console.error(e);}
+      await fetchUserBets();
+      closeCard(sid);
+    } catch (e) { console.error(e); }
   };
 
-  const cd = (d)=>d&&new Date(d)>new Date()?<CountdownClock startDate={d}/> : null;
+  const cd = (d) => d && new Date(d) > new Date() ? <CountdownClock startDate={d} /> : null;
 
-  /* ---------- ❶   ORDER: no‑bet first, then by startDate ---------- */
-  const orderedSeries = [...seriesList].sort((a,b)=>{
+  /* Series score display */
+  const SeriesScore = ({ s }) => {
+    const aW = s.teamAWins ?? 0;
+    const bW = s.teamBWins ?? 0;
+    if (aW === 0 && bW === 0) return null;
+    const leader = aW > bW ? s.teamA : bW > aW ? s.teamB : null;
+    return (
+      <div className="series-score">
+        <span className="score-num">{aW}</span>
+        <span className="score-dash">–</span>
+        <span className="score-num">{bW}</span>
+        {leader && <span className="score-leader">({leader} מובילה)</span>}
+      </div>
+    );
+  };
+
+  /* Sort: unlocked (open for betting) first, then by startDate */
+  const orderedSeries = [...seriesList].sort((a, b) => {
+    if (a.isLocked !== b.isLocked) return a.isLocked ? 1 : -1;
     const aBet = !!findDoc(a._id);
     const bBet = !!findDoc(b._id);
-    if (aBet !== bBet) return aBet ? 1 : -1;                     // no‑bet first
+    if (!a.isLocked && aBet !== bBet) return aBet ? 1 : -1;
     return new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15);
   });
 
-  /* ───────── render ───────── */
+  const openBetting  = orderedSeries.filter((s) => !s.isLocked);
+  const activeLocked = orderedSeries.filter((s) => s.isLocked);
+
   return (
     <div className="home-page">
-      <Header/>
-      <Background image="background.png"/>
+      <Header />
+      <Background image="background.png" />
 
       <div className="page-con">
         {/* info bar */}
@@ -159,32 +166,32 @@ export default function HomePage() {
           <div className="info-item"><small>הניקוד שלי</small><p>{myInfo.points}</p></div>
           <div className="info-item">
             <small>האלופה שלי</small>
-            {myInfo.champion
-              ? <p>{myInfo.champion}</p>
-              : <p> לא נבחרה אלופה</p>}
+            <p>{myInfo.champion || 'לא נבחרה'}</p>
           </div>
         </div>
 
+        {/* ── Open for betting ── */}
         <div className="series-list">
-          <h2 className="bets">דף הבית</h2>
-          {orderedSeries.length===0 && <p style={{marginRight:'2rem'}}>אין סדרות פתוחות כרגע.</p>}
+          <h2 className="bets">ניחושים פתוחים</h2>
+          {openBetting.length === 0 && (
+            <p style={{ marginRight: '2rem', opacity: 0.7 }}>אין סדרות פתוחות לניחוש כרגע.</p>
+          )}
 
-          {orderedSeries.map((s)=>{
+          {openBetting.map((s) => {
             const hasBet = !!findDoc(s._id);
             const isOpen = !!openCards[s._id];
 
             return (
-              <div key={s._id} className={`series-card ${hasBet?'has-bet':'no-bet'}`}>
-                {/* collapsed */}
+              <div key={s._id} className={`series-card ${hasBet ? 'has-bet' : 'no-bet'}`}>
                 {!isOpen && (
-                  <div className="series-header" style={{cursor:'pointer'}} onClick={()=>openCard(s._id)}>
+                  <div className="series-header" style={{ cursor: 'pointer' }} onClick={() => openCard(s._id)}>
                     <div className="left-logos">
-                      <TeamLogo teamName={s.teamA} className="big-logo"/>
-                      <TeamLogo teamName={s.teamB} className="big-logo"/>
+                      <TeamLogo teamName={s.teamA} className="big-logo" />
+                      <TeamLogo teamName={s.teamB} className="big-logo" />
                     </div>
                     <div className="right-column">
-                      {hasBet && <FaCheckCircle className="check-icon"/>}
-                      <div className="top-line"><span style={{opacity:.75}}>סיום ניחוש בעוד</span></div>
+                      {hasBet && <FaCheckCircle className="check-icon" />}
+                      <div className="top-line"><span style={{ opacity: .75 }}>סיום ניחוש בעוד</span></div>
                       {hasBet
                         ? <span className="bet-confirmed">ניחוש בוצע</span>
                         : <div className="countdown-line">{cd(s.startDate)}</div>}
@@ -192,36 +199,35 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* expanded */}
                 {isOpen && (
                   <div className="place-bet-inline">
                     <div className="top-bar">
                       <div className="top-bar-center">
-                        <span style={{opacity:.75}}>סיום ניחוש בעוד</span>
+                        <span style={{ opacity: .75 }}>סיום ניחוש בעוד</span>
                         <div className="countdown-text">{cd(s.startDate)}</div>
                       </div>
-                      <FaTimes className="close-icon" onClick={()=>closeCard(s._id)}/>
+                      <FaTimes className="close-icon" onClick={() => closeCard(s._id)} />
                     </div>
 
                     <div className="teams-row">
-                      <TeamLogo teamName={s.teamA} className="team-logo"/>
+                      <TeamLogo teamName={s.teamA} className="team-logo" />
                       <span className="teams-dash">-</span>
-                      <TeamLogo teamName={s.teamB} className="team-logo"/>
+                      <TeamLogo teamName={s.teamB} className="team-logo" />
                     </div>
 
                     <div className="bet-options">
-                      {s.betOptions.map((opt,i)=>(
+                      {s.betOptions.map((opt, i) => (
                         <div key={i} className="bet-category">
-                          <h5>{opt.category==='מנצחת הסדרה'?'מנצחת הסדרה (יחס)':opt.category}</h5>
+                          <h5>{opt.category === 'מנצחת הסדרה' ? 'מנצחת הסדרה (יחס)' : opt.category}</h5>
                           <div className="pill-container">
-                            {opt.choices.map((c,j)=>{
-                              const sel = isSel(s._id,opt.category,c.name);
-                              const txt = opt.category==='מנצחת הסדרה'
+                            {opt.choices.map((c, j) => {
+                              const sel = isSel(s._id, opt.category, c.name);
+                              const txt = opt.category === 'מנצחת הסדרה'
                                 ? `${c.name} (${formatOdds(c.odds)})`
                                 : c.name;
                               return (
-                                <div key={j} className={`pill ${sel?'selected':''}`}
-                                     onClick={()=>select(s._id,opt.category,c)}>{txt}</div>
+                                <div key={j} className={`pill ${sel ? 'selected' : ''}`}
+                                  onClick={() => select(s._id, opt.category, c)}>{txt}</div>
                               );
                             })}
                           </div>
@@ -230,8 +236,8 @@ export default function HomePage() {
                     </div>
 
                     <div className="modal-actions">
-                      <button className="primary-btn" onClick={()=>saveBet(s._id)}>שמור</button>
-                      <button className="cancel-btn"  onClick={()=>closeCard(s._id)}>בטל</button>
+                      <button className="primary-btn" onClick={() => saveBet(s._id)}>שמור</button>
+                      <button className="cancel-btn" onClick={() => closeCard(s._id)}>בטל</button>
                     </div>
                   </div>
                 )}
@@ -239,6 +245,40 @@ export default function HomePage() {
             );
           })}
         </div>
+
+        {/* ── Active locked series (score tracker) ── */}
+        {activeLocked.length > 0 && (
+          <div className="series-list live-section">
+            <h2 className="bets">סדרות פעילות 🏀</h2>
+            {activeLocked.map((s) => {
+              const myBet = findDoc(s._id);
+              return (
+                <div key={s._id} className="series-card locked-card">
+                  <div className="locked-header">
+                    <TeamLogo teamName={s.teamA} className="big-logo" />
+                    <div className="locked-center">
+                      <div className="locked-names">{s.teamA} – {s.teamB}</div>
+                      <SeriesScore s={s} />
+                      {s.round && <div className="round-label">{s.round}</div>}
+                    </div>
+                    <TeamLogo teamName={s.teamB} className="big-logo" />
+                  </div>
+
+                  {myBet && (
+                    <div className="my-locked-bet">
+                      <strong>הניחוש שלי:</strong>
+                      {myBet.bets.map((b, i) => (
+                        <span key={i} className="locked-bet-pill">
+                          {b.category}: <b>{b.choiceName}</b> ×{(+b.oddsWhenPlaced).toFixed(1)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
