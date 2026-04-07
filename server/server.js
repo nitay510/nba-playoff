@@ -82,13 +82,13 @@ app.listen(PORT, () => {
 });
 
 /***************************************************
- * Periodic auto-sync (every 4 hours during playoffs)
- * Keeps series win counts and lock status up to date
- * without requiring an admin to manually press sync.
+ * Schedulers
  ***************************************************/
 const { getPlayoffSeries } = require('./services/espnService');
 const Series = require('./models/Series');
+const { runDailyStatsSync } = require('./controllers/syncController');
 
+/* ── Light sync every 4h: update win counts + lock status ── */
 async function autoSync() {
   try {
     const espnSeries = await getPlayoffSeries();
@@ -96,12 +96,13 @@ async function autoSync() {
       const filter = s.externalId
         ? { externalId: s.externalId }
         : { $or: [{ teamA: s.teamAHe, teamB: s.teamBHe }, { teamA: s.teamBHe, teamB: s.teamAHe }] };
-
       await Series.findOneAndUpdate(filter, {
         $set: {
-          teamAWins:  s.teamAWins,
-          teamBWins:  s.teamBWins,
-          externalId: s.externalId,
+          teamAWins:   s.teamAWins,
+          teamBWins:   s.teamBWins,
+          externalId:  s.externalId,
+          ...(s.teamAEspnId ? { teamAEspnId: String(s.teamAEspnId) } : {}),
+          ...(s.teamBEspnId ? { teamBEspnId: String(s.teamBEspnId) } : {}),
           ...(s.startDate && new Date() >= new Date(s.startDate) ? { isLocked: true } : {}),
         },
       });
@@ -112,6 +113,22 @@ async function autoSync() {
   }
 }
 
-// Run once at startup, then every 4 hours
+/* ── Daily stats sync at 8:00 AM Israel time (UTC+3 = 05:00 UTC) ── */
+function scheduleDailyAt5UTC(fn) {
+  const now    = new Date();
+  const next5  = new Date(Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 5, 0, 0, 0
+  ));
+  if (next5 <= now) next5.setUTCDate(next5.getUTCDate() + 1);
+  const msUntil = next5 - now;
+  console.log(`[DailySync] Next run in ${Math.round(msUntil / 60000)} minutes (05:00 UTC / 08:00 Israel)`);
+  setTimeout(() => {
+    fn();
+    setInterval(fn, 24 * 60 * 60 * 1000);
+  }, msUntil);
+}
+
+// Start schedulers after DB connects (give 10s)
 setTimeout(autoSync, 10_000);
 setInterval(autoSync, 4 * 60 * 60 * 1000);
+scheduleDailyAt5UTC(runDailyStatsSync);

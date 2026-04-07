@@ -1,112 +1,94 @@
 @import '../../styles/_variables.scss';
 @import '../../styles/_mixins.scss';
+
 .login-container {
   margin-top: 35vh;
-    .title-small {
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 35.27px;
-  text-align: center;
-    }
-  .title-big {
-    font-weight: 1200;
-    font-size: 52px;
-    margin-bottom: 4rem;
+
+  .title-small {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 35.27px;
     text-align: center;
-  
-      }
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      margin-left: 2rem;
-      margin-right: 2rem;
-      border-radius: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1.5rem;
-      backdrop-filter: blur(24px);
-  
-      label {
-        margin-bottom: 0.25rem;
-        font-weight: 400;
-        font-size: 16px;
-        line-height: 23.52px;
-        letter-spacing: 0%;
-        text-align: right;
-        margin-left: 2rem;
-        margin-right: 2rem;
-      }
-  
-      input {
-        padding: 0.6rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.3);
-        font-size: 1rem;
-        margin-left: 2rem;
-        margin-right: 2rem;
-      }
-  
-      .error-msg {
-        color: $error-color;
-        margin-bottom: 1rem;
-        text-align: center;
-        font-size: 0.9rem;
-      }
-  
-      button {
-        border: 1px solid rgba(255, 255, 255, 1);
-        border-radius: 4px;
-    padding: 9px 0px;
-        color:  rgba(255, 255, 255, 1);
-        font-family: 'Almoni Neue', sans-serif;
-font-weight: 600;
-font-size: 16px;
-line-height: 23.52px;
+  }
 
-text-align: center;
-margin-right: 2rem;
-    margin-left: 2rem;
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 2rem;
+    border-radius: 1rem;
     background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    backdrop-filter: blur(24px);
 
-  
-      }
-    }
-  
-    .register-container2 {
-
-      display: flex;  // Ensures elements stay on the same line
-      align-items: center;  // Aligns text and link vertically
-      gap: 8px;  // Adds some spacing between text and link
-    }
-    
-    .register-text {
-      color: #ccc;
-      margin-right: 3rem;
+    label {
+      margin-bottom: 0.25rem;
       font-weight: 400;
-      font-size: 14px;
-      line-height: 20.58px;
+      font-size: 16px;
       text-align: right;
-      
     }
-    
-    .register-link {
-      color: white;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 20.58px;
-      text-decoration: underline;
+
+    input {
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1rem;
+      &::placeholder { color: rgba(255,255,255,0.5); }
+      &:focus { outline: none; border-color: rgba(255,255,255,0.7); }
+    }
+
+    .error-msg {
+      color: $error-color;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    button[type='submit'] {
+      border: 1px solid rgba(255, 255, 255, 1);
+      border-radius: 4px;
+      padding: 10px 0;
+      color: #fff;
+      font-family: 'Almoni Neue', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.15);
+      transition: background 0.2s;
+      &:hover { background: rgba(255,255,255,0.25); }
     }
 
     .forgot-link-wrap {
       text-align: center;
-      margin: 0.5rem 0 0.25rem;
+      margin: 0.75rem 0 0.25rem;
     }
+
     .forgot-link {
-      color: rgba(255,255,255,0.65);
-      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
       text-decoration: underline;
       &:hover { color: #fff; }
+    }
+
+    .register-container2 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+
+    .register-text {
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+    }
+
+    .register-link {
+      color: #fff;
+      font-size: 14px;
+      text-decoration: underline;
     }
   }
 }

@@ -1,164 +1,249 @@
 .series-modal-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  
-    .series-modal {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 450px;
-  
-      /* ADD THESE to limit height */
-      max-height: 80vh;      /* 80% of viewport height */
-      overflow-y: auto;      /* scroll inside the modal if content is too large */
-  
-      background: #fff;
-      padding: 1.5rem;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .series-modal {
+    width: 92%;
+    max-width: 480px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: #1a1a2e;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 1.5rem;
+    direction: rtl;
+    color: #fff;
+
+    .modal-title {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: #fff;
+    }
+
+    .modal-label {
+      display: block;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      margin: 0.9rem 0 0.3rem;
+      font-weight: 600;
+    }
+
+    .modal-input,
+    .modal-select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
-      direction: rtl;
-      color: #000;
-  
-      .modal-title {
-        text-align: center;
-        margin-bottom: 1rem;
-        font-size: 1.2rem;
-        color: #000;
-      }
-  
-      .modal-label {
-        display: block;
-        margin-top: 0.75rem;
-        font-weight: 600;
-        color: #000;
-      }
-  
-      .modal-input {
-        margin-top: 0.3rem;
-        padding: 0.5rem;
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        color: #000;
-        background-color: #fff;
-      }
-  
-      .bet-options-header {
-        margin-top: 1.5rem;
-        margin-bottom: 0.5rem;
-        color: #000;
-        font-size: 1rem;
-        font-weight: bold;
-        text-align: center;
-      }
-  
-      .bet-category {
-        margin-top: 1.2rem;
-        padding: 0.8rem;
-        background-color: #f5f5f5; /* light grey background for contrast */
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 0.95rem;
+      option { background: #1a1a2e; }
+      &:focus { outline: none; border-color: #0d6efd; }
+    }
+
+    /* Step 1 */
+    .load-msg {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.88rem;
+      &.error { color: #ff6b6b; }
+    }
+
+    .step1-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+
+    .load-btn {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.65rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    /* Step 2 */
+    .teams-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+
+      .team-tag {
+        background: rgba(255,255,255,0.1);
         border-radius: 6px;
-        position: relative; /* for add-choice-btn positioning? */
-  
-        .bet-category-title {
-          font-size: 1rem;
-          color: #000;
-        }
-  
-        .add-choice-btn {
-          position: absolute;
-          top: 8px;
-          left: 12px;
-          font-size: 0.8rem;
-          background-color: #007bff;
-          color: #fff;
-          border: none;
-          border-radius: 4px;
-          padding: 0.3rem 0.6rem;
-          margin-right: 0.5rem;
-          cursor: pointer;
-  
-          &:hover {
-            background-color: darken(#007bff, 10%);
-          }
-        }
-  
-        .bet-choice {
-          display: flex;
-          align-items: center;
-          margin-top: 0.5rem;
-  
-          .choice-name-input {
-            flex: 2;
-            margin-right: 0.5rem;
-            color: #000;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 0.4rem;
-          }
-  
-          .choice-odds-input {
-            width: 60px;
-            margin-left: 0.5rem;
-            color: #000;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 0.4rem;
-          }
-        }
-      }
-  
-      .add-category-btn {
-        margin-top: 1.2rem;
-        background-color: #28a745;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
+        padding: 0.25rem 0.6rem;
+        font-weight: 700;
         font-size: 0.9rem;
-        cursor: pointer;
-  
-        &:hover {
-          background-color: darken(#28a745, 10%);
-        }
       }
-  
-      .modal-actions {
+      .vs-label { opacity: 0.6; font-size: 0.85rem; }
+      .back-btn {
+        margin-right: auto;
+        background: none;
+        border: 1px solid rgba(255,255,255,0.3);
+        color: rgba(255,255,255,0.7);
+        border-radius: 6px;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+    }
+
+    .odds-section {
+      margin-top: 1.1rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 0.75rem;
+
+      .section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin: 0 0 0.6rem;
+        color: #ffd700;
+      }
+
+      .winner-odds-row,
+      .games-row {
         display: flex;
-        justify-content: center;
-        margin-top: 1.5rem;
-  
-        button {
-          margin: 0 0.5rem;
-          padding: 0.6rem 1rem;
-          cursor: pointer;
-          border: none;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .odds-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        flex: 1;
+        min-width: 80px;
+
+        span {
+          font-size: 0.78rem;
+          text-align: center;
+          opacity: 0.85;
+          line-height: 1.2;
+        }
+
+        input {
+          width: 70px;
+          padding: 0.35rem;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 6px;
+          background: rgba(255,255,255,0.1);
+          color: #ffd700;
+          font-size: 0.95rem;
+          font-weight: 700;
+          text-align: center;
+          &:focus { outline: none; border-color: #0d6efd; }
+        }
+
+        &.small span { font-size: 0.72rem; }
+      }
+    }
+
+    /* Player categories */
+    .player-category {
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 0.7rem;
+
+      .cat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        strong { font-size: 0.9rem; }
+        .cat-count { font-size: 0.75rem; opacity: 0.6; }
+      }
+
+      .player-list {
+        max-height: 180px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+
+      .player-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255,255,255,0.06);
+        border-radius: 6px;
+        padding: 0.3rem 0.5rem;
+
+        .player-name {
+          flex: 1;
+          font-size: 0.82rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .player-odds-input {
+          width: 55px;
+          padding: 0.2rem;
+          border: 1px solid rgba(255,255,255,0.2);
           border-radius: 4px;
-          font-size: 0.9rem;
+          background: rgba(255,255,255,0.1);
+          color: #ffd700;
+          font-size: 0.82rem;
+          text-align: center;
         }
-  
-        .save-btn {
-          background-color: #007bff;
-          color: #fff;
-  
-          &:hover {
-            background-color: darken(#007bff, 10%);
-          }
-        }
-  
-        .cancel-btn {
-          background-color: #ccc;
-  
-          &:hover {
-            background-color: darken(#ccc, 10%);
-          }
+
+        .remove-btn {
+          background: none;
+          border: none;
+          color: rgba(255,100,100,0.7);
+          font-size: 0.8rem;
+          cursor: pointer;
+          padding: 0 0.2rem;
+          &:hover { color: #ff4444; }
         }
       }
     }
+
+    .no-players-note {
+      font-size: 0.82rem;
+      opacity: 0.6;
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+
+    /* Action buttons */
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+
+      button {
+        flex: 1;
+        padding: 0.65rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .save-btn   { background: #0d6efd; color: #fff; }
+      .cancel-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    }
   }
-  
+}

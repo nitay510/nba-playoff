@@ -19,10 +19,20 @@ const SeriesSchema = new mongoose.Schema({
   startDate: { type: Date },
   isFinished: { type: Boolean, default: false },
   // Live sync fields (populated by the ESPN sync)
-  externalId: { type: String },          // ESPN series UID for deduplication
-  teamAWins:  { type: Number, default: 0 },
-  teamBWins:  { type: Number, default: 0 },
-  round:      { type: String },          // "First Round", "Conference Semifinals" …
+  externalId:   { type: String },
+  teamAWins:    { type: Number, default: 0 },
+  teamBWins:    { type: Number, default: 0 },
+  round:        { type: String },
+  teamAEspnId:  { type: String },        // ESPN team ID for roster / stats queries
+  teamBEspnId:  { type: String },
+  // Daily player stats (points / rebounds / assists aggregated across the series)
+  playerStats: [{
+    playerName: String,
+    teamName:   String,
+    points:     { type: Number, default: 0 },
+    rebounds:   { type: Number, default: 0 },
+    assists:    { type: Number, default: 0 },
+  }],
 });
 
 module.exports = mongoose.model('Series', SeriesSchema);

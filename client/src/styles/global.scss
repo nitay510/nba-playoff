@@ -1,19 +1,38 @@
 /* global.scss */
-@import './variables'; // optional if you store variables separately
-html,
-h2{
-  margin-block-start:5px;
-}
+@import './variables';
+
+html, h2 { margin-block-start: 5px; }
+
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: 'Almoni Neue', sans-serif; 
+  font-family: 'Almoni Neue', sans-serif;
   color: #fff;
-  background-color: #000000;
-  direction: rtl; /* ensure overall layout is right-to-left */
+  background-color: #0a0a14;
+  direction: rtl;
 }
+
+/* Subtle top-of-page gradient accent */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0d6efd, #6610f2, #e83e8c);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Better input defaults */
+input, select, textarea {
+  font-family: inherit;
+  direction: rtl;
+}
+
+/* Smooth link transitions */
+a { transition: color 0.15s ease; }
 
 .page-con{
   min-height: 100vh; 
