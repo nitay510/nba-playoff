@@ -136,6 +136,36 @@ exports.getSeriesData = async (req, res) => {
   }
 };
 
+/* ── POST /api/sync/cleanup  (admin) ─────────────────────────
+ * Wipes all series, user bets, non-admin users, and leagues
+ * except ישראל. Use before a new playoff season.
+ * ----------------------------------------------------------- */
+exports.cleanupDatabase = async (req, res) => {
+  try {
+    const User    = require('../models/User');
+    const League  = require('../models/League');
+    const UserBet = require('../models/UserBet');
+
+    const [users, leagues, seriesRes, bets] = await Promise.all([
+      User.deleteMany({ isAdmin: { $ne: true } }),
+      League.deleteMany({ name: { $ne: 'ישראל' } }),
+      Series.deleteMany({}),
+      UserBet.deleteMany({}),
+    ]);
+
+    return res.json({
+      msg: 'ניקוי הושלם',
+      usersDeleted:   users.deletedCount,
+      leaguesDeleted: leagues.deletedCount,
+      seriesDeleted:  seriesRes.deletedCount,
+      betsDeleted:    bets.deletedCount,
+    });
+  } catch (err) {
+    console.error('[Cleanup]', err);
+    return res.status(500).json({ msg: 'Cleanup failed', error: err.message });
+  }
+};
+
 /* ── Daily stats sync (called by scheduler at 8am Israel) ─── */
 exports.runDailyStatsSync = async () => {
   console.log('[DailySync] Starting player stats update...');

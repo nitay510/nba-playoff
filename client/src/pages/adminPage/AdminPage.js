@@ -17,6 +17,7 @@ function AdminPage() {
   const [editSeries,       setEditSeries]       = useState(null);
   const [syncing,          setSyncing]          = useState(false);
   const [syncMsg,          setSyncMsg]          = useState('');
+  const [cleaning,         setCleaning]         = useState(false);
 
   useEffect(() => { fetchUnfinishedSeries(); }, []);
 
@@ -47,6 +48,25 @@ function AdminPage() {
       setSyncMsg('✗ שגיאת רשת בסנכרון');
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleCleanup = async () => {
+    if (!window.confirm('למחוק את כל הסדרות, הניחושים והמשתמשים (למעט אדמין)? פעולה בלתי הפיכה!')) return;
+    setCleaning(true);
+    setSyncMsg('');
+    try {
+      const res  = await fetch('/api/sync/cleanup', { method: 'POST', credentials: 'include' });
+      const data = await res.json();
+      setSyncMsg(res.ok
+        ? `✓ ניקוי הושלם: ${data.seriesDeleted} סדרות, ${data.betsDeleted} ניחושים, ${data.usersDeleted} משתמשים`
+        : `✗ שגיאה: ${data.msg}`
+      );
+      fetchUnfinishedSeries();
+    } catch {
+      setSyncMsg('✗ שגיאת רשת בניקוי');
+    } finally {
+      setCleaning(false);
     }
   };
 
@@ -86,6 +106,9 @@ function AdminPage() {
         </button>
         <button onClick={() => navigate('/admin/finished')} className="finished-btn">
           ראה סדרות שהסתיימו
+        </button>
+        <button onClick={handleCleanup} disabled={cleaning} className="cleanup-btn">
+          {cleaning ? 'מנקה...' : '🗑 ניקוי מסד נתונים'}
         </button>
       </div>
 

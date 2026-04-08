@@ -50,13 +50,6 @@
     }
 
     /* Step 1 */
-    .load-msg {
-      margin-top: 0.75rem;
-      text-align: center;
-      font-size: 0.88rem;
-      &.error { color: #ff6b6b; }
-    }
-
     .step1-actions {
       display: flex;
       flex-direction: column;
@@ -116,8 +109,7 @@
         color: #ffd700;
       }
 
-      .winner-odds-row,
-      .games-row {
+      .winner-odds-row {
         display: flex;
         gap: 0.75rem;
         flex-wrap: wrap;
@@ -150,8 +142,21 @@
           text-align: center;
           &:focus { outline: none; border-color: #0d6efd; }
         }
+      }
 
-        &.small span { font-size: 0.72rem; }
+      /* Games fixed display */
+      .games-fixed-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .game-fixed-badge {
+        background: rgba(255,255,255,0.1);
+        border-radius: 6px;
+        padding: 0.3rem 0.65rem;
+        font-size: 0.82rem;
+        opacity: 0.8;
       }
     }
 
@@ -172,8 +177,41 @@
         .cat-count { font-size: 0.75rem; opacity: 0.6; }
       }
 
+      /* Add player form */
+      .add-player-form {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+
+        .player-input-he,
+        .player-input-en {
+          flex: 1;
+          min-width: 90px;
+          padding: 0.35rem 0.5rem;
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 6px;
+          background: rgba(255,255,255,0.08);
+          color: #fff;
+          font-size: 0.82rem;
+          &::placeholder { color: rgba(255,255,255,0.4); }
+          &:focus { outline: none; border-color: #0d6efd; }
+        }
+
+        .add-player-btn {
+          background: #0d6efd;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 0.35rem 0.7rem;
+          font-size: 0.82rem;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+      }
+
       .player-list {
-        max-height: 180px;
+        max-height: 160px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -191,20 +229,8 @@
         .player-name {
           flex: 1;
           font-size: 0.82rem;
-          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-        }
-
-        .player-odds-input {
-          width: 55px;
-          padding: 0.2rem;
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 4px;
-          background: rgba(255,255,255,0.1);
-          color: #ffd700;
-          font-size: 0.82rem;
-          text-align: center;
         }
 
         .remove-btn {
@@ -217,13 +243,6 @@
           &:hover { color: #ff4444; }
         }
       }
-    }
-
-    .no-players-note {
-      font-size: 0.82rem;
-      opacity: 0.6;
-      text-align: center;
-      margin-top: 0.75rem;
     }
 
     /* Action buttons */

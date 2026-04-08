@@ -4,25 +4,28 @@ import TeamLogo from '../../components/TeamLogo';
 import Background from '../../components/Login-back';
 import './championSelectionPage.scss';
 
-// 2025-26 NBA Playoff teams with FanDuel-style odds (scaled 1.5–10)
-// Sorted by odds ascending (favorites first)
+// 2025-26 NBA Playoff + Play-In teams (20 teams), sorted by odds
 const TEAMS = [
-  { name: 'אוקלהומה סיטי',          odds: 2.00 },
-  { name: 'בוסטון סלטיקס',          odds: 2.80 },
-  { name: 'קליבלנד קאבלירס',        odds: 4.00 },
-  { name: 'ניו יורק ניקס',          odds: 5.00 },
-  { name: 'דנבר נאגטס',             odds: 5.50 },
-  { name: 'יוסטון רוקטס',           odds: 6.00 },
-  { name: 'מינסוטה טימברוולבס',     odds: 6.50 },
-  { name: 'לוס אנגלס לייקרס',       odds: 7.00 },
-  { name: 'מילווקי באקס',            odds: 7.00 },
-  { name: 'גולדן סטייט ווריוורס',   odds: 7.50 },
-  { name: 'דאלאס מאבריקס',          odds: 8.00 },
-  { name: 'אינדיאנה פייסרס',        odds: 8.50 },
-  { name: 'לוס אנגלס קליפרס',       odds: 9.00 },
-  { name: 'מיאמי היט',              odds: 10.0 },
-  { name: 'אורלנדו מגיק',           odds: 10.0 },
-  { name: 'דטרויט פיסטונס',         odds: 10.0 },
+  { name: 'אוקלהומה סיטי',           odds: 2.00 },
+  { name: 'בוסטון סלטיקס',           odds: 2.80 },
+  { name: 'קליבלנד קאבלירס',         odds: 4.00 },
+  { name: 'ניו יורק ניקס',           odds: 5.00 },
+  { name: 'דנבר נאגטס',              odds: 5.50 },
+  { name: 'יוסטון רוקטס',            odds: 6.00 },
+  { name: 'מינסוטה טימברוולבס',      odds: 6.50 },
+  { name: 'לוס אנגלס לייקרס',        odds: 7.00 },
+  { name: 'גולדן סטייט ווריוורס',    odds: 7.50 },
+  { name: 'פיניקס סאנס',             odds: 8.00 },
+  { name: 'לוס אנגלס קליפרס',        odds: 8.50 },
+  { name: 'דטרויט פיסטונס',          odds: 9.00 },
+  { name: 'אורלנדו מגיק',            odds: 9.00 },
+  { name: 'פילדלפיה 76',             odds: 9.00 },
+  { name: 'מיאמי היט',               odds: 9.50 },
+  { name: 'סן אנטוניו ספרס',         odds: 9.50 },
+  { name: 'אטלנטה הוקס',             odds: 10.00 },
+  { name: 'טורונטו ראפטורס',         odds: 10.00 },
+  { name: 'פורטלנד טרייל בלייזרס',  odds: 10.00 },
+  { name: 'שרלוט הורנטס',            odds: 10.00 },
 ];
 
 export default function ChampionSelectionPage() {

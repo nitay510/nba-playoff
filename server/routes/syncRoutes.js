@@ -4,6 +4,7 @@ const syncCtrl = require('../controllers/syncController');
 const { requireAdmin } = require('../middleware/authMiddleware');
 
 router.post('/run',            requireAdmin,  syncCtrl.syncFromNBA);
+router.post('/cleanup',        requireAdmin,  syncCtrl.cleanupDatabase);
 router.get ('/champion-odds',                 syncCtrl.getChampionOdds);
 router.get ('/test',                          syncCtrl.testConnection);
 router.get ('/teams',                         syncCtrl.getTeams);
