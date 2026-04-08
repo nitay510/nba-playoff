@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebSearch",
+      "WebFetch(domain:www.nba.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(git add:*)"
     ]
   }
 }
