@@ -4,28 +4,28 @@ import TeamLogo from '../../components/TeamLogo';
 import Background from '../../components/Login-back';
 import './championSelectionPage.scss';
 
-// 2025-26 NBA Playoff + Play-In teams (20 teams), sorted by odds
+// 2025-26 NBA Playoff + Play-In teams (20 teams), sorted by odds ascending
 const TEAMS = [
   { name: 'אוקלהומה סיטי',           odds: 3.00 },
-  { name: 'בוסטון סלטיקס',           odds: 6.0 },
+  { name: 'סן אנטוניו ספרס',         odds: 5.00 },
+  { name: 'בוסטון סלטיקס',           odds: 6.00 },
+  { name: 'דנבר נאגטס',              odds: 8.00 },
   { name: 'קליבלנד קאבלירס',         odds: 11.00 },
-  { name: 'ניו יורק ניקס',           odds: 12.00 },
-  { name: 'דנבר נאגטס',              odds: 8.0 },
-  { name: 'יוסטון רוקטס',            odds: 20.00 },
-  { name: 'מינסוטה טימברוולבס',      odds: 15.00 },
-  { name: 'לוס אנגלס לייקרס',        odds: 20.00 },
-  { name: 'גולדן סטייט ווריוורס',    odds: 30.0 },
-  { name: 'פיניקס סאנס',             odds: 25.00 },
-  { name: 'לוס אנגלס קליפרס',        odds: 30.0 },
   { name: 'דטרויט פיסטונס',          odds: 12.00 },
-  { name: 'אורלנדו מגיק',            odds: 30.00 },
-  { name: 'פילדלפיה 76',             odds: 25.00 },
-  { name: 'מיאמי היט',               odds: 30.0 },
-  { name: 'סן אנטוניו ספרס',         odds: 5.0 },
+  { name: 'ניו יורק ניקס',           odds: 12.00 },
+  { name: 'מינסוטה טימברוולבס',      odds: 15.00 },
+  { name: 'יוסטון רוקטס',            odds: 20.00 },
+  { name: 'לוס אנגלס לייקרס',        odds: 20.00 },
   { name: 'אטלנטה הוקס',             odds: 25.00 },
+  { name: 'פילדלפיה 76',             odds: 25.00 },
+  { name: 'פיניקס סאנס',             odds: 25.00 },
+  { name: 'שרלוט הורנטס',            odds: 25.00 },
+  { name: 'גולדן סטייט ווריוורס',    odds: 30.00 },
+  { name: 'לוס אנגלס קליפרס',        odds: 30.00 },
+  { name: 'מיאמי היט',               odds: 30.00 },
+  { name: 'אורלנדו מגיק',            odds: 30.00 },
   { name: 'טורונטו ראפטורס',         odds: 30.00 },
   { name: 'פורטלנד טרייל בלייזרס',  odds: 30.00 },
-  { name: 'שרלוט הורנטס',            odds: 25.00 },
 ];
 
 export default function ChampionSelectionPage() {
