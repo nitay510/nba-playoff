@@ -155,8 +155,9 @@ exports.forgotPassword = async (req, res) => {
 
     return res.json({ msg: 'אם האימייל קיים במערכת, נשלח אליו קישור לאיפוס סיסמה' });
   } catch (error) {
-    console.error('[forgotPassword]', error);
-    return res.status(500).json({ msg: 'שגיאה בשליחת המייל. נסה שוב מאוחר יותר.' });
+    console.error('[forgotPassword] ERROR:', error.message);
+    console.error('[forgotPassword] STACK:', error.stack);
+    return res.status(500).json({ msg: 'שגיאה בשליחת המייל', debug: error.message });
   }
 };
 
