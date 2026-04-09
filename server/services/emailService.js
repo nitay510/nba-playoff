@@ -1,52 +1,18 @@
-const nodemailer = require('nodemailer');
-
-function createTransporter() {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_APP_PASSWORD;
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '587');
-
-  console.log('[Email] Creating transporter:', {
-    host,
-    port,
-    user: user ? `${user.slice(0, 4)}***` : 'NOT SET',
-    passSet: !!pass,
-    passLen: pass ? pass.length : 0,
-  });
-
-  if (!user || !pass) {
-    throw new Error(`Email env vars missing — EMAIL_USER=${user ? 'set' : 'MISSING'}, EMAIL_APP_PASSWORD=${pass ? 'set' : 'MISSING'}`);
-  }
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-    tls: { rejectUnauthorized: false }, // avoid cert issues on some hosts
-  });
-}
+const { Resend } = require('resend');
 
 async function sendPasswordResetEmail(toEmail, token) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('RESEND_API_KEY env var not set');
+
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   const resetLink   = `${frontendUrl}/reset-password?token=${token}`;
 
-  console.log('[Email] Sending reset email to:', toEmail);
-  console.log('[Email] Reset link:', resetLink);
+  console.log('[Email] Sending reset email via Resend to:', toEmail);
 
-  const transporter = createTransporter();
+  const resend = new Resend(apiKey);
 
-  // Verify SMTP connection before sending
-  try {
-    await transporter.verify();
-    console.log('[Email] SMTP connection verified OK');
-  } catch (verifyErr) {
-    console.error('[Email] SMTP verify FAILED:', verifyErr.message);
-    throw verifyErr;
-  }
-
-  const info = await transporter.sendMail({
-    from:    `"NBA Playoff Bets" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+  const { data, error } = await resend.emails.send({
+    from:    'NBA Playoff Bets <onboarding@resend.dev>',
     to:      toEmail,
     subject: 'איפוס סיסמה – NBA Playoff Bets',
     html: `
@@ -68,7 +34,12 @@ async function sendPasswordResetEmail(toEmail, token) {
     `,
   });
 
-  console.log('[Email] Sent successfully, messageId:', info.messageId);
+  if (error) {
+    console.error('[Email] Resend error:', JSON.stringify(error));
+    throw new Error(error.message || JSON.stringify(error));
+  }
+
+  console.log('[Email] Sent successfully, id:', data?.id);
 }
 
 module.exports = { sendPasswordResetEmail };
