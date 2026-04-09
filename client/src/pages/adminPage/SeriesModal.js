@@ -155,8 +155,8 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     });
   };
 
-  // Add selected players to all 3 categories
-  const addSelectedToAll = () => {
+  // Add selected players to a specific category (or all)
+  const addSelectedTo = (setters) => {
     const toAdd = roster
       .filter((p) => selectedEn.has(p.nameEn))
       .map((p) => ({ name: p.nameHe, odds: 1 }));
@@ -168,9 +168,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
         ...newPlayers.filter((np) => !prev.some((p) => p.name === np.name)),
       ]);
 
-    setScorers((prev)    => merge(prev, toAdd));
-    setRebounders((prev) => merge(prev, toAdd));
-    setAssisters((prev)  => merge(prev, toAdd));
+    setters.forEach((setter) => setter((prev) => merge(prev, toAdd)));
     setSelectedEn(new Set());
   };
 
@@ -323,9 +321,13 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
                     ))}
                   </div>
                   {selectedEn.size > 0 && (
-                    <button type="button" className="add-all-btn" onClick={addSelectedToAll}>
-                      + הוסף {selectedEn.size} שחקנים לכל הקטגוריות
-                    </button>
+                    <div className="add-to-cat-btns">
+                      <span className="add-to-label">הוסף {selectedEn.size} שחקנים ל:</span>
+                      <button type="button" onClick={() => addSelectedTo([setScorers])}>🏀 נקודות</button>
+                      <button type="button" onClick={() => addSelectedTo([setRebounders])}>💪 ריבאונד</button>
+                      <button type="button" onClick={() => addSelectedTo([setAssisters])}>🎯 אסיסטים</button>
+                      <button type="button" className="add-all" onClick={() => addSelectedTo([setScorers, setRebounders, setAssisters])}>הכל</button>
+                    </div>
                   )}
                 </>
               )}
