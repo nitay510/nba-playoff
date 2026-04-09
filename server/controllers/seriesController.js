@@ -2,6 +2,7 @@
 const Series = require('../models/Series');
 const UserBet = require('../models/UserBet');
 const User = require('../models/User');
+const { getSeriesGames, getSeriesPlayerStats } = require('../services/espnService');
 // Create a new series (admin)
 exports.createSeries = async (req, res) => {
   try {
@@ -148,3 +149,53 @@ exports.setFinalResults = async (req, res) => {
       return res.status(500).json({ msg: 'Server error' });
     }
   };
+/* ── GET /api/series/:seriesId/stats  (public) ─────────────── */
+exports.getSeriesStats = async (req, res) => {
+  try {
+    const series = await Series.findById(req.params.seriesId).lean();
+    if (!series) return res.status(404).json({ msg: 'Not found' });
+
+    const games = await getSeriesGames(series.teamAEspnId, series.teamBEspnId);
+
+    return res.json({
+      _id:        series._id,
+      teamA:      series.teamA,
+      teamB:      series.teamB,
+      teamAWins:  series.teamAWins || 0,
+      teamBWins:  series.teamBWins || 0,
+      round:      series.round,
+      playerStats: series.playerStats || [],
+      games,
+    });
+  } catch (err) {
+    console.error('[SeriesStats]', err);
+    return res.status(500).json({ msg: err.message });
+  }
+};
+
+/* ── POST /api/series/:seriesId/refresh-stats  (public) ────── */
+exports.refreshSeriesStats = async (req, res) => {
+  try {
+    const series = await Series.findById(req.params.seriesId);
+    if (!series) return res.status(404).json({ msg: 'Not found' });
+
+    const aId = series.teamAEspnId;
+    const bId = series.teamBEspnId;
+    if (!aId || !bId) return res.status(400).json({ msg: 'ESPN IDs missing for this series' });
+
+    const [stats, games] = await Promise.all([
+      getSeriesPlayerStats(aId, bId),
+      getSeriesGames(aId, bId),
+    ]);
+
+    if (stats.length > 0) {
+      series.playerStats = stats;
+      await series.save();
+    }
+
+    return res.json({ playerStats: series.playerStats, games });
+  } catch (err) {
+    console.error('[RefreshStats]', err);
+    return res.status(500).json({ msg: err.message });
+  }
+};

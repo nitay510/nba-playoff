@@ -323,4 +323,22 @@ align-items: center;
       padding: 0.15rem 0.5rem;
     }
   }
+
+  .stats-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.65rem;
+    background: rgba(13, 110, 253, 0.18);
+    border: 1px solid rgba(13, 110, 253, 0.4);
+    color: #7db8ff;
+    border-radius: 8px;
+    padding: 0.45rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(13, 110, 253, 0.3); }
+  }
 }

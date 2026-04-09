@@ -10,7 +10,9 @@ router.put('/:seriesId', requireAdmin, seriesController.updateSeries);
 router.put('/:seriesId/lock', requireAdmin, seriesController.lockSeries);
 router.put('/:seriesId/results', requireAdmin, seriesController.setFinalResults);
 // Anyone can see the series
-router.get('/', seriesController.getAllSeries);
-router.get('/:seriesId', seriesController.getSeriesById);
+router.get('/',                    seriesController.getAllSeries);
+router.get('/:seriesId',           seriesController.getSeriesById);
+router.get('/:seriesId/stats',     seriesController.getSeriesStats);
+router.post('/:seriesId/refresh-stats', seriesController.refreshSeriesStats);
 
 module.exports = router;

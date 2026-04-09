@@ -167,4 +167,52 @@ async function testESPN() {
   }
 }
 
-module.exports = { getPlayoffSeries, getTeamRoster, getSeriesPlayerStats, testESPN };
+/* ──────────────────────────────────────────────────────────────
+ * Series game-by-game scores (completed + live)
+ * ────────────────────────────────────────────────────────────── */
+async function getSeriesGames(teamAEspnId, teamBEspnId) {
+  if (!teamAEspnId || !teamBEspnId) return [];
+  try {
+    const res = await fetch(
+      `${BASE}/teams/${teamAEspnId}/schedule?season=2026&seasontype=3`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+
+    const teamBStr = String(teamBEspnId);
+    const games = [];
+
+    for (const event of (data.events || [])) {
+      const comp  = event.competitions?.[0];
+      const comps = comp?.competitors || [];
+      if (!comps.some((c) => String(c.team?.id) === teamBStr)) continue;
+
+      const status = comp?.status?.type;
+      const isCompleted = status?.completed === true;
+      const isLive      = status?.state === 'in';
+      if (!isCompleted && !isLive) continue;
+
+      const home = comps.find((c) => c.homeAway === 'home') || comps[0];
+      const away = comps.find((c) => c.homeAway === 'away') || comps[1];
+
+      games.push({
+        id:         event.id,
+        date:       event.date,
+        isCompleted,
+        isLive,
+        statusText: status?.shortDetail || '',
+        homeTeam:   home?.team?.displayName || '',
+        awayTeam:   away?.team?.displayName || '',
+        homeScore:  home?.score != null ? parseInt(home.score) : null,
+        awayScore:  away?.score != null ? parseInt(away.score) : null,
+      });
+    }
+
+    return games.sort((a, b) => new Date(a.date) - new Date(b.date));
+  } catch (err) {
+    console.error('[ESPN] Series games error:', err.message);
+    return [];
+  }
+}
+
+module.exports = { getPlayoffSeries, getTeamRoster, getSeriesPlayerStats, getSeriesGames, testESPN };

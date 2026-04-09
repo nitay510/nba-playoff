@@ -5,6 +5,7 @@ import TeamLogo            from '../../components/TeamLogo';
 import { FaCheckCircle, FaTimes } from 'react-icons/fa';
 import Background          from '../../components/Login-back';
 import Header              from '../../components/Header';
+import SeriesStatsModal    from './SeriesStatsModal';
 import './HomePage.scss';
 
 export default function HomePage() {
@@ -19,6 +20,7 @@ export default function HomePage() {
   const [userBets,   setUserBets]   = useState([]);
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
+  const [statsSeries, setStatsSeries] = useState(null); // series to show stats for
 
   /* join league from invite link */
   const inviteRef = useRef(localStorage.getItem('pendingLeague'));
@@ -274,12 +276,26 @@ export default function HomePage() {
                       ))}
                     </div>
                   )}
+
+                  <button
+                    className="stats-btn"
+                    onClick={() => setStatsSeries(s)}
+                  >
+                    📊 סטטיסטיקות
+                  </button>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {statsSeries && (
+        <SeriesStatsModal
+          series={statsSeries}
+          onClose={() => setStatsSeries(null)}
+        />
+      )}
     </div>
   );
 }
