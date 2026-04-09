@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { transliterateToHebrew } from '../../utils/transliterate';
 import './SeriesModal.scss';
 
 const GAMES_CHOICES = [
@@ -10,11 +11,15 @@ const GAMES_CHOICES = [
 
 const OTHER = { name: 'אחר', odds: 1 };
 
+const CAT_POINTS  = 'מלך הנקודות';
+const CAT_REB     = 'מלך הריבאונד';
+const CAT_ASSISTS = 'מלך האסיסטים';
+
 function withOther(list) {
   return [...list.filter((p) => p.name !== 'אחר'), OTHER];
 }
 
-/* ── Add-player mini-form ─────────────────────────────────── */
+/* ── Manual add-player form (fallback) ────────────────────── */
 function AddPlayerForm({ onAdd }) {
   const [he, setHe] = useState('');
   const [en, setEn] = useState('');
@@ -22,44 +27,32 @@ function AddPlayerForm({ onAdd }) {
   const submit = () => {
     const heTrim = he.trim();
     if (!heTrim) return;
-    const combined = en.trim() ? `${heTrim} / ${en.trim()}` : heTrim;
-    onAdd({ name: combined, odds: 1 });
+    onAdd({ name: heTrim, nameEn: en.trim(), odds: 1 });
     setHe('');
     setEn('');
   };
 
-  const onKey = (e) => { if (e.key === 'Enter') submit(); };
-
   return (
     <div className="add-player-form">
-      <input
-        className="player-input-he"
-        placeholder="שם בעברית"
-        value={he}
+      <input className="player-input-he" placeholder="שם בעברית" value={he}
         onChange={(e) => setHe(e.target.value)}
-        onKeyDown={onKey}
-      />
-      <input
-        className="player-input-en"
-        placeholder="English name"
-        value={en}
+        onKeyDown={(e) => e.key === 'Enter' && submit()} />
+      <input className="player-input-en" placeholder="English (optional)" value={en}
         onChange={(e) => setEn(e.target.value)}
-        onKeyDown={onKey}
-      />
+        onKeyDown={(e) => e.key === 'Enter' && submit()} />
       <button type="button" className="add-player-btn" onClick={submit}>+ הוסף</button>
     </div>
   );
 }
 
 /* ── Player category block ────────────────────────────────── */
-function PlayerCategory({ label, players, onAdd, onRemove }) {
+function PlayerCategory({ label, players, onManualAdd, onRemove }) {
   return (
     <div className="player-category">
       <div className="cat-header">
         <strong>{label}</strong>
         <span className="cat-count">{players.length} שחקנים</span>
       </div>
-      <AddPlayerForm onAdd={onAdd} />
       <div className="player-list">
         {players.map((p) => (
           <div key={p.name} className="player-row">
@@ -70,6 +63,7 @@ function PlayerCategory({ label, players, onAdd, onRemove }) {
           </div>
         ))}
       </div>
+      <AddPlayerForm onAdd={onManualAdd} />
     </div>
   );
 }
@@ -87,7 +81,13 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
   const [rebounders,  setRebounders]  = useState([OTHER]);
   const [assisters,   setAssisters]   = useState([OTHER]);
 
-  // Load team list on mount
+  // ESPN roster state
+  const [roster,       setRoster]      = useState([]); // [{ nameEn, nameHe }]
+  const [selectedEn,   setSelectedEn]  = useState(new Set()); // selected player nameEn
+  const [rosterLoading, setRosterLoading] = useState(false);
+  const [rosterMsg,    setRosterMsg]   = useState('');
+
+  // Load team dropdown
   useEffect(() => {
     fetch('/api/sync/teams')
       .then((r) => r.json())
@@ -95,7 +95,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
       .catch(() => {});
   }, []);
 
-  // If editing existing series, pre-populate and skip to step 2
+  // Pre-populate when editing existing series
   useEffect(() => {
     if (!existingSeries) return;
     setTeamA(existingSeries.teamA || '');
@@ -106,21 +106,77 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     }
     const opts = existingSeries.betOptions || [];
     const winner = opts.find((o) => o.category === 'מנצחת הסדרה');
-    if (winner?.choices?.length >= 2) {
+    if (winner?.choices?.length >= 2)
       setWinnerOdds({ a: winner.choices[0].odds, b: winner.choices[1].odds });
-    }
-    const scorer    = opts.find((o) => o.category === 'מלך הניקוד');
-    const rebounder = opts.find((o) => o.category === 'מלך הריבאונד');
-    const assister  = opts.find((o) => o.category === 'מלך הבישוט');
+
+    const scorer    = opts.find((o) => o.category === CAT_POINTS);
+    const rebounder = opts.find((o) => o.category === CAT_REB);
+    const assister  = opts.find((o) => o.category === CAT_ASSISTS);
     setScorers(scorer?.choices    ? withOther(scorer.choices)    : [OTHER]);
     setRebounders(rebounder?.choices ? withOther(rebounder.choices) : [OTHER]);
     setAssisters(assister?.choices  ? withOther(assister.choices)  : [OTHER]);
     setStep(2);
   }, [existingSeries]);
 
-  // ── Helpers ───────────────────────────────────────────────
-  const addTo    = (setter, player) =>
-    setter((prev) => withOther([...prev.filter((p) => p.name !== 'אחר' && p.name !== player.name), player]));
+  // ── Fetch ESPN roster ─────────────────────────────────────
+  const loadRoster = async () => {
+    if (!teamA || !teamB) return;
+    setRosterLoading(true);
+    setRosterMsg('');
+    try {
+      const res  = await fetch(
+        `/api/sync/series-data?teamAHe=${encodeURIComponent(teamA)}&teamBHe=${encodeURIComponent(teamB)}`,
+        { credentials: 'include' }
+      );
+      const data = await res.json();
+      if (!res.ok) { setRosterMsg(data.msg || 'שגיאה בטעינה'); return; }
+
+      const combined = [
+        ...(data.rosterA || []),
+        ...(data.rosterB || []),
+      ].map((nameEn) => ({ nameEn, nameHe: transliterateToHebrew(nameEn) }));
+
+      setRoster(combined);
+      setSelectedEn(new Set());
+      setRosterMsg(combined.length ? '' : 'לא נמצאו שחקנים ב-ESPN');
+    } catch {
+      setRosterMsg('שגיאת רשת');
+    } finally {
+      setRosterLoading(false);
+    }
+  };
+
+  // Toggle player selection in roster
+  const togglePlayer = (nameEn) => {
+    setSelectedEn((prev) => {
+      const next = new Set(prev);
+      next.has(nameEn) ? next.delete(nameEn) : next.add(nameEn);
+      return next;
+    });
+  };
+
+  // Add selected players to all 3 categories
+  const addSelectedToAll = () => {
+    const toAdd = roster
+      .filter((p) => selectedEn.has(p.nameEn))
+      .map((p) => ({ name: p.nameHe, odds: 1 }));
+    if (!toAdd.length) return;
+
+    const merge = (prev, newPlayers) =>
+      withOther([
+        ...prev.filter((p) => p.name !== 'אחר'),
+        ...newPlayers.filter((np) => !prev.some((p) => p.name === np.name)),
+      ]);
+
+    setScorers((prev)    => merge(prev, toAdd));
+    setRebounders((prev) => merge(prev, toAdd));
+    setAssisters((prev)  => merge(prev, toAdd));
+    setSelectedEn(new Set());
+  };
+
+  // ── Category helpers ──────────────────────────────────────
+  const manualAdd  = (setter, player) =>
+    setter((prev) => withOther([...prev.filter((p) => p.name !== 'אחר' && p.name !== player.name), { name: player.name, odds: 1 }]));
 
   const removeFrom = (setter, name) =>
     setter((prev) => prev.filter((p) => p.name !== name));
@@ -128,7 +184,6 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
   // ── Save ──────────────────────────────────────────────────
   const handleSave = async () => {
     try {
-      const startDate = startDateStr ? new Date(startDateStr) : null;
       const betOptions = [
         {
           category: 'מנצחת הסדרה',
@@ -138,13 +193,14 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
           ],
         },
         { category: 'בכמה משחקים', choices: GAMES_CHOICES },
-        { category: 'מלך הניקוד',   choices: scorers },
-        { category: 'מלך הריבאונד', choices: rebounders },
-        { category: 'מלך הבישוט',   choices: assisters },
+        { category: CAT_POINTS,    choices: scorers },
+        { category: CAT_REB,       choices: rebounders },
+        { category: CAT_ASSISTS,   choices: assisters },
       ];
 
       const url    = existingSeries ? `/api/series/${existingSeries._id}` : '/api/series';
       const method = existingSeries ? 'PUT' : 'POST';
+      const startDate = startDateStr ? new Date(startDateStr) : null;
 
       await fetch(url, {
         method, credentials: 'include',
@@ -166,37 +222,27 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
           {existingSeries ? 'עריכת סדרה' : 'יצירת סדרה חדשה'}
         </h3>
 
-        {/* ── STEP 1: Pick teams ───────────────────────────── */}
+        {/* ── STEP 1 ──────────────────────────────────────── */}
         {step === 1 && (
           <div className="step-1">
             <label className="modal-label">קבוצה א׳</label>
             <select className="modal-select" value={teamA} onChange={(e) => setTeamA(e.target.value)}>
               <option value="">-- בחר קבוצה --</option>
-              {allTeams.filter((t) => t !== teamB).map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
+              {allTeams.filter((t) => t !== teamB).map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
 
             <label className="modal-label">קבוצה ב׳</label>
             <select className="modal-select" value={teamB} onChange={(e) => setTeamB(e.target.value)}>
               <option value="">-- בחר קבוצה --</option>
-              {allTeams.filter((t) => t !== teamA).map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
+              {allTeams.filter((t) => t !== teamA).map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
 
             <label className="modal-label">תאריך התחלה (הניחושים ייסגרו אוטומטית)</label>
-            <input
-              type="datetime-local" className="modal-input"
-              value={startDateStr} onChange={(e) => setStartDate(e.target.value)}
-            />
+            <input type="datetime-local" className="modal-input"
+              value={startDateStr} onChange={(e) => setStartDate(e.target.value)} />
 
             <div className="step1-actions">
-              <button
-                className="load-btn"
-                onClick={() => setStep(2)}
-                disabled={!teamA || !teamB}
-              >
+              <button className="load-btn" onClick={() => setStep(2)} disabled={!teamA || !teamB}>
                 הבא ←
               </button>
               <button className="cancel-btn" onClick={onClose}>בטל</button>
@@ -204,7 +250,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
           </div>
         )}
 
-        {/* ── STEP 2: Configure odds & players ────────────── */}
+        {/* ── STEP 2 ──────────────────────────────────────── */}
         {step === 2 && (
           <div className="step-2">
             <div className="teams-summary">
@@ -215,35 +261,27 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
             </div>
 
             <label className="modal-label">תאריך התחלה</label>
-            <input
-              type="datetime-local" className="modal-input"
-              value={startDateStr} onChange={(e) => setStartDate(e.target.value)}
-            />
+            <input type="datetime-local" className="modal-input"
+              value={startDateStr} onChange={(e) => setStartDate(e.target.value)} />
 
-            {/* Winner odds — editable */}
+            {/* Winner odds */}
             <div className="odds-section">
               <h4 className="section-title">מנצחת הסדרה — יחסים</h4>
               <div className="winner-odds-row">
                 <div className="odds-box">
                   <span>{teamA}</span>
-                  <input
-                    type="number" step="0.1" min="1.1"
-                    value={winnerOdds.a}
-                    onChange={(e) => setWinnerOdds((p) => ({ ...p, a: e.target.value }))}
-                  />
+                  <input type="number" step="0.1" min="1.1" value={winnerOdds.a}
+                    onChange={(e) => setWinnerOdds((p) => ({ ...p, a: e.target.value }))} />
                 </div>
                 <div className="odds-box">
                   <span>{teamB}</span>
-                  <input
-                    type="number" step="0.1" min="1.1"
-                    value={winnerOdds.b}
-                    onChange={(e) => setWinnerOdds((p) => ({ ...p, b: e.target.value }))}
-                  />
+                  <input type="number" step="0.1" min="1.1" value={winnerOdds.b}
+                    onChange={(e) => setWinnerOdds((p) => ({ ...p, b: e.target.value }))} />
                 </div>
               </div>
             </div>
 
-            {/* Games count — fixed at 3 */}
+            {/* Games — fixed */}
             <div className="odds-section">
               <h4 className="section-title">בכמה משחקים — יחס קבוע: 3</h4>
               <div className="games-fixed-row">
@@ -253,25 +291,56 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
               </div>
             </div>
 
-            {/* Player categories — all odds fixed at 1 */}
-            <PlayerCategory
-              label="🏀 מלך הניקוד"
-              players={scorers}
-              onAdd={(p) => addTo(setScorers, p)}
-              onRemove={(n) => removeFrom(setScorers, n)}
-            />
-            <PlayerCategory
-              label="💪 מלך הריבאונד"
-              players={rebounders}
-              onAdd={(p) => addTo(setRebounders, p)}
-              onRemove={(n) => removeFrom(setRebounders, n)}
-            />
-            <PlayerCategory
-              label="🎯 מלך הבישוט"
-              players={assisters}
-              onAdd={(p) => addTo(setAssisters, p)}
-              onRemove={(n) => removeFrom(setAssisters, n)}
-            />
+            {/* ESPN roster picker */}
+            <div className="roster-section">
+              <div className="roster-header">
+                <strong>שחקנים מ-ESPN</strong>
+                <button
+                  type="button"
+                  className="load-roster-btn"
+                  onClick={loadRoster}
+                  disabled={rosterLoading}
+                >
+                  {rosterLoading ? 'טוען...' : '⟳ טען שחקנים'}
+                </button>
+              </div>
+
+              {rosterMsg && <p className="roster-msg">{rosterMsg}</p>}
+
+              {roster.length > 0 && (
+                <>
+                  <div className="roster-chips">
+                    {roster.map((p) => (
+                      <button
+                        key={p.nameEn}
+                        type="button"
+                        className={`roster-chip ${selectedEn.has(p.nameEn) ? 'selected' : ''}`}
+                        onClick={() => togglePlayer(p.nameEn)}
+                        title={p.nameHe}
+                      >
+                        {p.nameEn}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedEn.size > 0 && (
+                    <button type="button" className="add-all-btn" onClick={addSelectedToAll}>
+                      + הוסף {selectedEn.size} שחקנים לכל הקטגוריות
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Player categories */}
+            <PlayerCategory label={`🏀 ${CAT_POINTS}`} players={scorers}
+              onManualAdd={(p) => manualAdd(setScorers, p)}
+              onRemove={(n) => removeFrom(setScorers, n)} />
+            <PlayerCategory label={`💪 ${CAT_REB}`} players={rebounders}
+              onManualAdd={(p) => manualAdd(setRebounders, p)}
+              onRemove={(n) => removeFrom(setRebounders, n)} />
+            <PlayerCategory label={`🎯 ${CAT_ASSISTS}`} players={assisters}
+              onManualAdd={(p) => manualAdd(setAssisters, p)}
+              onRemove={(n) => removeFrom(setAssisters, n)} />
 
             <div className="modal-actions">
               <button className="save-btn" onClick={handleSave}>שמור סדרה</button>
