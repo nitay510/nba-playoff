@@ -96,19 +96,8 @@ function AdminPage() {
         <button onClick={handleCreateNew} className="create-series-btn">
           + צור סדרה חדשה
         </button>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="sync-btn"
-          title="מושך סדרות פלייאוף מ-ESPN ויחסים מ-FanDuel"
-        >
-          {syncing ? 'מסנכרן...' : '⟳ סנכרן מ-NBA / FanDuel'}
-        </button>
         <button onClick={() => navigate('/admin/finished')} className="finished-btn">
           ראה סדרות שהסתיימו
-        </button>
-        <button onClick={handleCleanup} disabled={cleaning} className="cleanup-btn">
-          {cleaning ? 'מנקה...' : '🗑 ניקוי מסד נתונים'}
         </button>
       </div>
 
