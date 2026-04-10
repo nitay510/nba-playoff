@@ -28,15 +28,33 @@ const TEAMS = [
   { name: 'פורטלנד טרייל בלייזרס',  odds: 30.00 },
 ];
 
+// (deadline enforcement is on the server; this constant is unused client-side)
+
 export default function ChampionSelectionPage() {
   const navigate = useNavigate();
-  const [selectedTeam, setSelectedTeam] = useState(null);
-  const [username,     setUsername]     = useState('');
+  const [selectedTeam,    setSelectedTeam]    = useState(null);
+  const [username,        setUsername]        = useState('');
+  const [existingChampion, setExistingChampion] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem('username');
     if (!stored) { navigate('/'); return; }
     setUsername(stored);
+
+    // Fetch current champion to pre-select it
+    fetch('/api/auth/me', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: stored }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.champion) {
+          setExistingChampion(d.champion);
+          setSelectedTeam(d.champion);
+        }
+      })
+      .catch(() => {});
   }, [navigate]);
 
   const handleSubmit = async () => {
@@ -57,10 +75,14 @@ export default function ChampionSelectionPage() {
     }
   };
 
+  const isChanging = !!existingChampion;
+
   return (
     <div className="champion-selection-page">
       <Background image="open-screen.png" />
-      <h1 className="page-title">מי תהיה האלופה?</h1>
+      <h1 className="page-title">
+        {isChanging ? 'שינוי בחירת האלופה' : 'מי תהיה האלופה?'}
+      </h1>
 
       <div className="main-card">
         <div className="teams-grid">
@@ -81,6 +103,11 @@ export default function ChampionSelectionPage() {
         <button className="submit-btn" onClick={handleSubmit}>
           אישור
         </button>
+        {isChanging && (
+          <button className="cancel-champion-btn" onClick={() => navigate('/home')}>
+            ביטול
+          </button>
+        )}
       </div>
     </div>
   );

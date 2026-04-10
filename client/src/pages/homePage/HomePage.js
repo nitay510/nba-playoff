@@ -156,6 +156,8 @@ export default function HomePage() {
   const openBetting  = orderedSeries.filter((s) => !s.isLocked);
   const activeLocked = orderedSeries.filter((s) => s.isLocked);
 
+  const canChangeChampion = new Date() < new Date('2026-04-17T22:00:00Z'); // button hidden after April 18 01:00 Israel time
+
   return (
     <div className="home-page">
       <Header />
@@ -169,6 +171,11 @@ export default function HomePage() {
           <div className="info-item">
             <small>האלופה שלי</small>
             <p>{myInfo.champion || 'לא נבחרה'}</p>
+            {canChangeChampion && (
+              <button className="change-champion-btn" onClick={() => navigate('/choose-champion')}>
+                שנה בחירה
+              </button>
+            )}
           </div>
         </div>
 

@@ -89,7 +89,19 @@
     cursor: pointer;
     transition: background-color 0.3s;
     margin-top: 1rem;
+  }
 
-
+  .cancel-champion-btn {
+    align-self: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Almoni Neue', sans-serif;
+    padding: 6px 40px;
+    background: none;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    &:hover { background: rgba(255, 255, 255, 0.1); }
   }
 }

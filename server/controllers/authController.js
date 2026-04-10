@@ -108,11 +108,30 @@ exports.logout = (req, res) => {
 };
 
 /* ── setChampion ── */
+// Existing users can change their pick until April 18 at 01:00 Israel time (UTC+3)
+const CHANGE_DEADLINE        = new Date('2026-04-17T22:00:00Z');
+// New users (no previous pick) can make their first pick until April 20 end of day Israel time
+const NEW_SELECTION_DEADLINE = new Date('2026-04-20T20:59:00Z');
+
 exports.setChampion = async (req, res) => {
   try {
     const { username, champion } = req.body;
     const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ msg: 'המשתמש לא נמצא' });
+
+    const now = new Date();
+    if (user.champions) {
+      // Existing pick – change deadline is April 18 01:00
+      if (now > CHANGE_DEADLINE) {
+        return res.status(403).json({ msg: 'המועד האחרון לשינוי האלופה עבר (18 באפריל, 01:00)' });
+      }
+    } else {
+      // First-time pick – allowed until April 20
+      if (now > NEW_SELECTION_DEADLINE) {
+        return res.status(403).json({ msg: 'המועד האחרון לבחירת אלופה עבר (20 באפריל)' });
+      }
+    }
+
     user.champions = champion;
     await user.save();
     return res.status(200).json({ msg: 'אלוף עודכן בהצלחה', champion: user.champions });
