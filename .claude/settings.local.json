@@ -5,7 +5,9 @@
       "WebSearch",
       "WebFetch(domain:www.nba.com)",
       "WebFetch(domain:en.wikipedia.org)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:basketball.realgm.com)",
+      "WebFetch(domain:www.basketball-reference.com)"
     ]
   }
 }
