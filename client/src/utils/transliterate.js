@@ -224,6 +224,91 @@ const PLAYER_DICT = {
   'Grant Williams': 'גראנט וויליאמס',
   'Tre Mann':       'טרה מאן',
   'Seth Curry':     'סת קארי',
+
+  // Indiana Pacers
+  'Tyrese Haliburton':  'טיריס הליברטון',
+  'Myles Turner':       'מיילס טרנר',
+  'Bennedict Mathurin': "בנדיקט מת'ורין",
+  'Andrew Nembhard':    'אנדרו נמבהארד',
+  'Obi Toppin':         'אובי טופין',
+  'TJ McConnell':       'TJ מקונל',
+  'T.J. McConnell':     'TJ מקונל',
+  'James Johnson':      "ג'יימס ג'ונסון",
+  'Isaiah Jackson':     "ישעיהו ג'קסון",
+
+  // Milwaukee Bucks
+  'Giannis Antetokounmpo': 'יאניס אנטטוקונמפו',
+  'Damian Lillard':         'דמיאן ליארד',
+  'Khris Middleton':        'כריס מידלטון',
+  'Brook Lopez':            'ברוק לופז',
+  'Bobby Portis':           "בובי פורטיס",
+  'Pat Connaughton':        "פט קונוטון",
+  'Malik Beasley':          'מאליק ביסלי',
+  'MarJon Beauchamp':       "מארג'ון בושאמפ",
+  'Taurean Prince':         "טוריאן פרינס",
+
+  // Dallas Mavericks
+  'Kyrie Irving':     'קיירי אירווינג',
+  'Luka Doncic':      "לוקה דונצ'יץ'",
+  'PJ Washington':    "PJ ווושינגטון",
+  'Dereck Lively II': 'דרק ליבלי',
+  'Daniel Gafford':   'דניאל גאפורד',
+  'Quentin Grimes':   'קווינטין גריימס',
+  'Spencer Dinwiddie': 'ספנסר דינווידי',
+  'Maxi Kleber':      'מקסי קלבר',
+  'Josh Green':       "ג'וש גרין",
+
+  // Memphis Grizzlies
+  'Ja Morant':           "ג'ה מוראנט",
+  'Jaren Jackson Jr.':   "ג'ארן ג'קסון ג'וניור",
+  'Jaren Jackson':       "ג'ארן ג'קסון",
+  'Desmond Bane':        'דזמונד ביין',
+  'Marcus Smart':        'מרקוס סמארט',
+  'GG Jackson':          "GG ג'קסון",
+  'Vince Williams Jr.':  "וינס וויליאמס ג'וניור",
+  'Ziaire Williams':     'זיאיר וויליאמס',
+  'Santi Aldama':        'סנטי אלדאמה',
+
+  // New Orleans Pelicans
+  'Brandon Ingram':      'ברנדון אינגרם',
+  'Zion Williamson':     'זיון ווליאמסון',
+  'CJ McCollum':         "CJ מקולום",
+  'Herb Jones':          "הרב ג'ונס",
+  'Jonas Valanciunas':   "יונאס ולנצ'יונאס",
+  'Trey Murphy III':     'טריי מרפי',
+  'Trey Murphy':         'טריי מרפי',
+  'Naji Marshall':       "נאג'י מארשל",
+  'Jose Alvarado':       "חוזה אלברדו",
+
+  // Sacramento Kings
+  'Domantas Sabonis':  'דומנטס סבוניס',
+  "De'Aaron Fox":      "דה'ארון פוקס",
+  'Kevin Huerter':     'קווין יורטר',
+  'Harrison Barnes':   'האריסון בארנס',
+  'Malik Monk':        'מאליק מונק',
+  'Keegan Murray':     'קיגן מארי',
+  'Davion Mitchell':   'דביון מיטשל',
+  'Alex Len':          'אלכס לן',
+
+  // Chicago Bulls
+  'Zach LaVine':       'זאק לאוין',
+  'Nikola Vucevic':    "ניקולה ווצ'ביץ'",
+  'Coby White':        'קובי ווייט',
+  'Patrick Williams':  'פטריק וויליאמס',
+  'DeMar DeRozan':     'דמאר דרוזן',
+  'Ayo Dosunmu':       'אייו דוסונמו',
+  'Torrey Craig':      "טורי קרייג",
+  'Andre Drummond':    'אנדרה דראמונד',
+
+  // Utah Jazz
+  'Lauri Markkanen':  'לאורי מארקנן',
+  'Walker Kessler':   'ווקר קסלר',
+  'Collin Sexton':    'קולין סקסטון',
+  'John Collins':     "ג'ון קולינס",
+  'Keyonte George':   "קיאונטה ג'ורג'",
+  'Jordan Clarkson':  "ג'ורדן קלארקסון",
+  'Kris Dunn':        'קריס דאן',
+  'Taylor Hendricks': 'טיילור הנדריקס',
 };
 
 /* ── Normalization: strip diacritics + lowercase ─────────────
