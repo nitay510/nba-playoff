@@ -309,6 +309,123 @@ const PLAYER_DICT = {
   'Jordan Clarkson':  "ג'ורדן קלארקסון",
   'Kris Dunn':        'קריס דאן',
   'Taylor Hendricks': 'טיילור הנדריקס',
+
+  // ── 2025-26 Season: new additions, trades & rookies ──────────
+
+  // LA Lakers (Luka era)
+  'Jake LaRavia':         "ג'ייק לארביה",
+  'Jarred Vanderbilt':    "ג'ארד ונדרביל",
+  'Dalton Knecht':        'דלטון נכט',
+  'Jaxson Hayes':         "ג'קסון הייז",
+  'Luke Kennard':         'לוק קנארד',
+  'Nick Smith Jr.':       "ניק סמית' ג'וניור",
+
+  // Houston Rockets (Kevin Durant era)
+  'Reed Sheppard':        'ריד שפרד',
+  'Jeff Green':           "ג'ף גרין",
+  "Jae'Sean Tate":        "ג'יי'שון טייט",
+  'Josh Okogie':          "ג'וש אוקוג'י",
+  'Tristen Newton':       'טריסטן ניוטון',
+
+  // San Antonio Spurs
+  'De\'Aaron Fox':        "דה'ארון פוקס",
+  'Dylan Harper':         'דילן הארפר',
+  'Carter Bryant':        'קארטר בריאנט',
+
+  // OKC Thunder
+  'Cason Wallace':        'קיסון ווואלס',
+  'Jared McCain':         "ג'ארד מקיין",
+  'Nikola Topic':         "ניקולה טופיץ'",
+  'Ajay Mitchell':        "אג'יי מיטשל",
+  'Payton Sandfort':      'פייטון סנדפורט',
+  'Jaylin Williams':      "ג'יילין וויליאמס",
+  'Thomas Sorber':        'תומאס סורבר',
+
+  // Boston Celtics
+  'Baylor Scheierman':    'ביילור שיירמן',
+  'Neemias Queta':        'נמיאס קווטה',
+  'Anfernee Simons':      'אנפרני סיימונס',
+
+  // Cleveland Cavaliers
+  'Dennis Schroder':      'דניס שרודר',
+  'Dennis Schröder':      'דניס שרודר',
+  'Keon Ellis':           'קיאון אליס',
+  'Tyrese Proctor':       'טיריס פרוקטור',
+
+  // New York Knicks
+  'Guerschon Yabusele':   'גרשון יבוסלה',
+  'Tyler Kolek':          'טיילר קולק',
+  'Landry Shamet':        'לנדרי שמט',
+  'Jeremy Sochan':        "ג'רמי סושאן",
+
+  // Toronto Raptors
+  'Brandon Ingram':       'ברנדון אינגרם',
+  'Trayce Jackson-Davis': "טרייס ג'קסון-דייוויס",
+  'Jamal Shead':          "ג'מאל שד",
+  'Jonathan Mogbo':       "ג'ונתן מוגבו",
+
+  // Atlanta Hawks
+  'Jalen Johnson':        "ג'יילן ג'ונסון",
+  'Buddy Hield':          'באדי הילד',
+  'Zaccharie Risacher':   'זכריה ריסאשה',
+  'Corey Kispert':        'קורי קיספרט',
+  'Dyson Daniels':        'דייסון דניאלס',
+
+  // Minnesota Timberwolves
+  'Julius Randle':        "ג'וליוס רנדל",
+  'Bones Hyland':         'בונז היילנד',
+  'Terrence Shannon Jr.': "טרנס שנון ג'וניור",
+  'Julian Phillips':      "ג'וליאן פיליפס",
+  'Donte DiVincenzo':     "דונטה דיבינצ'נזו",
+
+  // Denver Nuggets
+  'Cameron Johnson':      "קמרון ג'ונסון",
+  'Tim Hardaway Jr.':     "טים הארדאוויי ג'וניור",
+  'DaRon Holmes II':      'דרון הולמס',
+  'Tyus Jones':           "טיוס ג'ונס",
+  'Jonas Valanciunas':    "יונאס ולנצ'יונאס",
+
+  // Philadelphia 76ers
+  'VJ Edgecombe':         "VJ אדג'קומב",
+  'V.J. Edgecombe':       "VJ אדג'קומב",
+  'Johni Broome':         "ג'וני ברום",
+  'Dalen Terry':          'דלן טרי',
+  'Justin Edwards':       "ג'סטין אדוורדס",
+  'Adem Bona':            'אדם בונה',
+
+  // Orlando Magic
+  'Anthony Black':        'אנתוני בלאק',
+  'Jonathan Isaac':       "ג'ונתן אייזק",
+  'Jase Richardson':      "ג'יז ריצ'רדסון",
+  'Desmond Bane':         'דזמונד ביין',
+
+  // Detroit Pistons
+  'Jalen Duren':          "ג'יילן דורן",
+  'Ron Holland':          'רון הולנד',
+  'Chaz Lanier':          "צ'אז לניר",
+  'Paul Reed':            'פול ריד',
+  'Caris LeVert':         'קאריס לוורט',
+  'Duncan Robinson':      'דאנקן רובינסון',
+
+  // Indiana Pacers
+  'Aaron Nesmith':        "אהרון נסמית'",
+  'Jarace Walker':        "ג'ארס ווקר",
+  'Kobe Brown':           'קובי בראון',
+  'Ivica Zubac':          "איביצה זובאץ'",
+
+  // Phoenix Suns
+  'Ryan Dunn':            'ראיין דאן',
+  "Royce O'Neale":        'רויס אוניל',
+  'Khaman Maluach':       "חמאן מאלואץ'",
+  'Jamaree Bouyea':       "ג'מארי בויאה",
+  'Jalen Green':          "ג'יילן גרין",
+
+  // Portland Trail Blazers
+  'Damian Lillard':       'דמיאן ליארד',
+  'Deni Avdija':          "דני אבדיג'ה",
+  'Donovan Clingan':      'דונובן קלינגן',
+  'Vit Krejci':           "ויט קרייצ'י",
+  'Jrue Holiday':         "ג'רו הולידי",
 };
 
 /* ── Normalization: strip diacritics + lowercase ─────────────
