@@ -355,6 +355,65 @@ align-items: center;
     &:hover { background: rgba(13, 110, 253, 0.3); }
   }
 }
+/* ── Finished series section ─────────────────────────────── */
+.finished-section { margin-top: 1.5rem; }
+
+.finished-card {
+  cursor: default !important;
+
+  .locked-header {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .winner-logo {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+  }
+
+  .loser-logo {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+  }
+
+  .finished-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0.3rem 0;
+    font-size: 1.5rem;
+    font-weight: 900;
+
+    .wins { color: rgba(255,255,255,0.5); }
+    .wins.leading { color: #ffd700; }
+    .rec-dash { color: #fff; font-size: 1.1rem; }
+  }
+
+  .winner-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffd700;
+    margin-top: 0.2rem;
+  }
+
+  .locked-bet-pill {
+    &.bet-correct {
+      background: rgba(34, 197, 94, 0.25);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #86efac;
+    }
+    &.bet-wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .bet-verdict {
+      font-weight: 700;
+      margin-right: 0.2rem;
+    }
+  }
+}
+
 /* ── Push notification banner ─────────────────────────────── */
 .push-banner {
   display: flex;

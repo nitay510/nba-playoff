@@ -105,7 +105,7 @@ export default function HomePage() {
     try {
       const r = await fetch('/api/series');
       const d = await r.json();
-      setSeriesList(d.filter((s) => !s.isFinished));
+      setSeriesList(Array.isArray(d) ? d : []);
     } catch (e) { console.error(e); }
   };
 
@@ -182,7 +182,8 @@ export default function HomePage() {
   };
 
   /* Sort: unlocked (open for betting) first, then by startDate */
-  const orderedSeries = [...seriesList].sort((a, b) => {
+  const activeSeries = seriesList.filter((s) => !s.isFinished);
+  const orderedSeries = [...activeSeries].sort((a, b) => {
     if (a.isLocked !== b.isLocked) return a.isLocked ? 1 : -1;
     const aBet = !!findDoc(a._id);
     const bBet = !!findDoc(b._id);
@@ -190,8 +191,22 @@ export default function HomePage() {
     return new Date(a.startDate || 1e15) - new Date(b.startDate || 1e15);
   });
 
-  const openBetting  = orderedSeries.filter((s) => !s.isLocked);
-  const activeLocked = orderedSeries.filter((s) => s.isLocked);
+  const openBetting    = orderedSeries.filter((s) => !s.isLocked);
+  const activeLocked   = orderedSeries.filter((s) => s.isLocked);
+  const finishedSeries = [...seriesList]
+    .filter((s) => s.isFinished)
+    .sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0));
+
+  /* For finished series: check if a user bet choice matches the final answer */
+  const betResult = (myBet, series) => {
+    if (!myBet) return null;
+    return myBet.bets.map((b) => {
+      const opt = series.betOptions?.find((o) => o.category === b.category);
+      const hasFinal = !!opt?.finalChoice;
+      const correct  = hasFinal && opt.finalChoice === b.choiceName;
+      return { ...b, hasFinal, correct };
+    });
+  };
 
   const canChangeChampion = new Date() < new Date('2026-04-17T22:00:00Z'); // button hidden after April 18 01:00 Israel time
 
@@ -341,10 +356,58 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  <button
-                    className="stats-btn"
-                    onClick={() => setStatsSeries(s)}
-                  >
+                  <button className="stats-btn" onClick={() => setStatsSeries(s)}>
+                    📊 סטטיסטיקות
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Finished series ── */}
+        {finishedSeries.length > 0 && (
+          <div className="series-list finished-section">
+            <h2 className="bets">סדרות שהסתיימו ✅</h2>
+            {finishedSeries.map((s) => {
+              const myBet = findDoc(s._id);
+              const results = betResult(myBet, s);
+              const aW = s.teamAWins ?? 0;
+              const bW = s.teamBWins ?? 0;
+              const winner = aW > bW ? s.teamA : bW > aW ? s.teamB : null;
+              return (
+                <div key={s._id} className="series-card finished-card">
+                  <div className="locked-header">
+                    <TeamLogo teamName={s.teamA} className={`big-logo ${aW > bW ? 'winner-logo' : 'loser-logo'}`} />
+                    <div className="locked-center">
+                      <div className="locked-names">{s.teamA} – {s.teamB}</div>
+                      <div className="finished-score">
+                        <span className={aW > bW ? 'wins leading' : 'wins'}>{aW}</span>
+                        <span className="rec-dash"> – </span>
+                        <span className={bW > aW ? 'wins leading' : 'wins'}>{bW}</span>
+                      </div>
+                      {winner && <div className="winner-label">🏆 {winner}</div>}
+                      {s.round && <div className="round-label">{s.round}</div>}
+                    </div>
+                    <TeamLogo teamName={s.teamB} className={`big-logo ${bW > aW ? 'winner-logo' : 'loser-logo'}`} />
+                  </div>
+
+                  {results && (
+                    <div className="my-locked-bet">
+                      <strong>הניחוש שלי:</strong>
+                      {results.map((b, i) => (
+                        <span
+                          key={i}
+                          className={`locked-bet-pill ${b.hasFinal ? (b.correct ? 'bet-correct' : 'bet-wrong') : ''}`}
+                        >
+                          {b.category}: <b>{b.choiceName}</b>
+                          {b.hasFinal && <span className="bet-verdict">{b.correct ? ' ✓' : ' ✗'}</span>}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <button className="stats-btn" onClick={() => setStatsSeries(s)}>
                     📊 סטטיסטיקות
                   </button>
                 </div>
