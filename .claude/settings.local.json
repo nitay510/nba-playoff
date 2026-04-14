@@ -7,7 +7,8 @@
       "WebFetch(domain:en.wikipedia.org)",
       "Bash(git add:*)",
       "WebFetch(domain:basketball.realgm.com)",
-      "WebFetch(domain:www.basketball-reference.com)"
+      "WebFetch(domain:www.basketball-reference.com)",
+      "WebFetch(domain:site.api.espn.com)"
     ]
   }
 }
