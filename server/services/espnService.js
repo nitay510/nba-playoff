@@ -11,6 +11,12 @@ const BASE2 = 'https://site.api.espn.com/apis/v2/sports/basketball/nba';
 async function getPlayoffSeries() {
   try {
     const res = await fetch(`${BASE2}/playoffs`);
+
+    // 404 = bracket not published yet (pre-playoffs / between rounds) — not an error
+    if (res.status === 404) {
+      console.log('[ESPN] Playoff bracket not available yet — will retry later');
+      return [];
+    }
     if (!res.ok) throw new Error(`ESPN returned ${res.status}`);
     const data = await res.json();
 
@@ -143,24 +149,27 @@ async function testESPN() {
       .slice(0, 3)
       .map((t) => t.team?.displayName);
 
-    // Test 2: playoff bracket (returns empty rounds outside of playoffs)
-    const playoffsRes  = await fetch(`${BASE2}/playoffs`);
-    const playoffsOk   = playoffsRes.ok;
-    const playoffsData = playoffsOk ? await playoffsRes.json() : null;
-    const roundCount   = playoffsData?.rounds?.length || 0;
-    const seriesTotal  = (playoffsData?.rounds || []).reduce(
+    // Test 2: playoff bracket (404 = not published yet, that's normal)
+    const playoffsRes    = await fetch(`${BASE2}/playoffs`);
+    const bracketMissing = playoffsRes.status === 404;
+    const playoffsOk     = playoffsRes.ok;
+    const playoffsData   = playoffsOk ? await playoffsRes.json() : null;
+    const roundCount     = playoffsData?.rounds?.length || 0;
+    const seriesTotal    = (playoffsData?.rounds || []).reduce(
       (n, r) => n + (r.series?.length || 0), 0
     );
 
     return {
       teamsEndpoint:    teamsOk ? 'OK' : 'FAIL',
-      playoffsEndpoint: playoffsOk ? 'OK' : 'FAIL',
+      playoffsEndpoint: bracketMissing ? 'NOT_READY_YET' : playoffsOk ? 'OK' : 'FAIL',
       sampleTeams,
       playoffRounds:    roundCount,
       playoffSeries:    seriesTotal,
-      note: seriesTotal === 0
-        ? 'No active playoffs right now — the bracket will populate once playoffs begin.'
-        : `${seriesTotal} series found across ${roundCount} rounds.`,
+      note: bracketMissing
+        ? 'Bracket not published yet (play-in in progress or pre-season) — will auto-populate once playoffs begin.'
+        : seriesTotal === 0
+          ? 'No active playoffs right now.'
+          : `${seriesTotal} series found across ${roundCount} rounds.`,
     };
   } catch (err) {
     return { error: err.message };
