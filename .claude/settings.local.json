@@ -8,7 +8,14 @@
       "Bash(git add:*)",
       "WebFetch(domain:basketball.realgm.com)",
       "WebFetch(domain:www.basketball-reference.com)",
-      "WebFetch(domain:site.api.espn.com)"
+      "WebFetch(domain:site.api.espn.com)",
+      "Bash(grep -E \"\\\\.js$|^d\")",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Read(//usr/local/bin/**)",
+      "Read(//usr/bin/**)",
+      "Bash(nvm use:*)",
+      "Bash(/mnt/c/Users/User/Documents/GitHub/nba-playoff/server/node_modules/.bin/web-push generate-vapid-keys:*)"
     ]
   }
 }

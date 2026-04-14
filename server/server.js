@@ -18,6 +18,7 @@ const seriesRoutes  = require('./routes/seriesRoutes');
 const leagueRoutes  = require('./routes/leagueRoutes');
 const userBetRoutes = require('./routes/userBetRoutes');
 const syncRoutes    = require('./routes/syncRoutes');
+const pushRoutes    = require('./routes/pushRoutes');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -65,6 +66,7 @@ app.use('/api/series',    seriesRoutes);
 app.use('/api/user-bets', userBetRoutes);
 app.use('/api/leagues',   leagueRoutes);
 app.use('/api/sync',      syncRoutes);
+app.use('/api/push',      pushRoutes);
 
 /***************************************************
  * Serve React Build (production)
@@ -132,3 +134,61 @@ function scheduleDailyAt5UTC(fn) {
 setTimeout(autoSync, 10_000);
 setInterval(autoSync, 4 * 60 * 60 * 1000);
 scheduleDailyAt5UTC(runDailyStatsSync);
+
+/* ── Pre-series push notifications ─────────────────────────────
+ * Every 30 minutes: find series starting in ~2 hours and notify
+ * every user who hasn't submitted their bets for that series yet.
+ * ─────────────────────────────────────────────────────────────*/
+const UserBet        = require('./models/UserBet');
+const User           = require('./models/User');
+const { sendToUser } = require('./services/pushService');
+
+async function sendPreSeriesNotifications() {
+  try {
+    const now        = new Date();
+    const windowFrom = new Date(now.getTime() + 1.5 * 60 * 60 * 1000); // now + 1h30m
+    const windowTo   = new Date(now.getTime() + 2.5 * 60 * 60 * 1000); // now + 2h30m
+
+    // Series starting within the 1h-window around the 2h mark
+    const upcoming = await Series.find({
+      startDate:  { $gte: windowFrom, $lte: windowTo },
+      isLocked:   false,
+      isFinished: false,
+    });
+
+    if (!upcoming.length) return;
+
+    // All users who have at least one push subscription
+    const usersWithPush = await User.find(
+      { 'pushSubscriptions.0': { $exists: true } },
+      '_id pushSubscriptions',
+    );
+
+    for (const series of upcoming) {
+      // Users who already submitted bets for this series
+      const existingBets = await UserBet.find(
+        { seriesId: series._id },
+        'userId',
+      );
+      const bettedUserIds = new Set(existingBets.map((b) => String(b.userId)));
+
+      const minutesLeft = Math.round((new Date(series.startDate) - now) / 60000);
+
+      for (const user of usersWithPush) {
+        if (bettedUserIds.has(String(user._id))) continue; // already bet
+
+        await sendToUser(user._id, {
+          title: '⏰ אל תשכח למלא הימורים!',
+          body:  `${series.teamA} נגד ${series.teamB} מתחיל בעוד ~${minutesLeft} דקות`,
+          url:   '/home',
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[PushNotif] Error:', err.message);
+  }
+}
+
+// Start after 15s, then every 30 minutes
+setTimeout(sendPreSeriesNotifications, 15_000);
+setInterval(sendPreSeriesNotifications, 30 * 60 * 1000);

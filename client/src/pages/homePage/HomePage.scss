@@ -355,3 +355,42 @@ align-items: center;
     &:hover { background: rgba(13, 110, 253, 0.3); }
   }
 }
+/* ── Push notification banner ─────────────────────────────── */
+.push-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(13, 110, 253, 0.18);
+  border: 1px solid rgba(13, 110, 253, 0.45);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin: 0.6rem 1rem 0;
+  color: #fff;
+  font-size: 0.9rem;
+  direction: rtl;
+
+  &__icon { color: #60aaff; font-size: 1.1rem; flex-shrink: 0; }
+  &__text  { flex: 1; }
+
+  &__allow {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    &:disabled { opacity: 0.6; cursor: default; }
+  }
+
+  &__dismiss {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem;
+    &:hover { color: #fff; }
+  }
+}

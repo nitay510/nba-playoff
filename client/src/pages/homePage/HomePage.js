@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate }     from 'react-router-dom';
 import CountdownClock      from '../../components/CountdownClock';
 import TeamLogo            from '../../components/TeamLogo';
-import { FaCheckCircle, FaTimes } from 'react-icons/fa';
+import { FaCheckCircle, FaTimes, FaBell } from 'react-icons/fa';
 import Background          from '../../components/Login-back';
 import Header              from '../../components/Header';
 import SeriesStatsModal    from './SeriesStatsModal';
+import { isPushSupported, registerPushNotifications } from '../../utils/pushNotifications';
 import './HomePage.scss';
 
 export default function HomePage() {
@@ -21,6 +22,8 @@ export default function HomePage() {
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
   const [statsSeries, setStatsSeries] = useState(null); // series to show stats for
+  const [showPushBanner, setShowPushBanner] = useState(false);
+  const [pushLoading,    setPushLoading]    = useState(false);
 
   /* join league from invite link */
   const inviteRef = useRef(localStorage.getItem('pendingLeague'));
@@ -45,6 +48,40 @@ export default function HomePage() {
     fetchAllActiveSeries();
     fetchUserBets();
   }, []);
+
+  /* Show push-permission banner once per browser if not yet asked */
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    if (localStorage.getItem('pushAsked')) return;
+    if (Notification.permission === 'granted') {
+      // Already granted on another visit — silently re-subscribe
+      registerPushNotifications().catch(() => {});
+      return;
+    }
+    if (Notification.permission === 'denied') return;
+    setShowPushBanner(true);
+  }, []);
+
+  const handleAllowPush = async () => {
+    setPushLoading(true);
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        await registerPushNotifications();
+      }
+    } catch (e) {
+      console.error('Push registration failed:', e);
+    } finally {
+      localStorage.setItem('pushAsked', '1');
+      setShowPushBanner(false);
+      setPushLoading(false);
+    }
+  };
+
+  const handleDismissPush = () => {
+    localStorage.setItem('pushAsked', '1');
+    setShowPushBanner(false);
+  };
 
   const formatOdds = (v) => (Number.isFinite(+v) ? (+v).toFixed(1) : v);
 
@@ -162,6 +199,26 @@ export default function HomePage() {
     <div className="home-page">
       <Header />
       <Background image="background.png" />
+
+      {/* Push-notification permission banner */}
+      {showPushBanner && (
+        <div className="push-banner">
+          <FaBell className="push-banner__icon" />
+          <span className="push-banner__text">
+            רוצה תזכורת 2 שעות לפני כל סדרה?
+          </span>
+          <button
+            className="push-banner__allow"
+            onClick={handleAllowPush}
+            disabled={pushLoading}
+          >
+            {pushLoading ? '...' : 'אפשר התראות'}
+          </button>
+          <button className="push-banner__dismiss" onClick={handleDismissPush}>
+            <FaTimes />
+          </button>
+        </div>
+      )}
 
       <div className="page-con">
         {/* info bar */}
