@@ -205,7 +205,7 @@ export default function HomePage() {
         <div className="push-banner">
           <FaBell className="push-banner__icon" />
           <span className="push-banner__text">
-            רוצה תזכורת 2 שעות לפני כל סדרה?
+            רוצה תזכורת לפני כל סדרה?
           </span>
           <button
             className="push-banner__allow"
