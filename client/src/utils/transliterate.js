@@ -310,6 +310,13 @@ const PLAYER_DICT = {
   'Kris Dunn':        'קריס דאן',
   'Taylor Hendricks': 'טיילור הנדריקס',
 
+  // ── ESPN exact-name aliases (mismatch fixes) ─────────────────
+  // ESPN returns the full legal name; dict had nicknames
+  'Luguentz Dort':      'לו דורט',        // ESPN full name for 'Lu Dort'
+  'Ronald Holland II':  'רון הולנד',      // ESPN full name for 'Ron Holland'
+  'Javonte Green':      "ג'בונטה גרין",   // Pistons rotation
+  "Nae'Qwan Tomlin":   "נאקוון טומלין",   // Cavaliers
+
   // ── 2025-26 Season: new additions, trades & rookies ──────────
 
   // LA Lakers (Luka era)
@@ -426,15 +433,160 @@ const PLAYER_DICT = {
   'Donovan Clingan':      'דונובן קלינגן',
   'Vit Krejci':           "ויט קרייצ'י",
   'Jrue Holiday':         "ג'רו הולידי",
+  'Kris Murray':          "קריס מארי",
+  'Shaedon Sharpe':       'שיידון שארפ',
+  'Jerami Grant':         "ג'רמי גראנט",
+  'Toumani Camara':       'טומאני קמארה',
+
+  // ── Complete rosters — ESPN-verified displayNames ────────────
+
+  // OKC Thunder (full rotation)
+  'Brooks Barnhizer':     'ברוקס בארנהייזר',
+  'Branden Carlson':      'ברנדן קארלסון',
+  'Nikola Topic':         "ניקולה טופיץ'",
+
+  // San Antonio Spurs (full rotation)
+  'Kelly Olynyk':         'קלי אולניק',
+  'Bismack Biyombo':      'ביסמק ביומבו',
+  'Julian Champagnie':    "ג'וליאן שמפניי",
+  'Mason Plumlee':        'מייסון פלאמלי',
+  'Luke Kornet':          'לוק קורנט',
+  'Jordan McLaughlin':    "ג'ורדן מקלאולין",
+  'Harrison Ingram':      'האריסון אינגרם',
+
+  // Denver Nuggets (full rotation)
+  'Peyton Watson':        'פייטון ווטסון',
+  'Christian Braun':      'כריסטיאן בראון',
+  'Bruce Brown':          'ברוס בראון',
+  'Julian Strawther':     "ג'וליאן סטרות'ר",
+  'Zeke Nnaji':           "זיק נאג'י",
+
+  // LA Lakers (full rotation)
+  'Adou Thiero':          "אדו ת'יארו",
+  'Drew Timme':           'דרו טים',
+  'Deandre Ayton':        "דיאנדרי אייטון",
+  'Maxi Kleber':          'מקסי קלבר',
+
+  // Houston Rockets (full rotation)
+  'Amen Thompson':        'איימן תומפסון',
+  'Jabari Smith Jr.':     "ג'אבארי סמית' ג'וניור",
+  'Steven Adams':         'סטיבן אדמס',
+  'Tari Eason':           'טארי איסון',
+  'Fred VanVleet':        'פרד ואנבליט',
+  'Dorian Finney-Smith':  "דוריאן פיני-סמית'",
+  'Aaron Holiday':        'אהרון הולידי',
+
+  // Minnesota Timberwolves (full rotation)
+  'Anthony Edwards':      'אנתוני אדוורדס',
+  'Rudy Gobert':          'רודי גובר',
+  'Jaden McDaniels':      "ג'יידן מקדניאלס",
+  'Mike Conley':          'מייק קונלי',
+  'Naz Reid':             'נאז ריד',
+  'Kyle Anderson':        'קייל אנדרסון',
+  'Joe Ingles':           "ג'ו אינגלס",
+  'Jaylen Clark':         "ג'יילן קלארק",
+
+  // Phoenix Suns (full rotation)
+  'Devin Booker':         'דווין בוקר',
+  'Grayson Allen':        'גריסון אלן',
+  'Dillon Brooks':        'דילון ברוקס',
+  'Mark Williams':        'מארק וויליאמס',
+  'Haywood Highsmith':    "הייווד הייסמית'",
+
+  // Detroit Pistons (full rotation)
+  'Cade Cunningham':      'קייד קאנינגהאם',
+  'Ausar Thompson':       'אוסאר תומפסון',
+  'Isaiah Stewart':       'ישעיהו סטיוארט',
+  'Tobias Harris':        'טוביאס האריס',
+  'Kevin Huerter':        'קווין יורטר',
+  'Marcus Sasser':        'מרקוס סאסר',
+
+  // Boston Celtics (full rotation)
+  'Jayson Tatum':         "ג'ייסון טייטום",
+  'Jaylen Brown':         "ג'יילן בראון",
+  'Derrick White':        'דריק וויט',
+  'Payton Pritchard':     "פייטון פריצ'רד",
+  'Sam Hauser':           'סם האוזר',
+  'Nikola Vucevic':       "ניקולה ווצ'ביץ'",
+  'Ron Harper Jr.':       "רון הארפר ג'וניור",
+  'Baylor Scheierman':    'ביילור שיירמן',
+
+  // New York Knicks (full rotation)
+  'Jalen Brunson':        "ג'יילן ברונסון",
+  'Karl-Anthony Towns':   'קארל-אנתוני טאונס',
+  'Mikal Bridges':        "מיקאל ברידג'ס",
+  'OG Anunoby':           "OG אנונובי",
+  'Josh Hart':            "ג'וש הארט",
+  'Miles McBride':        "מיילס מקברייד",
+  'Mitchell Robinson':    'מיטשל רובינסון',
+  'Jordan Clarkson':      "ג'ורדן קלארקסון",
+  'Pacome Dadiet':        'פקום דדיאט',
+
+  // Cleveland Cavaliers (full rotation)
+  'Donovan Mitchell':     'דונובן מיטשל',
+  'Evan Mobley':          'אוון מובלי',
+  'Jarrett Allen':        "ג'ארט אלן",
+  'Max Strus':            'מקס סטראוס',
+  'Dean Wade':            'דין ויד',
+  'Larry Nance Jr.':      "לארי ננס ג'וניור",
+  'Keon Ellis':           'קיאון אליס',
+
+  // Toronto Raptors (full rotation)
+  'Scottie Barnes':       'סקוטי בארנס',
+  'RJ Barrett':           "RJ בארט",
+  'Jakob Poeltl':         'יאקוב פאלטל',
+  'Immanuel Quickley':    'עמנואל קוויקלי',
+  'Gradey Dick':          'גריידי דיק',
+
+  // Atlanta Hawks (full rotation)
+  'Trae Young':           'טריי יאנג',
+  'Onyeka Okongwu':       'אוניקה אוקונגוו',
+  'Jonathan Kuminga':     "ג'ונתן קומינגה",
+  'Nickeil Alexander-Walker': "ניקייל אלכסנדר-ווקר",
+  'Dyson Daniels':        'דייסון דניאלס',
+  'Mouhamed Gueye':       'מוחמד גי',
+  'Caleb Houstan':        'קאלב האוסטן',
+  'Asa Newell':           'אסה ניואל',
+
+  // Philadelphia 76ers (full rotation)
+  'Joel Embiid':          "ג'ואל אמביד",
+  'Tyrese Maxey':         'טיריס מקסי',
+  'Paul George':          "פול ג'ורג'",
+  'Andre Drummond':       'אנדרה דראמונד',
+  'Kyle Lowry':           'קייל לאורי',
+  'Quentin Grimes':       'קווינטין גריימס',
+  'Kelly Oubre Jr.':      "קלי אורה ג'וניור",
+
+  // Orlando Magic (full rotation)
+  'Paolo Banchero':       "פאולו בנצ'רו",
+  'Franz Wagner':         'פרנץ ואגנר',
+  'Wendell Carter Jr.':   "וונדל קארטר ג'וניור",
+  'Jalen Suggs':          "ג'יילן סאגס",
+  'Moritz Wagner':        'מוריץ ואגנר',
+  'Goga Bitadze':         'גוגה ביטאדזה',
+  'Tristan da Silva':     "טריסטן דה סילבה",
+  'Anthony Black':        'אנתוני בלאק',
+
+  // Indiana Pacers (full rotation)
+  'Tyrese Haliburton':    'טיריס הליברטון',
+  'Pascal Siakam':        'פסקל סיאקם',
+  'Andrew Nembhard':      'אנדרו נמבהארד',
+  'T.J. McConnell':       'TJ מקונל',
+  'Obi Toppin':           'אובי טופין',
+  'Ben Sheppard':         'בן שפרד',
+  'Myles Turner':         'מיילס טרנר',
 };
 
 /* ── Normalization: strip diacritics + lowercase ─────────────
- * Handles ESPN returning "Nikola Jokić" vs dict key "Nikola Jokic"
+ * Handles ESPN returning "Nikola Jokić" vs dict key "Nikola Jokic",
+ * curly apostrophes vs straight (De'Aaron Fox), extra spaces, etc.
  * ─────────────────────────────────────────────────────────── */
 function normalize(str) {
   return str
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')  // remove accent marks
+    .replace(/[\u0300-\u036f]/g, '')           // remove accent marks
+    .replace(/[\u2018\u2019\u02BC\u02B9\u0060\u00B4\uFF07]/g, "'") // unify apostrophe variants → ASCII '
+    .replace(/\s+/g, ' ')                      // collapse multiple / non-breaking spaces
     .replace(/[čćž]/gi, (c) => ({ č:'c', ć:'c', ž:'z', Č:'c', Ć:'c', Ž:'z' }[c] || c))
     .replace(/[šŠ]/g, 's')
     .replace(/[đĐ]/g, 'd')
