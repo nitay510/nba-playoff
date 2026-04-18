@@ -337,6 +337,68 @@ align-items: center;
     }
   }
 
+  /* ── Live player standings (points / rebounds / assists) ─── */
+  .player-standings {
+    margin-top: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .standings-cat {
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 0.45rem 0.65rem;
+
+      .standings-cat-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.55);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.35rem;
+      }
+
+      .standings-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.18rem 0;
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.8);
+
+        &.my-pick {
+          color: #fff;
+          font-weight: 700;
+        }
+
+        .standings-rank {
+          min-width: 1.8rem;
+          color: rgba(255,255,255,0.4);
+          font-size: 0.72rem;
+        }
+
+        .standings-name { flex: 1; }
+
+        .standings-val {
+          font-weight: 700;
+          color: #ffd700;
+          min-width: 3rem;
+          text-align: left;
+        }
+
+        .my-pick-tag {
+          font-size: 0.65rem;
+          background: rgba(255,215,0,0.2);
+          border: 1px solid rgba(255,215,0,0.4);
+          color: #ffd700;
+          border-radius: 3px;
+          padding: 1px 5px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
   .stats-btn {
     display: block;
     width: 100%;

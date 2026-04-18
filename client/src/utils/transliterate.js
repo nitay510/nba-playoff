@@ -633,6 +633,26 @@ function transliterateWord(word) {
   return result;
 }
 
+/* ── Reverse map: Hebrew → English (first-match wins) ─────── */
+const HE_TO_EN = {};
+for (const [en, he] of Object.entries(PLAYER_DICT)) {
+  if (!HE_TO_EN[he]) HE_TO_EN[he] = en;
+}
+
+/**
+ * Look up a player's stat from playerStats (ESPN English names) using their Hebrew name.
+ * statKey: 'points' | 'rebounds' | 'assists'
+ * Returns the numeric value or null if not found.
+ */
+export function getPlayerStat(hebrewName, playerStats, statKey) {
+  if (!hebrewName || !playerStats?.length || !statKey) return null;
+  const en = HE_TO_EN[hebrewName];
+  if (!en) return null;
+  const normEn = normalize(en);
+  const match = playerStats.find((p) => normalize(p.playerName) === normEn);
+  return match != null ? (match[statKey] ?? null) : null;
+}
+
 /* ── Main export ──────────────────────────────────────────── */
 export function transliterateToHebrew(fullName) {
   if (!fullName) return '';

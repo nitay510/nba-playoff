@@ -7,7 +7,52 @@ import Background          from '../../components/Login-back';
 import Header              from '../../components/Header';
 import SeriesStatsModal    from './SeriesStatsModal';
 import { isPushSupported, registerPushNotifications } from '../../utils/pushNotifications';
+import { getPlayerStat }   from '../../utils/transliterate';
 import './HomePage.scss';
+
+const CAT_STAT = {
+  'מלך הנקודות': 'points',
+  'מלך הריבאונד': 'rebounds',
+  'מלך האסיסטים': 'assists',
+};
+const STAT_LABEL = { points: "נק'", rebounds: "ריב'", assists: 'עזר' };
+
+/* Live player-category standings inside a series card */
+function PlayerStandings({ betOptions, playerStats, myBets }) {
+  const cats = (betOptions || []).filter((opt) => CAT_STAT[opt.category]);
+  if (!cats.length || !playerStats?.length) return null;
+
+  return (
+    <div className="player-standings">
+      {cats.map((opt) => {
+        const statKey  = CAT_STAT[opt.category];
+        const myChoice = myBets?.find((b) => b.category === opt.category)?.choiceName;
+
+        const rows = (opt.choices || [])
+          .filter((c) => c.name !== 'אחר')
+          .map((c) => ({ name: c.name, val: getPlayerStat(c.name, playerStats, statKey) }))
+          .filter((c) => c.val !== null)
+          .sort((a, b) => b.val - a.val);
+
+        if (!rows.length) return null;
+
+        return (
+          <div key={opt.category} className="standings-cat">
+            <div className="standings-cat-title">{opt.category}</div>
+            {rows.map((c, i) => (
+              <div key={c.name} className={`standings-row${c.name === myChoice ? ' my-pick' : ''}`}>
+                <span className="standings-rank">#{i + 1}</span>
+                <span className="standings-name">{c.name}</span>
+                <span className="standings-val">{c.val} {STAT_LABEL[statKey]}</span>
+                {c.name === myChoice && <span className="my-pick-tag">הבחירה שלי</span>}
+              </div>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -356,6 +401,12 @@ export default function HomePage() {
                     </div>
                   )}
 
+                  <PlayerStandings
+                    betOptions={s.betOptions}
+                    playerStats={s.playerStats}
+                    myBets={myBet?.bets}
+                  />
+
                   <button className="stats-btn" onClick={() => setStatsSeries(s)}>
                     📊 סטטיסטיקות
                   </button>
@@ -406,6 +457,12 @@ export default function HomePage() {
                       ))}
                     </div>
                   )}
+
+                  <PlayerStandings
+                    betOptions={s.betOptions}
+                    playerStats={s.playerStats}
+                    myBets={myBet?.bets}
+                  />
 
                   <button className="stats-btn" onClick={() => setStatsSeries(s)}>
                     📊 סטטיסטיקות
