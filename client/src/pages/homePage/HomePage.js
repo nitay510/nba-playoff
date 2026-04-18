@@ -208,7 +208,7 @@ export default function HomePage() {
     });
   };
 
-  const canChangeChampion = new Date() < new Date('2026-04-17T22:00:00Z'); // button hidden after April 18 01:00 Israel time
+  const canChangeChampion = new Date() < new Date('2026-04-18T17:30:00Z'); // button hidden after April 18 20:30 Israel time
 
   return (
     <div className="home-page">
