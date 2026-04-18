@@ -104,13 +104,18 @@ async function getSeriesPlayerStats(teamAEspnId, teamBEspnId) {
         if (!sumRes.ok) continue;
         const summary = await sumRes.json();
 
-        for (const teamBox of (summary.boxscore?.players || [])) {
+        // ESPN returns boxscore.players OR boxscore.teams depending on the endpoint version
+        const teamBoxes = summary.boxscore?.players || summary.boxscore?.teams || [];
+        for (const teamBox of teamBoxes) {
           const teamName = teamBox.team?.displayName || '';
           for (const statGroup of (teamBox.statistics || [])) {
-            const keys = statGroup.keys || [];
+            // ESPN uses 'names' in box score responses; 'keys' is a fallback
+            const keys = statGroup.names || statGroup.keys || statGroup.labels || [];
             const ptsIdx = keys.indexOf('PTS');
             const rebIdx = keys.indexOf('REB');
             const astIdx = keys.indexOf('AST');
+
+            if (ptsIdx < 0 && rebIdx < 0 && astIdx < 0) continue; // skip stat groups with no relevant columns
 
             for (const athlete of (statGroup.athletes || [])) {
               const name = athlete.athlete?.displayName;
