@@ -86,11 +86,11 @@ app.listen(PORT, () => {
 /***************************************************
  * Schedulers
  ***************************************************/
-const { getPlayoffSeries } = require('./services/espnService');
+const { getPlayoffSeries, getSeriesPlayerStats } = require('./services/espnService');
 const Series = require('./models/Series');
-const { runDailyStatsSync } = require('./controllers/syncController');
+const { NBA_TEAM_IDS } = require('./services/nbaTeamIds');
 
-/* ── Light sync every 4h: update win counts + lock status ── */
+/* ── Sync every hour: update win counts, lock status, and stats after games ── */
 async function autoSync() {
   try {
     const espnSeries = await getPlayoffSeries();
@@ -98,6 +98,13 @@ async function autoSync() {
       const filter = s.externalId
         ? { externalId: s.externalId }
         : { $or: [{ teamA: s.teamAHe, teamB: s.teamBHe }, { teamA: s.teamBHe, teamB: s.teamAHe }] };
+
+      // Check current wins before updating, so we know if a game just finished
+      const existing = await Series.findOne(filter);
+      const prevTotal = existing ? (existing.teamAWins || 0) + (existing.teamBWins || 0) : 0;
+      const newTotal  = (s.teamAWins || 0) + (s.teamBWins || 0);
+      const gameFinished = newTotal > prevTotal;
+
       await Series.findOneAndUpdate(filter, {
         $set: {
           teamAWins:   s.teamAWins,
@@ -108,6 +115,24 @@ async function autoSync() {
           ...(s.startDate && new Date() >= new Date(s.startDate) ? { isLocked: true } : {}),
         },
       });
+
+      // Refresh player stats whenever a new game completed (or stats are empty)
+      const noStats = !existing?.playerStats?.length;
+      if (gameFinished || noStats) {
+        const aId = s.teamAEspnId ? String(s.teamAEspnId) : String(NBA_TEAM_IDS[s.teamAHe] || '');
+        const bId = s.teamBEspnId ? String(s.teamBEspnId) : String(NBA_TEAM_IDS[s.teamBHe] || '');
+        if (aId && bId) {
+          try {
+            const stats = await getSeriesPlayerStats(aId, bId);
+            if (stats.length > 0) {
+              await Series.findOneAndUpdate(filter, { $set: { playerStats: stats } });
+              console.log(`[AutoSync] Stats refreshed for ${s.teamAHe} vs ${s.teamBHe} (${stats.length} players)`);
+            }
+          } catch (err) {
+            console.error(`[AutoSync] Stats error for ${s.teamAHe} vs ${s.teamBHe}:`, err.message);
+          }
+        }
+      }
     }
     if (espnSeries.length) console.log(`[AutoSync] Updated ${espnSeries.length} series`);
   } catch (err) {
@@ -115,25 +140,9 @@ async function autoSync() {
   }
 }
 
-/* ── Daily stats sync at 8:00 AM Israel time (UTC+3 = 05:00 UTC) ── */
-function scheduleDailyAt5UTC(fn) {
-  const now    = new Date();
-  const next5  = new Date(Date.UTC(
-    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 5, 0, 0, 0
-  ));
-  if (next5 <= now) next5.setUTCDate(next5.getUTCDate() + 1);
-  const msUntil = next5 - now;
-  console.log(`[DailySync] Next run in ${Math.round(msUntil / 60000)} minutes (05:00 UTC / 08:00 Israel)`);
-  setTimeout(() => {
-    fn();
-    setInterval(fn, 24 * 60 * 60 * 1000);
-  }, msUntil);
-}
-
-// Start schedulers after DB connects (give 10s)
+// Start schedulers after DB connects (give 10s), then run every hour
 setTimeout(autoSync, 10_000);
-setInterval(autoSync, 4 * 60 * 60 * 1000);
-scheduleDailyAt5UTC(runDailyStatsSync);
+setInterval(autoSync, 60 * 60 * 1000);
 
 /* ── Pre-series push notifications ─────────────────────────────
  * Every 30 minutes: find series starting in ~2 hours and notify

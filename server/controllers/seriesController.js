@@ -3,6 +3,7 @@ const Series = require('../models/Series');
 const UserBet = require('../models/UserBet');
 const User = require('../models/User');
 const { getSeriesGames, getSeriesPlayerStats } = require('../services/espnService');
+const { NBA_TEAM_IDS } = require('../services/nbaTeamIds');
 // Create a new series (admin)
 exports.createSeries = async (req, res) => {
   try {
@@ -179,8 +180,8 @@ exports.refreshSeriesStats = async (req, res) => {
     const series = await Series.findById(req.params.seriesId);
     if (!series) return res.status(404).json({ msg: 'Not found' });
 
-    const aId = series.teamAEspnId;
-    const bId = series.teamBEspnId;
+    const aId = series.teamAEspnId || String(NBA_TEAM_IDS[series.teamA] || '');
+    const bId = series.teamBEspnId || String(NBA_TEAM_IDS[series.teamB] || '');
     if (!aId || !bId) return res.status(400).json({ msg: 'ESPN IDs missing for this series' });
 
     const [stats, games] = await Promise.all([
