@@ -122,6 +122,10 @@ export default function HomePage() {
     fetchMyUserInfo();
     fetchAllActiveSeries();
     fetchUserBets();
+
+    // Auto-refresh series every 3 minutes so wins update without manual reload
+    const interval = setInterval(fetchAllActiveSeries, 3 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

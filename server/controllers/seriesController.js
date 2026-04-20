@@ -156,18 +156,26 @@ exports.getSeriesStats = async (req, res) => {
     const series = await Series.findById(req.params.seriesId);
     if (!series) return res.status(404).json({ msg: 'Not found' });
 
-    const games = await getSeriesGames(series.teamAEspnId, series.teamBEspnId);
+    // Use stored ESPN IDs, falling back to the name→ID map (same logic as refreshSeriesStats)
+    const aId = series.teamAEspnId || String(NBA_TEAM_IDS[series.teamA] || '');
+    const bId = series.teamBEspnId || String(NBA_TEAM_IDS[series.teamB] || '');
+
+    // Persist IDs if they were missing
+    if (aId && !series.teamAEspnId) { series.teamAEspnId = aId; }
+    if (bId && !series.teamBEspnId) { series.teamBEspnId = bId; }
+
+    const games = aId && bId ? await getSeriesGames(aId, bId) : [];
 
     // Compute wins from live game results (more up-to-date than hourly DB sync)
     let teamAWins = series.teamAWins || 0;
     let teamBWins = series.teamBWins || 0;
 
-    if (series.teamAEspnId && games.length > 0) {
+    if (aId && games.length > 0) {
       let computedA = 0;
       let computedB = 0;
       for (const g of games) {
         if (!g.isCompleted) continue;
-        const homeIsA = g.homeTeamId === String(series.teamAEspnId);
+        const homeIsA = g.homeTeamId === aId;
         if (homeIsA) {
           if (g.homeWon) computedA++;
           else if (g.awayWon) computedB++;
@@ -176,15 +184,19 @@ exports.getSeriesStats = async (req, res) => {
           else if (g.homeWon) computedB++;
         }
       }
-      // Use computed if we got more games than what the DB knows about
+      // Use computed total if it's fresher than DB
       if (computedA + computedB > teamAWins + teamBWins) {
         teamAWins = computedA;
         teamBWins = computedB;
-        // Update DB so home page also reflects fresh wins
-        series.teamAWins = teamAWins;
-        series.teamBWins = teamBWins;
-        await series.save();
       }
+    }
+
+    // Save any updates (IDs, wins) back to DB so the home page reflects them
+    if (series.teamAWins !== teamAWins || series.teamBWins !== teamBWins ||
+        series.teamAEspnId !== aId     || series.teamBEspnId !== bId) {
+      series.teamAWins   = teamAWins;
+      series.teamBWins   = teamBWins;
+      await series.save();
     }
 
     return res.json({
