@@ -223,6 +223,15 @@ async function getSeriesGames(teamAEspnId, teamBEspnId) {
       const home = comps.find((c) => c.homeAway === 'home') || comps[0];
       const away = comps.find((c) => c.homeAway === 'away') || comps[1];
 
+      const homeScoreRaw = home?.score;
+      const awayScoreRaw = away?.score;
+      const homeScore = homeScoreRaw != null && homeScoreRaw !== '' ? parseInt(homeScoreRaw) || null : null;
+      const awayScore = awayScoreRaw != null && awayScoreRaw !== '' ? parseInt(awayScoreRaw) || null : null;
+
+      // Use ESPN's winner flag first; fall back to score comparison
+      const homeWon = isCompleted && (home?.winner === true || (homeScore != null && awayScore != null && homeScore > awayScore));
+      const awayWon = isCompleted && (away?.winner === true || (homeScore != null && awayScore != null && awayScore > homeScore));
+
       games.push({
         id:         event.id,
         date:       event.date,
@@ -231,8 +240,12 @@ async function getSeriesGames(teamAEspnId, teamBEspnId) {
         statusText: status?.shortDetail || '',
         homeTeam:   home?.team?.displayName || '',
         awayTeam:   away?.team?.displayName || '',
-        homeScore:  home?.score != null ? parseInt(home.score) : null,
-        awayScore:  away?.score != null ? parseInt(away.score) : null,
+        homeTeamId: home?.team?.id ? String(home.team.id) : '',
+        awayTeamId: away?.team?.id ? String(away.team.id) : '',
+        homeScore,
+        awayScore,
+        homeWon,
+        awayWon,
       });
     }
 

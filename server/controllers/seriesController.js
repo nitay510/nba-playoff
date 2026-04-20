@@ -153,18 +153,47 @@ exports.setFinalResults = async (req, res) => {
 /* ── GET /api/series/:seriesId/stats  (public) ─────────────── */
 exports.getSeriesStats = async (req, res) => {
   try {
-    const series = await Series.findById(req.params.seriesId).lean();
+    const series = await Series.findById(req.params.seriesId);
     if (!series) return res.status(404).json({ msg: 'Not found' });
 
     const games = await getSeriesGames(series.teamAEspnId, series.teamBEspnId);
 
+    // Compute wins from live game results (more up-to-date than hourly DB sync)
+    let teamAWins = series.teamAWins || 0;
+    let teamBWins = series.teamBWins || 0;
+
+    if (series.teamAEspnId && games.length > 0) {
+      let computedA = 0;
+      let computedB = 0;
+      for (const g of games) {
+        if (!g.isCompleted) continue;
+        const homeIsA = g.homeTeamId === String(series.teamAEspnId);
+        if (homeIsA) {
+          if (g.homeWon) computedA++;
+          else if (g.awayWon) computedB++;
+        } else {
+          if (g.awayWon) computedA++;
+          else if (g.homeWon) computedB++;
+        }
+      }
+      // Use computed if we got more games than what the DB knows about
+      if (computedA + computedB > teamAWins + teamBWins) {
+        teamAWins = computedA;
+        teamBWins = computedB;
+        // Update DB so home page also reflects fresh wins
+        series.teamAWins = teamAWins;
+        series.teamBWins = teamBWins;
+        await series.save();
+      }
+    }
+
     return res.json({
-      _id:        series._id,
-      teamA:      series.teamA,
-      teamB:      series.teamB,
-      teamAWins:  series.teamAWins || 0,
-      teamBWins:  series.teamBWins || 0,
-      round:      series.round,
+      _id:         series._id,
+      teamA:       series.teamA,
+      teamB:       series.teamB,
+      teamAWins,
+      teamBWins,
+      round:       series.round,
       playerStats: series.playerStats || [],
       games,
     });

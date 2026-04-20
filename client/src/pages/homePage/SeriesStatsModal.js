@@ -29,31 +29,22 @@ function StatCategory({ players, statKey, statLabel, gamesPlayed }) {
 }
 
 /* ── Game score row ── */
-function GameRow({ game, index, teamAHe, teamBHe, teamAEspnName, teamBEspnName }) {
-  const homeIsA = game.homeTeam === teamAEspnName;
-  const awayIsA = game.awayTeam === teamAEspnName;
-
-  const homeHe = homeIsA ? teamAHe : awayIsA ? teamBHe : game.homeTeam;
-  const awayHe = homeIsA ? teamBHe : awayIsA ? teamAHe : game.awayTeam;
-
-  const homeWon = game.isCompleted && game.homeScore != null && game.awayScore != null && game.homeScore > game.awayScore;
-  const awayWon = game.isCompleted && game.homeScore != null && game.awayScore != null && game.awayScore > game.homeScore;
+function GameRow({ game, index }) {
+  const { homeWon, awayWon } = game;
 
   return (
     <div className={`game-row ${game.isLive ? 'is-live' : ''} ${game.isCompleted ? 'is-done' : ''}`}>
       <span className="game-num">מ{index + 1}</span>
       <span className="game-teams">
-        <span className={homeWon ? 'team-winner' : ''}>{homeHe}</span>
+        <span className={homeWon ? 'team-winner' : ''}>{game.homeTeam || '–'}</span>
         <span className="vs-sep"> נגד </span>
-        <span className={awayWon ? 'team-winner' : ''}>{awayHe}</span>
+        <span className={awayWon ? 'team-winner' : ''}>{game.awayTeam || '–'}</span>
       </span>
-      {(game.homeScore != null || game.awayScore != null) && (
-        <span className="game-score-nums">
-          <span className={homeWon ? 'score-winner' : 'score-dim'}>{game.homeScore ?? '–'}</span>
-          <span className="score-colon">:</span>
-          <span className={awayWon ? 'score-winner' : 'score-dim'}>{game.awayScore ?? '–'}</span>
-        </span>
-      )}
+      <span className="game-score-nums">
+        <span className={homeWon ? 'score-winner' : 'score-dim'}>{game.homeScore ?? '–'}</span>
+        <span className="score-colon">:</span>
+        <span className={awayWon ? 'score-winner' : 'score-dim'}>{game.awayScore ?? '–'}</span>
+      </span>
       {game.isLive && <span className="live-badge">LIVE</span>}
       {game.statusText && !game.isLive && (
         <span className="game-date">{game.statusText}</span>
@@ -116,13 +107,6 @@ export default function SeriesStatsModal({ series, onClose }) {
   const games = data?.games || [];
   const gamesPlayed = games.filter((g) => g.isCompleted).length;
 
-  // Try to find the ESPN English names from the games data
-  const espnTeamAName = games.length
-    ? (games[0].homeTeam.toLowerCase().includes(series.teamA?.split(' ')[0]?.toLowerCase() ?? '')
-        ? games[0].homeTeam
-        : games[0].awayTeam)
-    : '';
-
   return (
     <div className="stats-overlay" onClick={onClose}>
       <div className="stats-modal" onClick={(e) => e.stopPropagation()}>
@@ -175,15 +159,7 @@ export default function SeriesStatsModal({ series, onClose }) {
               <div className="games-section">
                 <h4>תוצאות משחקים</h4>
                 {games.map((g, i) => (
-                  <GameRow
-                    key={g.id || i}
-                    game={g}
-                    index={i}
-                    teamAHe={series.teamA}
-                    teamBHe={series.teamB}
-                    teamAEspnName={g.homeTeam}
-                    teamBEspnName={g.awayTeam}
-                  />
+                  <GameRow key={g.id || i} game={g} index={i} />
                 ))}
               </div>
             )}

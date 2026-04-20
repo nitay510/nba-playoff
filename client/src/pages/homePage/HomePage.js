@@ -519,7 +519,7 @@ export default function HomePage() {
       {statsSeries && (
         <SeriesStatsModal
           series={statsSeries}
-          onClose={() => setStatsSeries(null)}
+          onClose={() => { setStatsSeries(null); fetchAllActiveSeries(); }}
         />
       )}
     </div>
