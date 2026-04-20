@@ -79,12 +79,12 @@ export default function SeriesStatsModal({ series, onClose }) {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      const res = await fetch(`/api/series/${series._id}/refresh-stats`, {
+      // Refresh player stats from ESPN
+      await fetch(`/api/series/${series._id}/refresh-stats`, {
         method: 'POST', credentials: 'include',
       });
-      const d = await res.json();
-      setData((prev) => ({ ...prev, playerStats: d.playerStats, games: d.games }));
-      setUpdateTime(new Date());
+      // Re-fetch stats (includes fresh wins computed from game results)
+      await fetchStats();
     } catch (e) {
       console.error(e);
     } finally {

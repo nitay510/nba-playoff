@@ -196,7 +196,26 @@ async function testESPN() {
 }
 
 /* ──────────────────────────────────────────────────────────────
+ * Helper: parse a score value from ESPN (string, number, or object)
+ * ────────────────────────────────────────────────────────────── */
+function parseScore(raw) {
+  if (raw == null) return null;
+  if (typeof raw === 'number') return raw;
+  if (typeof raw === 'object') return parseScore(raw.value ?? raw.displayValue);
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    const n = parseInt(raw, 10);
+    return isNaN(n) ? null : n;
+  }
+  return null;
+}
+
+function parseBool(raw) {
+  return raw === true || raw === 'true';
+}
+
+/* ──────────────────────────────────────────────────────────────
  * Series game-by-game scores (completed + live)
+ * Scores come from the game summary endpoint (more reliable than schedule).
  * ────────────────────────────────────────────────────────────── */
 async function getSeriesGames(teamAEspnId, teamBEspnId) {
   if (!teamAEspnId || !teamBEspnId) return [];
@@ -208,7 +227,7 @@ async function getSeriesGames(teamAEspnId, teamBEspnId) {
     const data = await res.json();
 
     const teamBStr = String(teamBEspnId);
-    const games = [];
+    const events = [];
 
     for (const event of (data.events || [])) {
       const comp  = event.competitions?.[0];
@@ -223,16 +242,13 @@ async function getSeriesGames(teamAEspnId, teamBEspnId) {
       const home = comps.find((c) => c.homeAway === 'home') || comps[0];
       const away = comps.find((c) => c.homeAway === 'away') || comps[1];
 
-      const homeScoreRaw = home?.score;
-      const awayScoreRaw = away?.score;
-      const homeScore = homeScoreRaw != null && homeScoreRaw !== '' ? parseInt(homeScoreRaw) || null : null;
-      const awayScore = awayScoreRaw != null && awayScoreRaw !== '' ? parseInt(awayScoreRaw) || null : null;
+      // Try to get scores from the schedule response first
+      let homeScore = parseScore(home?.score);
+      let awayScore = parseScore(away?.score);
+      let homeWon   = parseBool(home?.winner);
+      let awayWon   = parseBool(away?.winner);
 
-      // Use ESPN's winner flag first; fall back to score comparison
-      const homeWon = isCompleted && (home?.winner === true || (homeScore != null && awayScore != null && homeScore > awayScore));
-      const awayWon = isCompleted && (away?.winner === true || (homeScore != null && awayScore != null && awayScore > homeScore));
-
-      games.push({
+      events.push({
         id:         event.id,
         date:       event.date,
         isCompleted,
@@ -249,7 +265,35 @@ async function getSeriesGames(teamAEspnId, teamBEspnId) {
       });
     }
 
-    return games.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // For completed games missing scores, fetch the summary endpoint (scores are always there)
+    await Promise.all(
+      events.map(async (game) => {
+        if (!game.isCompleted) return;
+        if (game.homeScore != null && game.awayScore != null) return; // already have scores
+
+        try {
+          const sumRes = await fetch(`${BASE}/summary?event=${game.id}`);
+          if (!sumRes.ok) return;
+          const sum = await sumRes.json();
+
+          // Scores are in header.competitions[0].competitors
+          const hComps = sum.header?.competitions?.[0]?.competitors || [];
+          const hHome  = hComps.find((c) => c.homeAway === 'home') || hComps[0];
+          const hAway  = hComps.find((c) => c.homeAway === 'away') || hComps[1];
+
+          if (hHome || hAway) {
+            game.homeScore = parseScore(hHome?.score);
+            game.awayScore = parseScore(hAway?.score);
+            game.homeWon   = parseBool(hHome?.winner) || (game.homeScore != null && game.awayScore != null && game.homeScore > game.awayScore);
+            game.awayWon   = parseBool(hAway?.winner) || (game.homeScore != null && game.awayScore != null && game.awayScore > game.homeScore);
+          }
+        } catch (err) {
+          console.error(`[ESPN] Summary score fallback error (event ${game.id}):`, err.message);
+        }
+      })
+    );
+
+    return events.sort((a, b) => new Date(a.date) - new Date(b.date));
   } catch (err) {
     console.error('[ESPN] Series games error:', err.message);
     return [];

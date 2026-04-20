@@ -16,7 +16,8 @@
       "Read(//usr/bin/**)",
       "Bash(nvm use:*)",
       "Bash(/mnt/c/Users/User/Documents/GitHub/nba-playoff/server/node_modules/.bin/web-push generate-vapid-keys:*)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python3 *)"
     ]
   }
 }
