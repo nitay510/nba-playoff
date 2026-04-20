@@ -2,15 +2,13 @@
   margin-top: 2rem;
   margin-bottom: 55px;
 
-  // new row for user info
   .info-bar {
-    display: flex
-;
+    display: flex;
     justify-content: space-between;
     align-items: start;
     margin: 0.5rem 2rem;
     text-align: center;
-  
+
     .info-item {
       display: flex;
       flex-direction: column;
@@ -18,10 +16,8 @@
 
       small {
         color: rgba(255, 255, 255, 0.6);
-        // or a light gray
         font-size: 14px;
         margin-bottom: 0.25rem;
-        // label styling
       }
 
       p {
@@ -48,6 +44,7 @@
 
   .series-list {
     margin-top: 2rem;
+
     .bets {
       margin-right: 2rem;
       margin-top: 2rem;
@@ -57,21 +54,17 @@
     }
 
     .series-card {
-      height: auto; /* no fixed height, because expanded card is bigger */
+      height: auto;
       border-radius: 10px;
       margin-bottom: 1.25rem;
       margin-left: 2rem;
       margin-right: 2rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s ease-in-out;
-      position: relative; 
+      position: relative;
 
-      &.has-bet {
-        background: rgba(255, 255, 255, 0.6);
-      }
-      &.no-bet {
-        background: rgba(255, 255, 255, 0.2);
-      }
+      &.has-bet  { background: rgba(255, 255, 255, 0.6); }
+      &.no-bet   { background: rgba(255, 255, 255, 0.2); }
 
       .series-header {
         display: flex;
@@ -86,9 +79,7 @@
         order: 1;
       }
 
-      .big-logo {
-        width: 60px;
-      }
+      .big-logo { width: 60px; }
 
       .right-column {
         display: flex;
@@ -132,14 +123,8 @@
         position: relative;
 
         @keyframes slideIn {
-          from {
-            transform: translateY(-20px);
-            opacity: 0.4;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
+          from { transform: translateY(-20px); opacity: 0.4; }
+          to   { transform: translateY(0);     opacity: 1;   }
         }
 
         .top-bar {
@@ -211,8 +196,7 @@
               background: #fff;
               color: rgba(11, 19, 30, 1);
               border-radius: 8px;
-              padding-bottom: 0.3rem;
-              padding-top: 0.3rem;
+              padding: 0.3rem;
               cursor: pointer;
               text-align: center;
               font-weight: 400;
@@ -241,8 +225,8 @@
             font-size: 12px;
             cursor: pointer;
             display: flex;
-justify-content: center;
-align-items: center;  
+            justify-content: center;
+            align-items: center;
 
             &.cancel-btn {
               background: none;
@@ -259,224 +243,8 @@ align-items: center;
     }
   }
 }
-.choose-champ-btn{
-  border-radius: 4px;
-  height: 22px;
-  width: 68px;
-  font-family: 'Almoni Neue';
-}
 
-/* ── Live active series section ── */
-.live-section { margin-top: 1.5rem; }
-
-.locked-card {
-  cursor: default !important;
-
-  .locked-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-
-    .locked-center {
-      flex: 1;
-      text-align: center;
-
-      .locked-names {
-        font-weight: 700;
-        font-size: 0.95rem;
-        color: #fff;
-      }
-
-      .round-label {
-        font-size: 0.72rem;
-        opacity: 0.6;
-        margin-top: 0.2rem;
-      }
-    }
-  }
-
-  .series-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    margin: 0.3rem 0;
-
-    .score-num {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #ffd700;
-    }
-
-    .score-dash { font-size: 1.2rem; color: #fff; }
-
-    .score-leader {
-      font-size: 0.75rem;
-      color: #ffd700;
-      opacity: 0.85;
-    }
-  }
-
-  .my-locked-bet {
-    margin-top: 0.6rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(255,255,255,0.08);
-    border-radius: 6px;
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.85);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    align-items: center;
-
-    .locked-bet-pill {
-      background: rgba(255,255,255,0.12);
-      border-radius: 4px;
-      padding: 0.15rem 0.5rem;
-    }
-  }
-
-  /* ── Live player standings (points / rebounds / assists) ─── */
-  .player-standings {
-    margin-top: 0.6rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    .standings-cat {
-      background: rgba(255,255,255,0.06);
-      border-radius: 6px;
-      padding: 0.45rem 0.65rem;
-
-      .standings-cat-title {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: rgba(255,255,255,0.55);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 0.35rem;
-      }
-
-      .standings-row {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.18rem 0;
-        font-size: 0.82rem;
-        color: rgba(255,255,255,0.8);
-
-        &.my-pick {
-          color: #fff;
-          font-weight: 700;
-        }
-
-        .standings-rank {
-          min-width: 1.8rem;
-          color: rgba(255,255,255,0.4);
-          font-size: 0.72rem;
-        }
-
-        .standings-name { flex: 1; }
-
-        .standings-val {
-          font-weight: 700;
-          color: #ffd700;
-          min-width: 3rem;
-          text-align: left;
-        }
-
-        .my-pick-tag {
-          font-size: 0.65rem;
-          background: rgba(255,215,0,0.2);
-          border: 1px solid rgba(255,215,0,0.4);
-          color: #ffd700;
-          border-radius: 3px;
-          padding: 1px 5px;
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-
-  .stats-btn {
-    display: block;
-    width: 100%;
-    margin-top: 0.65rem;
-    background: rgba(13, 110, 253, 0.18);
-    border: 1px solid rgba(13, 110, 253, 0.4);
-    color: #7db8ff;
-    border-radius: 8px;
-    padding: 0.45rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.15s;
-
-    &:hover { background: rgba(13, 110, 253, 0.3); }
-  }
-}
-/* ── Finished series section ─────────────────────────────── */
-.finished-section { margin-top: 1.5rem; }
-
-.finished-card {
-  cursor: default !important;
-
-  .locked-header {
-    padding: 0.75rem 0.5rem;
-  }
-
-  .winner-logo {
-    opacity: 1;
-    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
-  }
-
-  .loser-logo {
-    opacity: 0.45;
-    filter: grayscale(0.6);
-  }
-
-  .finished-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    margin: 0.3rem 0;
-    font-size: 1.5rem;
-    font-weight: 900;
-
-    .wins { color: rgba(255,255,255,0.5); }
-    .wins.leading { color: #ffd700; }
-    .rec-dash { color: #fff; font-size: 1.1rem; }
-  }
-
-  .winner-label {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #ffd700;
-    margin-top: 0.2rem;
-  }
-
-  .locked-bet-pill {
-    &.bet-correct {
-      background: rgba(34, 197, 94, 0.25);
-      border: 1px solid rgba(34, 197, 94, 0.5);
-      color: #86efac;
-    }
-    &.bet-wrong {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
-    }
-    .bet-verdict {
-      font-weight: 700;
-      margin-right: 0.2rem;
-    }
-  }
-}
-
-/* ── Push notification banner ─────────────────────────────── */
+/* ── Push notification banner ────────────────────── */
 .push-banner {
   display: flex;
   align-items: center;
@@ -490,7 +258,7 @@ align-items: center;
   font-size: 0.9rem;
   direction: rtl;
 
-  &__icon { color: #60aaff; font-size: 1.1rem; flex-shrink: 0; }
+  &__icon  { color: #60aaff; font-size: 1.1rem; flex-shrink: 0; }
   &__text  { flex: 1; }
 
   &__allow {
@@ -513,5 +281,355 @@ align-items: center;
     font-size: 0.85rem;
     padding: 0.2rem;
     &:hover { color: #fff; }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   LOCKED / ACTIVE SERIES CARDS
+   ══════════════════════════════════════════════════ */
+.live-section { margin-top: 1.5rem; }
+
+/* Shared layout helpers used in both .locked-card and .finished-card */
+.locked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+
+  .locked-team-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 64px;
+
+    .locked-team-name {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      line-height: 1.2;
+      max-width: 70px;
+      word-break: break-word;
+    }
+
+    .big-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      transition: filter 0.2s, opacity 0.2s;
+
+      &.logo-leading {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.55));
+      }
+    }
+  }
+
+  .locked-center {
+    flex: 1;
+    text-align: center;
+
+    .round-label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+  }
+}
+
+/* ── Shared styles for locked-card AND finished-card ── */
+.locked-card, .finished-card {
+  /* ── My bets section ── */
+  .my-locked-bet {
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+
+    .bet-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .locked-bet-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0;
+      font-size: 0.82rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+
+      &:last-child { border-bottom: none; }
+
+      .bet-cat {
+        color: rgba(255,255,255,0.45);
+        font-size: 0.75rem;
+        min-width: 90px;
+        flex-shrink: 0;
+      }
+
+      .bet-choice {
+        flex: 1;
+        color: #fff;
+        font-weight: 600;
+
+        .bet-verdict {
+          font-weight: 700;
+          margin-right: 0.25rem;
+        }
+      }
+
+      .bet-odds {
+        font-size: 0.75rem;
+        color: rgba(255, 215, 0, 0.75);
+        font-weight: 600;
+      }
+
+      .bet-actual {
+        font-size: 0.72rem;
+        color: rgba(255,255,255,0.4);
+      }
+
+      &.bet-correct {
+        background: rgba(34, 197, 94, 0.1);
+        border-radius: 4px;
+        padding: 0.25rem 0.35rem;
+
+        .bet-choice { color: #86efac; }
+        .bet-verdict { color: #4ade80; }
+      }
+
+      &.bet-wrong {
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 4px;
+        padding: 0.25rem 0.35rem;
+
+        .bet-choice { color: #fca5a5; }
+        .bet-verdict { color: #f87171; }
+      }
+    }
+
+    .bet-score-badge {
+      font-size: 0.7rem;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-weight: 700;
+
+      &.all-correct  { background: rgba(34,197,94,0.25);  color: #4ade80; }
+      &.partial      { background: rgba(251,191,36,0.25); color: #fbbf24; }
+      &.none-correct { background: rgba(239,68,68,0.2);   color: #f87171; }
+    }
+  }
+
+  .no-bet-notice {
+    margin-top: 0.55rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.35);
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* ── Live player standings ── */
+  .player-standings {
+    margin-top: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+
+    .standings-cat {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 0.5rem 0.65rem;
+
+      .standings-cat-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.35rem;
+      }
+
+      .standings-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.2rem 0;
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.7);
+        border-radius: 4px;
+
+        &.top-player {
+          background: rgba(255,215,0,0.07);
+          padding: 0.2rem 0.3rem;
+          border-radius: 4px;
+        }
+
+        &.my-pick {
+          color: #fff;
+          font-weight: 700;
+        }
+
+        .standings-rank {
+          min-width: 1.8rem;
+          color: rgba(255,255,255,0.35);
+          font-size: 0.7rem;
+        }
+
+        .standings-name { flex: 1; }
+
+        .standings-val {
+          font-weight: 700;
+          color: #ffd700;
+          min-width: 3.2rem;
+          text-align: left;
+        }
+
+        .my-pick-tag {
+          font-size: 0.63rem;
+          background: rgba(255,215,0,0.18);
+          border: 1px solid rgba(255,215,0,0.35);
+          color: #ffd700;
+          border-radius: 3px;
+          padding: 1px 5px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  .stats-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.7rem;
+    background: rgba(13, 110, 253, 0.15);
+    border: 1px solid rgba(13, 110, 253, 0.35);
+    color: #7db8ff;
+    border-radius: 8px;
+    padding: 0.45rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(13, 110, 253, 0.28); }
+  }
+}
+
+.locked-card {
+  cursor: default !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem;
+
+  /* ── Series score block (only active/locked series have this) ── */
+  .series-score-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+
+    .series-score-nums {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      .score-num {
+        font-size: 2rem;
+        font-weight: 900;
+        color: rgba(255,255,255,0.4);
+        line-height: 1;
+
+        &.leading {
+          color: #ffd700;
+          text-shadow: 0 0 12px rgba(255,215,0,0.4);
+        }
+      }
+
+      .score-sep {
+        font-size: 1.4rem;
+        color: rgba(255,255,255,0.3);
+        font-weight: 300;
+      }
+    }
+
+    .score-status-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffd700;
+      opacity: 0.9;
+      margin-top: 0.1rem;
+    }
+
+    .score-games-played {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 0.05rem;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   FINISHED SERIES CARDS
+   ══════════════════════════════════════════════════ */
+.finished-section { margin-top: 1.5rem; }
+
+.finished-card {
+  cursor: default !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem;
+
+  .locked-header { padding-bottom: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+  .winner-logo {
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)) !important;
+  }
+
+  .loser-logo {
+    opacity: 0.4 !important;
+    filter: grayscale(0.65) !important;
+  }
+
+  .finished-score-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    margin: 0.2rem 0;
+
+    .score-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.35);
+      line-height: 1;
+
+      &.leading {
+        color: #ffd700;
+        text-shadow: 0 0 12px rgba(255,215,0,0.4);
+      }
+    }
+
+    .score-sep { color: rgba(255,255,255,0.3); font-size: 1.4rem; font-weight: 300; }
+  }
+
+  .finished-winner-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffd700;
+    margin-top: 0.15rem;
   }
 }

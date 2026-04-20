@@ -36,11 +36,13 @@ function PlayerStandings({ betOptions, playerStats, myBets }) {
 
         if (!rows.length) return null;
 
+        const leader = rows[0];
+
         return (
           <div key={opt.category} className="standings-cat">
             <div className="standings-cat-title">{opt.category}</div>
             {rows.map((c, i) => (
-              <div key={c.name} className={`standings-row${c.name === myChoice ? ' my-pick' : ''}`}>
+              <div key={c.name} className={`standings-row${c.name === myChoice ? ' my-pick' : ''}${i === 0 ? ' top-player' : ''}`}>
                 <span className="standings-rank">#{i + 1}</span>
                 <span className="standings-name">{c.name}</span>
                 <span className="standings-val">{c.val} {STAT_LABEL[statKey]}</span>
@@ -50,6 +52,35 @@ function PlayerStandings({ betOptions, playerStats, myBets }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/* Series score badge — always renders for locked series */
+function SeriesScore({ s, alwaysShow }) {
+  const aW = s.teamAWins ?? 0;
+  const bW = s.teamBWins ?? 0;
+  if (!alwaysShow && aW === 0 && bW === 0) return null;
+
+  const leader = aW > bW ? s.teamA : bW > aW ? s.teamB : null;
+  const tied   = aW > 0 && aW === bW;
+  const total  = aW + bW;
+
+  let statusLabel;
+  if (aW === 0 && bW === 0) statusLabel = 'טרם שוחק';
+  else if (leader) statusLabel = `${leader} מובילה`;
+  else if (tied) statusLabel = 'שוויון';
+  else statusLabel = '';
+
+  return (
+    <div className="series-score-block">
+      <div className="series-score-nums">
+        <span className={`score-num${aW > bW ? ' leading' : ''}`}>{aW}</span>
+        <span className="score-sep"> – </span>
+        <span className={`score-num${bW > aW ? ' leading' : ''}`}>{bW}</span>
+      </div>
+      {statusLabel && <div className="score-status-label">{statusLabel}</div>}
+      {total > 0 && <div className="score-games-played">{total}/7 משחקים</div>}
     </div>
   );
 }
@@ -66,11 +97,10 @@ export default function HomePage() {
   const [userBets,   setUserBets]   = useState([]);
   const [openCards,  setOpenCards]  = useState({});
   const [localBets,  setLocalBets]  = useState({});
-  const [statsSeries, setStatsSeries] = useState(null); // series to show stats for
+  const [statsSeries, setStatsSeries] = useState(null);
   const [showPushBanner, setShowPushBanner] = useState(false);
   const [pushLoading,    setPushLoading]    = useState(false);
 
-  /* join league from invite link */
   const inviteRef = useRef(localStorage.getItem('pendingLeague'));
   useEffect(() => {
     if (!myInfo.username || !inviteRef.current) return;
@@ -94,12 +124,10 @@ export default function HomePage() {
     fetchUserBets();
   }, []);
 
-  /* Show push-permission banner once per browser if not yet asked */
   useEffect(() => {
     if (!isPushSupported()) return;
     if (localStorage.getItem('pushAsked')) return;
     if (Notification.permission === 'granted') {
-      // Already granted on another visit — silently re-subscribe
       registerPushNotifications().catch(() => {});
       return;
     }
@@ -111,9 +139,7 @@ export default function HomePage() {
     setPushLoading(true);
     try {
       const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        await registerPushNotifications();
-      }
+      if (permission === 'granted') await registerPushNotifications();
     } catch (e) {
       console.error('Push registration failed:', e);
     } finally {
@@ -145,7 +171,6 @@ export default function HomePage() {
     } catch (e) { console.error(e); }
   };
 
-  /* Fetch all non-finished series (locked AND unlocked) */
   const fetchAllActiveSeries = async () => {
     try {
       const r = await fetch('/api/series');
@@ -210,23 +235,6 @@ export default function HomePage() {
 
   const cd = (d) => d && new Date(d) > new Date() ? <CountdownClock startDate={d} /> : null;
 
-  /* Series score display */
-  const SeriesScore = ({ s }) => {
-    const aW = s.teamAWins ?? 0;
-    const bW = s.teamBWins ?? 0;
-    if (aW === 0 && bW === 0) return null;
-    const leader = aW > bW ? s.teamA : bW > aW ? s.teamB : null;
-    return (
-      <div className="series-score">
-        <span className="score-num">{aW}</span>
-        <span className="score-dash">–</span>
-        <span className="score-num">{bW}</span>
-        {leader && <span className="score-leader">({leader} מובילה)</span>}
-      </div>
-    );
-  };
-
-  /* Sort: unlocked (open for betting) first, then by startDate */
   const activeSeries = seriesList.filter((s) => !s.isFinished);
   const orderedSeries = [...activeSeries].sort((a, b) => {
     if (a.isLocked !== b.isLocked) return a.isLocked ? 1 : -1;
@@ -242,7 +250,6 @@ export default function HomePage() {
     .filter((s) => s.isFinished)
     .sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0));
 
-  /* For finished series: check if a user bet choice matches the final answer */
   const betResult = (myBet, series) => {
     if (!myBet) return null;
     return myBet.bets.map((b) => {
@@ -253,30 +260,21 @@ export default function HomePage() {
     });
   };
 
-  const canChangeChampion = new Date() < new Date('2026-04-19T17:30:00Z'); // button hidden after April 19 20:30 Israel time
+  const canChangeChampion = new Date() < new Date('2026-04-19T17:30:00Z');
 
   return (
     <div className="home-page">
       <Header />
       <Background image="background.png" />
 
-      {/* Push-notification permission banner */}
       {showPushBanner && (
         <div className="push-banner">
           <FaBell className="push-banner__icon" />
-          <span className="push-banner__text">
-            רוצה תזכורת לפני כל סדרה?
-          </span>
-          <button
-            className="push-banner__allow"
-            onClick={handleAllowPush}
-            disabled={pushLoading}
-          >
+          <span className="push-banner__text">רוצה תזכורת לפני כל סדרה?</span>
+          <button className="push-banner__allow" onClick={handleAllowPush} disabled={pushLoading}>
             {pushLoading ? '...' : 'אפשר התראות'}
           </button>
-          <button className="push-banner__dismiss" onClick={handleDismissPush}>
-            <FaTimes />
-          </button>
+          <button className="push-banner__dismiss" onClick={handleDismissPush}><FaTimes /></button>
         </div>
       )}
 
@@ -372,35 +370,52 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* ── Active locked series (score tracker) ── */}
+        {/* ── Active locked series ── */}
         {activeLocked.length > 0 && (
           <div className="series-list live-section">
             <h2 className="bets">סדרות פעילות 🏀</h2>
             {activeLocked.map((s) => {
               const myBet = findDoc(s._id);
+              const aW = s.teamAWins ?? 0;
+              const bW = s.teamBWins ?? 0;
+
               return (
                 <div key={s._id} className="series-card locked-card">
+                  {/* ── Header: logos + score ── */}
                   <div className="locked-header">
-                    <TeamLogo teamName={s.teamA} className="big-logo" />
-                    <div className="locked-center">
-                      <div className="locked-names">{s.teamA} – {s.teamB}</div>
-                      <SeriesScore s={s} />
-                      {s.round && <div className="round-label">{s.round}</div>}
+                    <div className="locked-team-side">
+                      <TeamLogo teamName={s.teamA} className={`big-logo${aW > bW ? ' logo-leading' : ''}`} />
+                      <span className="locked-team-name">{s.teamA}</span>
                     </div>
-                    <TeamLogo teamName={s.teamB} className="big-logo" />
+
+                    <div className="locked-center">
+                      {s.round && <div className="round-label">{s.round}</div>}
+                      <SeriesScore s={s} alwaysShow />
+                    </div>
+
+                    <div className="locked-team-side">
+                      <TeamLogo teamName={s.teamB} className={`big-logo${bW > aW ? ' logo-leading' : ''}`} />
+                      <span className="locked-team-name">{s.teamB}</span>
+                    </div>
                   </div>
 
-                  {myBet && (
+                  {/* ── My bets ── */}
+                  {myBet ? (
                     <div className="my-locked-bet">
-                      <strong>הניחוש שלי:</strong>
+                      <div className="bet-section-title">הניחוש שלי</div>
                       {myBet.bets.map((b, i) => (
-                        <span key={i} className="locked-bet-pill">
-                          {b.category}: <b>{b.choiceName}</b> ×{(+b.oddsWhenPlaced).toFixed(1)}
-                        </span>
+                        <div key={i} className="locked-bet-row">
+                          <span className="bet-cat">{b.category}</span>
+                          <span className="bet-choice">{b.choiceName}</span>
+                          <span className="bet-odds">×{(+b.oddsWhenPlaced).toFixed(1)}</span>
+                        </div>
                       ))}
                     </div>
+                  ) : (
+                    <div className="no-bet-notice">לא הגשת ניחוש לסדרה זו</div>
                   )}
 
+                  {/* ── Player standings ── */}
                   <PlayerStandings
                     betOptions={s.betOptions}
                     playerStats={s.playerStats}
@@ -408,7 +423,7 @@ export default function HomePage() {
                   />
 
                   <button className="stats-btn" onClick={() => setStatsSeries(s)}>
-                    📊 סטטיסטיקות
+                    📊 סטטיסטיקות ותוצאות משחקים
                   </button>
                 </div>
               );
@@ -426,36 +441,63 @@ export default function HomePage() {
               const aW = s.teamAWins ?? 0;
               const bW = s.teamBWins ?? 0;
               const winner = aW > bW ? s.teamA : bW > aW ? s.teamB : null;
+
+              const correctCount = results ? results.filter((r) => r.correct).length : 0;
+              const totalCount   = results ? results.filter((r) => r.hasFinal).length : 0;
+
               return (
                 <div key={s._id} className="series-card finished-card">
+                  {/* ── Header ── */}
                   <div className="locked-header">
-                    <TeamLogo teamName={s.teamA} className={`big-logo ${aW > bW ? 'winner-logo' : 'loser-logo'}`} />
-                    <div className="locked-center">
-                      <div className="locked-names">{s.teamA} – {s.teamB}</div>
-                      <div className="finished-score">
-                        <span className={aW > bW ? 'wins leading' : 'wins'}>{aW}</span>
-                        <span className="rec-dash"> – </span>
-                        <span className={bW > aW ? 'wins leading' : 'wins'}>{bW}</span>
-                      </div>
-                      {winner && <div className="winner-label">🏆 {winner}</div>}
-                      {s.round && <div className="round-label">{s.round}</div>}
+                    <div className="locked-team-side">
+                      <TeamLogo teamName={s.teamA} className={`big-logo ${aW > bW ? 'winner-logo' : 'loser-logo'}`} />
+                      <span className="locked-team-name">{s.teamA}</span>
                     </div>
-                    <TeamLogo teamName={s.teamB} className={`big-logo ${bW > aW ? 'winner-logo' : 'loser-logo'}`} />
+
+                    <div className="locked-center">
+                      {s.round && <div className="round-label">{s.round}</div>}
+                      <div className="finished-score-block">
+                        <span className={`score-num${aW > bW ? ' leading' : ''}`}>{aW}</span>
+                        <span className="score-sep"> – </span>
+                        <span className={`score-num${bW > aW ? ' leading' : ''}`}>{bW}</span>
+                      </div>
+                      {winner && <div className="finished-winner-label">🏆 {winner} ניצחה</div>}
+                    </div>
+
+                    <div className="locked-team-side">
+                      <TeamLogo teamName={s.teamB} className={`big-logo ${bW > aW ? 'winner-logo' : 'loser-logo'}`} />
+                      <span className="locked-team-name">{s.teamB}</span>
+                    </div>
                   </div>
 
-                  {results && (
+                  {/* ── My bets results ── */}
+                  {results ? (
                     <div className="my-locked-bet">
-                      <strong>הניחוש שלי:</strong>
+                      <div className="bet-section-title">
+                        הניחוש שלי
+                        {totalCount > 0 && (
+                          <span className={`bet-score-badge ${correctCount === totalCount ? 'all-correct' : correctCount > 0 ? 'partial' : 'none-correct'}`}>
+                            {correctCount}/{totalCount} נכון
+                          </span>
+                        )}
+                      </div>
                       {results.map((b, i) => (
-                        <span
-                          key={i}
-                          className={`locked-bet-pill ${b.hasFinal ? (b.correct ? 'bet-correct' : 'bet-wrong') : ''}`}
-                        >
-                          {b.category}: <b>{b.choiceName}</b>
-                          {b.hasFinal && <span className="bet-verdict">{b.correct ? ' ✓' : ' ✗'}</span>}
-                        </span>
+                        <div key={i} className={`locked-bet-row ${b.hasFinal ? (b.correct ? 'bet-correct' : 'bet-wrong') : ''}`}>
+                          <span className="bet-cat">{b.category}</span>
+                          <span className="bet-choice">
+                            {b.choiceName}
+                            {b.hasFinal && <span className="bet-verdict">{b.correct ? ' ✓' : ' ✗'}</span>}
+                          </span>
+                          {b.hasFinal && !b.correct && (
+                            <span className="bet-actual">
+                              ({s.betOptions?.find((o) => o.category === b.category)?.finalChoice})
+                            </span>
+                          )}
+                        </div>
                       ))}
                     </div>
+                  ) : (
+                    <div className="no-bet-notice">לא השתתפת בסדרה זו</div>
                   )}
 
                   <PlayerStandings
@@ -465,7 +507,7 @@ export default function HomePage() {
                   />
 
                   <button className="stats-btn" onClick={() => setStatsSeries(s)}>
-                    📊 סטטיסטיקות
+                    📊 סטטיסטיקות ותוצאות משחקים
                   </button>
                 </div>
               );

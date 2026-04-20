@@ -99,6 +99,10 @@ async function getSeriesPlayerStats(teamAEspnId, teamBEspnId) {
     const playerMap = {};
 
     for (const event of events) {
+      // Per-game map: first stat group that has PTS/REB/AST wins (avoids double-counting
+      // when ESPN returns multiple stat groups like "Starters" + "Bench" for the same player)
+      const gamePlayerMap = {};
+
       try {
         const sumRes = await fetch(`${BASE}/summary?event=${event.id}`);
         if (!sumRes.ok) continue;
@@ -115,22 +119,32 @@ async function getSeriesPlayerStats(teamAEspnId, teamBEspnId) {
             const rebIdx = keys.indexOf('REB');
             const astIdx = keys.indexOf('AST');
 
-            if (ptsIdx < 0 && rebIdx < 0 && astIdx < 0) continue; // skip stat groups with no relevant columns
+            if (ptsIdx < 0 && rebIdx < 0 && astIdx < 0) continue;
 
             for (const athlete of (statGroup.athletes || [])) {
               const name = athlete.athlete?.displayName;
               if (!name || !athlete.stats?.length) continue;
-              if (!playerMap[name]) {
-                playerMap[name] = { playerName: name, teamName, points: 0, rebounds: 0, assists: 0 };
-              }
-              if (ptsIdx >= 0) playerMap[name].points  += parseFloat(athlete.stats[ptsIdx]) || 0;
-              if (rebIdx >= 0) playerMap[name].rebounds += parseFloat(athlete.stats[rebIdx]) || 0;
-              if (astIdx >= 0) playerMap[name].assists  += parseFloat(athlete.stats[astIdx]) || 0;
+              if (gamePlayerMap[name]) continue; // already captured this player for this game
+
+              const pts = ptsIdx >= 0 ? parseFloat(athlete.stats[ptsIdx]) || 0 : 0;
+              const reb = rebIdx >= 0 ? parseFloat(athlete.stats[rebIdx]) || 0 : 0;
+              const ast = astIdx >= 0 ? parseFloat(athlete.stats[astIdx]) || 0 : 0;
+              gamePlayerMap[name] = { teamName, points: pts, rebounds: reb, assists: ast };
             }
           }
         }
       } catch (err) {
         console.error(`[ESPN] Box score error (event ${event.id}):`, err.message);
+      }
+
+      // Accumulate this game's stats into series totals
+      for (const [name, g] of Object.entries(gamePlayerMap)) {
+        if (!playerMap[name]) {
+          playerMap[name] = { playerName: name, teamName: g.teamName, points: 0, rebounds: 0, assists: 0 };
+        }
+        playerMap[name].points   += g.points;
+        playerMap[name].rebounds += g.rebounds;
+        playerMap[name].assists  += g.assists;
       }
     }
 

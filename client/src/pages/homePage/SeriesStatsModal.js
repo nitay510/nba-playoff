@@ -4,13 +4,19 @@ import { transliterateToHebrew } from '../../utils/transliterate';
 import './SeriesStatsModal.scss';
 
 /* ── Top-N players sorted by a stat key ── */
-function StatCategory({ title, players, statKey, statLabel }) {
-  const sorted = [...players].sort((a, b) => b[statKey] - a[statKey]).slice(0, 7);
+function StatCategory({ players, statKey, statLabel, gamesPlayed }) {
+  const sorted = [...players]
+    .filter((p) => p[statKey] > 0)
+    .sort((a, b) => b[statKey] - a[statKey])
+    .slice(0, 7);
+
   if (!sorted.length) return null;
 
   return (
     <div className="stat-cat">
-      <h4 className="cat-title">{title}</h4>
+      {gamesPlayed > 0 && (
+        <div className="stat-context">סה"כ בסדרה · {gamesPlayed} משחקים</div>
+      )}
       {sorted.map((p, i) => (
         <div key={p.playerName} className={`stat-row ${i === 0 ? 'leader' : ''}`}>
           <span className="stat-rank">#{i + 1}</span>
@@ -23,19 +29,31 @@ function StatCategory({ title, players, statKey, statLabel }) {
 }
 
 /* ── Game score row ── */
-function GameRow({ game, index, teamAName, teamBName }) {
-  // Map ESPN team display names back to Hebrew names for display
-  const homeHe = game.homeTeam;
-  const awayHe = game.awayTeam;
+function GameRow({ game, index, teamAHe, teamBHe, teamAEspnName, teamBEspnName }) {
+  const homeIsA = game.homeTeam === teamAEspnName;
+  const awayIsA = game.awayTeam === teamAEspnName;
+
+  const homeHe = homeIsA ? teamAHe : awayIsA ? teamBHe : game.homeTeam;
+  const awayHe = homeIsA ? teamBHe : awayIsA ? teamAHe : game.awayTeam;
+
+  const homeWon = game.isCompleted && game.homeScore != null && game.awayScore != null && game.homeScore > game.awayScore;
+  const awayWon = game.isCompleted && game.homeScore != null && game.awayScore != null && game.awayScore > game.homeScore;
 
   return (
-    <div className={`game-row ${game.isLive ? 'is-live' : ''}`}>
-      <span className="game-num">משחק {index + 1}</span>
-      <span className="game-score">
-        {homeHe} <b>{game.homeScore ?? '–'}</b>
-        <span className="score-sep"> : </span>
-        <b>{game.awayScore ?? '–'}</b> {awayHe}
+    <div className={`game-row ${game.isLive ? 'is-live' : ''} ${game.isCompleted ? 'is-done' : ''}`}>
+      <span className="game-num">מ{index + 1}</span>
+      <span className="game-teams">
+        <span className={homeWon ? 'team-winner' : ''}>{homeHe}</span>
+        <span className="vs-sep"> נגד </span>
+        <span className={awayWon ? 'team-winner' : ''}>{awayHe}</span>
       </span>
+      {(game.homeScore != null || game.awayScore != null) && (
+        <span className="game-score-nums">
+          <span className={homeWon ? 'score-winner' : 'score-dim'}>{game.homeScore ?? '–'}</span>
+          <span className="score-colon">:</span>
+          <span className={awayWon ? 'score-winner' : 'score-dim'}>{game.awayScore ?? '–'}</span>
+        </span>
+      )}
       {game.isLive && <span className="live-badge">LIVE</span>}
       {game.statusText && !game.isLive && (
         <span className="game-date">{game.statusText}</span>
@@ -50,7 +68,7 @@ export default function SeriesStatsModal({ series, onClose }) {
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [updateTime, setUpdateTime] = useState(null);
-  const [tab,        setTab]        = useState('points'); // points | rebounds | assists
+  const [tab,        setTab]        = useState('points');
 
   const fetchStats = useCallback(async () => {
     try {
@@ -89,9 +107,21 @@ export default function SeriesStatsModal({ series, onClose }) {
 
   const aW = data?.teamAWins ?? series.teamAWins ?? 0;
   const bW = data?.teamBWins ?? series.teamBWins ?? 0;
-  const leader = aW > bW ? data?.teamA : bW > aW ? data?.teamB : null;
+  const teamA = data?.teamA || series.teamA;
+  const teamB = data?.teamB || series.teamB;
+  const leader = aW > bW ? teamA : bW > aW ? teamB : null;
+  const isFinished = series.isFinished;
 
   const stats = data?.playerStats || [];
+  const games = data?.games || [];
+  const gamesPlayed = games.filter((g) => g.isCompleted).length;
+
+  // Try to find the ESPN English names from the games data
+  const espnTeamAName = games.length
+    ? (games[0].homeTeam.toLowerCase().includes(series.teamA?.split(' ')[0]?.toLowerCase() ?? '')
+        ? games[0].homeTeam
+        : games[0].awayTeam)
+    : '';
 
   return (
     <div className="stats-overlay" onClick={onClose}>
@@ -101,18 +131,38 @@ export default function SeriesStatsModal({ series, onClose }) {
         <div className="stats-header">
           <button className="close-x" onClick={onClose}>✕</button>
           <div className="header-logos">
-            <TeamLogo teamName={series.teamA} className="header-logo" />
-            <div className="header-center">
-              <div className="header-teams">{series.teamA} – {series.teamB}</div>
-              <div className="header-record">
-                <span className={aW > bW ? 'wins leading' : 'wins'}>{aW}</span>
-                <span className="rec-dash"> – </span>
-                <span className={bW > aW ? 'wins leading' : 'wins'}>{bW}</span>
-              </div>
-              {leader && <div className="header-leader">{leader} מובילה</div>}
-              {data?.round && <div className="header-round">{data.round}</div>}
+            <div className="header-team-col">
+              <TeamLogo teamName={series.teamA} className={`header-logo ${aW > bW ? 'logo-leading' : bW > aW ? 'logo-trailing' : ''}`} />
+              <span className="header-team-name">{series.teamA}</span>
             </div>
-            <TeamLogo teamName={series.teamB} className="header-logo" />
+
+            <div className="header-center">
+              {(data?.round || series.round) && (
+                <div className="header-round">{data?.round || series.round}</div>
+              )}
+              <div className="header-record">
+                <span className={`wins${aW > bW ? ' leading' : ''}`}>{aW}</span>
+                <span className="rec-dash"> – </span>
+                <span className={`wins${bW > aW ? ' leading' : ''}`}>{bW}</span>
+              </div>
+              {isFinished && leader ? (
+                <div className="header-status finished">🏆 {leader} ניצחה</div>
+              ) : leader ? (
+                <div className="header-status leading">{leader} מובילה</div>
+              ) : aW > 0 ? (
+                <div className="header-status tied">שוויון</div>
+              ) : (
+                <div className="header-status not-started">טרם שוחק</div>
+              )}
+              {gamesPlayed > 0 && (
+                <div className="header-games-count">{gamesPlayed} משחקים מ-7</div>
+              )}
+            </div>
+
+            <div className="header-team-col">
+              <TeamLogo teamName={series.teamB} className={`header-logo ${bW > aW ? 'logo-leading' : aW > bW ? 'logo-trailing' : ''}`} />
+              <span className="header-team-name">{series.teamB}</span>
+            </div>
           </div>
         </div>
 
@@ -121,12 +171,19 @@ export default function SeriesStatsModal({ series, onClose }) {
         ) : (
           <>
             {/* ── Games ── */}
-            {data?.games?.length > 0 && (
+            {games.length > 0 && (
               <div className="games-section">
                 <h4>תוצאות משחקים</h4>
-                {data.games.map((g, i) => (
-                  <GameRow key={g.id || i} game={g} index={i}
-                    teamAName={series.teamA} teamBName={series.teamB} />
+                {games.map((g, i) => (
+                  <GameRow
+                    key={g.id || i}
+                    game={g}
+                    index={i}
+                    teamAHe={series.teamA}
+                    teamBHe={series.teamB}
+                    teamAEspnName={g.homeTeam}
+                    teamBEspnName={g.awayTeam}
+                  />
                 ))}
               </div>
             )}
@@ -134,15 +191,15 @@ export default function SeriesStatsModal({ series, onClose }) {
             {/* ── Stats tabs ── */}
             {stats.length > 0 ? (
               <div className="stats-section">
-                <h4>סטטיסטיקות שחקנים בסדרה</h4>
+                <h4>סטטיסטיקות שחקנים — סה"כ בסדרה</h4>
                 <div className="tabs">
                   <button className={tab === 'points'   ? 'active' : ''} onClick={() => setTab('points')}>🏀 נקודות</button>
                   <button className={tab === 'rebounds' ? 'active' : ''} onClick={() => setTab('rebounds')}>💪 ריבאונד</button>
                   <button className={tab === 'assists'  ? 'active' : ''} onClick={() => setTab('assists')}>🎯 אסיסטים</button>
                 </div>
-                {tab === 'points'   && <StatCategory title="מלך הנקודות"  players={stats} statKey="points"   statLabel="נק'" />}
-                {tab === 'rebounds' && <StatCategory title="מלך הריבאונד" players={stats} statKey="rebounds" statLabel="ריב'" />}
-                {tab === 'assists'  && <StatCategory title="מלך האסיסטים" players={stats} statKey="assists"  statLabel="עזר" />}
+                {tab === 'points'   && <StatCategory players={stats} statKey="points"   statLabel="נק'"  gamesPlayed={gamesPlayed} />}
+                {tab === 'rebounds' && <StatCategory players={stats} statKey="rebounds" statLabel="ריב'" gamesPlayed={gamesPlayed} />}
+                {tab === 'assists'  && <StatCategory players={stats} statKey="assists"  statLabel="עזר"  gamesPlayed={gamesPlayed} />}
               </div>
             ) : (
               <p className="no-stats">

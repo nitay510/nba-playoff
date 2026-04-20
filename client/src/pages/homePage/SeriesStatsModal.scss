@@ -1,7 +1,7 @@
 .stats-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.78);
   z-index: 1000;
   display: flex;
   align-items: flex-end;
@@ -24,17 +24,17 @@
     /* ── Header ── */
     .stats-header {
       position: relative;
-      background: linear-gradient(135deg, #1a1a3e, #0d2060);
-      padding: 1rem 1rem 0.75rem;
+      background: linear-gradient(160deg, #1a1a3e 0%, #0d2060 100%);
+      padding: 1rem 1rem 0.85rem;
       border-radius: 16px 16px 0 0;
 
       .close-x {
         position: absolute;
-        top: 0.6rem;
-        left: 0.75rem;
+        top: 0.7rem;
+        left: 0.85rem;
         background: none;
         border: none;
-        color: rgba(255,255,255,0.6);
+        color: rgba(255,255,255,0.5);
         font-size: 1.1rem;
         cursor: pointer;
         &:hover { color: #fff; }
@@ -46,38 +46,77 @@
         justify-content: space-between;
         gap: 0.5rem;
 
-        .header-logo { width: 52px; height: 52px; object-fit: contain; }
+        .header-team-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+          min-width: 60px;
+
+          .header-logo {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            transition: filter 0.2s, opacity 0.2s;
+
+            &.logo-leading {
+              filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+            }
+            &.logo-trailing {
+              opacity: 0.45;
+              filter: grayscale(0.5);
+            }
+          }
+
+          .header-team-name {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            line-height: 1.2;
+            max-width: 68px;
+          }
+        }
 
         .header-center {
           flex: 1;
           text-align: center;
 
-          .header-teams {
-            font-size: 0.9rem;
-            opacity: 0.8;
+          .header-round {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
             margin-bottom: 0.25rem;
           }
 
           .header-record {
-            font-size: 2rem;
+            font-size: 2.4rem;
             font-weight: 900;
             line-height: 1;
+            margin-bottom: 0.2rem;
 
-            .wins { color: rgba(255,255,255,0.6); }
-            .wins.leading { color: #ffd700; }
-            .rec-dash { color: rgba(255,255,255,0.4); font-size: 1.4rem; }
+            .wins { color: rgba(255,255,255,0.35); }
+            .wins.leading {
+              color: #ffd700;
+              text-shadow: 0 0 14px rgba(255,215,0,0.45);
+            }
+            .rec-dash { color: rgba(255,255,255,0.25); font-size: 1.6rem; font-weight: 300; }
           }
 
-          .header-leader {
+          .header-status {
             font-size: 0.8rem;
-            color: #ffd700;
-            margin-top: 0.2rem;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+
+            &.leading     { color: #ffd700; }
+            &.finished    { color: #ffd700; }
+            &.tied        { color: rgba(255,255,255,0.6); }
+            &.not-started { color: rgba(255,255,255,0.4); font-weight: 400; }
           }
 
-          .header-round {
-            font-size: 0.75rem;
-            opacity: 0.6;
-            margin-top: 0.1rem;
+          .header-games-count {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.35);
           }
         }
       }
@@ -91,36 +130,81 @@
 
     /* ── Games section ── */
     .games-section {
-      padding: 0.75rem 1rem 0.5rem;
+      padding: 0.8rem 1rem 0.5rem;
       border-bottom: 1px solid rgba(255,255,255,0.08);
 
       h4 {
-        font-size: 0.85rem;
-        opacity: 0.6;
-        margin: 0 0 0.5rem;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.45);
+        margin: 0 0 0.55rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .game-row {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.35rem 0;
+        padding: 0.4rem 0.4rem;
+        border-radius: 6px;
+        margin-bottom: 0.25rem;
         font-size: 0.85rem;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        flex-wrap: wrap;
+        background: rgba(255,255,255,0.03);
+        flex-wrap: nowrap;
 
-        &.is-live { background: rgba(255, 50, 50, 0.08); border-radius: 6px; padding: 0.35rem 0.5rem; }
+        &.is-live {
+          background: rgba(255, 50, 50, 0.1);
+          border: 1px solid rgba(255,50,50,0.2);
+        }
 
-        .game-num { opacity: 0.5; font-size: 0.75rem; min-width: 50px; }
-        .game-score { flex: 1; }
-        .game-date  { opacity: 0.45; font-size: 0.72rem; }
+        &.is-done {
+          background: rgba(255,255,255,0.04);
+        }
+
+        .game-num {
+          font-size: 0.7rem;
+          color: rgba(255,255,255,0.3);
+          min-width: 22px;
+          font-weight: 700;
+        }
+
+        .game-teams {
+          flex: 1;
+          font-size: 0.82rem;
+
+          .team-winner {
+            color: #fff;
+            font-weight: 700;
+          }
+
+          .vs-sep {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.72rem;
+          }
+        }
+
+        .game-score-nums {
+          font-size: 0.85rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 0.15rem;
+          direction: ltr;
+
+          .score-winner { color: #ffd700; }
+          .score-dim    { color: rgba(255,255,255,0.35); }
+          .score-colon  { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
+        }
+
+        .game-date  { color: rgba(255,255,255,0.3); font-size: 0.68rem; white-space: nowrap; }
+
         .live-badge {
           background: #e53935;
           color: #fff;
           border-radius: 4px;
           padding: 0.1rem 0.4rem;
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           font-weight: 700;
           animation: pulse 1.5s infinite;
         }
@@ -129,13 +213,15 @@
 
     /* ── Stats section ── */
     .stats-section {
-      padding: 0.75rem 1rem 0;
+      padding: 0.8rem 1rem 0;
 
       h4 {
-        font-size: 0.85rem;
-        opacity: 0.6;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.45);
         margin: 0 0 0.6rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .tabs {
@@ -145,9 +231,9 @@
 
         button {
           flex: 1;
-          background: rgba(255,255,255,0.07);
-          border: 1px solid rgba(255,255,255,0.12);
-          color: rgba(255,255,255,0.7);
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.6);
           border-radius: 8px;
           padding: 0.4rem 0.3rem;
           font-size: 0.8rem;
@@ -164,7 +250,12 @@
       }
 
       .stat-cat {
-        .cat-title { display: none; } // title is in the tab
+        .stat-context {
+          font-size: 0.7rem;
+          color: rgba(255,255,255,0.3);
+          margin-bottom: 0.5rem;
+          text-align: center;
+        }
 
         .stat-row {
           display: flex;
@@ -174,16 +265,15 @@
           border-radius: 8px;
           margin-bottom: 0.3rem;
           background: rgba(255,255,255,0.04);
-          transition: background 0.1s;
 
           &.leader {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.25);
+            background: rgba(255,215,0,0.09);
+            border: 1px solid rgba(255,215,0,0.22);
           }
 
           .stat-rank {
-            font-size: 0.75rem;
-            opacity: 0.5;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
             min-width: 28px;
           }
 
@@ -204,7 +294,7 @@
     .no-stats {
       text-align: center;
       padding: 1.5rem 1rem;
-      opacity: 0.6;
+      color: rgba(255,255,255,0.5);
       font-size: 0.88rem;
       line-height: 1.6;
     }
@@ -220,19 +310,21 @@
 
       .update-time {
         flex: 1;
-        font-size: 0.78rem;
-        opacity: 0.45;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.3);
       }
 
       .refresh-btn {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.09);
+        border: 1px solid rgba(255,255,255,0.18);
         color: #fff;
         border-radius: 8px;
         padding: 0.4rem 0.9rem;
         font-size: 0.85rem;
         font-weight: 600;
-        &:disabled { opacity: 0.4; cursor: not-allowed; }
+        cursor: pointer;
+        &:disabled { opacity: 0.35; cursor: not-allowed; }
+        &:hover:not(:disabled) { background: rgba(255,255,255,0.16); }
       }
     }
   }
@@ -240,5 +332,5 @@
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+  50%       { opacity: 0.45; }
 }
