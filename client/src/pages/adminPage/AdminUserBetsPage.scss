@@ -1,0 +1,189 @@
+.admin-user-bets-page {
+  background: #0a0a0a;
+  color: #fff;
+  min-height: 100vh;
+  padding: 1rem;
+  font-family: inherit;
+
+  .aub-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    h2 { margin: 0; font-size: 1.2rem; }
+  }
+
+  .aub-back-top,
+  .aub-back {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+
+    &:hover { background: rgba(255,255,255,0.2); }
+  }
+
+  .aub-search {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    outline: none;
+
+    &::placeholder { color: rgba(255,255,255,0.35); }
+    &:focus { border-color: rgba(255,255,255,0.35); }
+  }
+
+  .aub-loading,
+  .aub-empty {
+    color: rgba(255,255,255,0.5);
+    padding: 1rem 0;
+  }
+
+  /* ── User list ── */
+  .aub-user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 480px;
+  }
+
+  .aub-user-row {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(255,255,255,0.15); }
+
+    .aub-uname {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .aub-pts {
+      font-size: 0.85rem;
+      color: #f6ad55;
+      margin-left: 0.75rem;
+    }
+
+    .aub-arrow {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.35);
+      margin-left: 0.5rem;
+    }
+  }
+
+  /* ── User editor ── */
+  .aub-editor {
+    max-width: 560px;
+  }
+
+  .aub-user-title {
+    margin: 0.75rem 0 0.1rem;
+    font-size: 1.1rem;
+  }
+
+  .aub-points {
+    font-size: 0.85rem;
+    color: #f6ad55;
+    margin-bottom: 1rem;
+  }
+
+  /* ── Series bet card ── */
+  .sbe-card {
+    background: rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .sbe-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .sbe-round {
+      font-size: 0.72rem;
+      font-weight: 400;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .sbe-locked { font-size: 0.85rem; }
+  }
+
+  .sbe-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+
+    .sbe-cat {
+      min-width: 110px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      text-align: right;
+    }
+
+    select {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 6px;
+      color: #fff;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+
+      option { background: #1a1a2e; color: #fff; }
+
+      &:focus { border-color: rgba(255,255,255,0.4); }
+    }
+  }
+
+  .sbe-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+
+    .sbe-ok  { font-size: 0.85rem; color: #68d391; }
+    .sbe-err { font-size: 0.85rem; color: #fc8181; }
+
+    button {
+      background: #3182ce;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:disabled { opacity: 0.55; cursor: default; }
+      &:not(:disabled):hover { background: #2b6cb0; }
+    }
+  }
+}

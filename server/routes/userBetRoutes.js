@@ -2,7 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const userBetController = require('../controllers/userBetController');
-const { requireAuth } = require('../middleware/authMiddleware');
+const { requireAuth, requireAdmin } = require('../middleware/authMiddleware');
+
+router.put('/admin/override', requireAdmin, userBetController.adminOverrideBet);
 
 // To place/update bet, the user must be logged in
 router.post('/:seriesId', requireAuth, userBetController.placeOrUpdateBet);

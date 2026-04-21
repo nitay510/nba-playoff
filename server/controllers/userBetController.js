@@ -76,6 +76,34 @@ exports.getAllUserBets = async (req, res) => {
   }
 };
 
+/* ── PUT /api/bets/admin/override  (admin only) ──────────────────
+   Override any user's bet even when series is locked.
+   Blocked if series is finished.
+──────────────────────────────────────────────────────────────── */
+exports.adminOverrideBet = async (req, res) => {
+  try {
+    const { userId, seriesId, bets } = req.body;
+
+    const series = await Series.findById(seriesId);
+    if (!series) return res.status(404).json({ msg: 'Series not found' });
+    if (series.isFinished) return res.status(400).json({ msg: 'Cannot edit bets for a finished series' });
+
+    let userBet = await UserBet.findOne({ userId, seriesId });
+    if (!userBet) {
+      userBet = new UserBet({ userId, seriesId, bets });
+    } else {
+      userBet.bets      = bets;
+      userBet.updatedAt = Date.now();
+    }
+    await userBet.save();
+
+    return res.json(userBet);
+  } catch (err) {
+    console.error('[adminOverrideBet]', err);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+};
+
 exports.getAllBetsOfAnyUser = async (req, res) => {
   try {
     const { username } = req.params;

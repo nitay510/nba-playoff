@@ -99,6 +99,9 @@ function AdminPage() {
         <button onClick={() => navigate('/admin/finished')} className="finished-btn">
           ראה סדרות שהסתיימו
         </button>
+        <button onClick={() => navigate('/admin/user-bets')} className="userbets-btn">
+          ערוך ניחושי משתמשים
+        </button>
       </div>
 
       {syncMsg && <p className="sync-msg">{syncMsg}</p>}

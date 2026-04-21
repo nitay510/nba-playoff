@@ -15,6 +15,7 @@ import ChampionSelectionPage     from './pages/registerPage/ChampionSelectionPag
 import HomePage                  from './pages/homePage/HomePage';
 import AdminPage                 from './pages/adminPage/AdminPage';
 import AdminFinishedPage         from './pages/adminPage/AdminFinishedPage';
+import AdminUserBetsPage         from './pages/adminPage/AdminUserBetsPage';
 import MyBetsPage                from './pages/MyBetsPage/MyBetsPage';
 import LeaderboardPage           from './pages/LeaderboardPage/LeaderboardPage';
 import UserBetsPage              from './pages/UserBetsPage/UserBetsPage';
@@ -59,6 +60,7 @@ function AppWrapper() {
         <Route path="/home"                     element={<HomePage />} />
         <Route path="/admin"                    element={<AdminPage />} />
         <Route path="/admin/finished"           element={<AdminFinishedPage />} />
+        <Route path="/admin/user-bets"          element={<AdminUserBetsPage />} />
         <Route path="/my-bets"                  element={<MyBetsPage />} />
         <Route path="/leagues"                  element={<LeaguesPage />} />
         <Route path="/leagues/:leagueId/leaderboard"
