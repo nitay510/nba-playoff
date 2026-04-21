@@ -16,5 +16,6 @@ router.get('/:leagueId/leaderboard', requireAuth, leagueController.getLeagueLead
 
 router.get('/:leagueId/my-rank', requireAuth, leagueController.getMyRank);
 
+router.get('/:leagueId/bets-breakdown', requireAuth, leagueController.getBetsBreakdown);
 
 module.exports = router;

@@ -107,6 +107,64 @@ exports.getLeagueLeaderboard = async (req, res) => {
   }
 };
 
+/* ── GET /api/leagues/:leagueId/bets-breakdown ─────────────── */
+exports.getBetsBreakdown = async (req, res) => {
+  try {
+    const { leagueId } = req.params;
+    const Series  = require('../models/Series');
+    const UserBet = require('../models/UserBet');
+
+    const league = await League.findById(leagueId).populate('members', '_id');
+    if (!league) return res.status(404).json({ msg: 'League not found' });
+
+    const memberIds = league.members.map((m) => m._id);
+
+    // Only locked, unfinished series
+    const activeSeries = await Series.find({ isLocked: true, isFinished: false });
+
+    const result = [];
+    for (const series of activeSeries) {
+      const bets = await UserBet.find({
+        seriesId: series._id,
+        userId: { $in: memberIds },
+      });
+
+      const catMap = {};
+      for (const ub of bets) {
+        for (const b of ub.bets) {
+          if (!catMap[b.category]) catMap[b.category] = {};
+          catMap[b.category][b.choiceName] = (catMap[b.category][b.choiceName] || 0) + 1;
+        }
+      }
+
+      const categories = Object.entries(catMap).map(([cat, choices]) => ({
+        category: cat,
+        totalVotes: Object.values(choices).reduce((s, v) => s + v, 0),
+        choices: Object.entries(choices)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count),
+      }));
+
+      result.push({
+        seriesId: series._id,
+        teamA:        series.teamA,
+        teamB:        series.teamB,
+        teamAWins:    series.teamAWins || 0,
+        teamBWins:    series.teamBWins || 0,
+        round:        series.round,
+        totalMembers: memberIds.length,
+        totalBettors: bets.length,
+        categories,
+      });
+    }
+
+    return res.json(result);
+  } catch (err) {
+    console.error('[BetsBreakdown]', err);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+};
+
 exports.getMyRank = async (req, res) => {
   try {
     const { leagueId } = req.params;
