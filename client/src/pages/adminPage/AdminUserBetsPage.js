@@ -29,7 +29,7 @@ function SeriesBetEditor({ series, userBet, onSave }) {
         oddsWhenPlaced: opt.choices.find((c) => c.name === choices[opt.category])?.odds || 1,
       })).filter((b) => b.choiceName);
 
-      const res = await fetch('/api/bets/admin/override', {
+      const res = await fetch('/api/user-bets/admin/override', {
         method:      'PUT',
         credentials: 'include',
         headers:     { 'Content-Type': 'application/json' },
@@ -90,7 +90,7 @@ function UserBetsEditor({ user, onBack }) {
       try {
         const [sRes, bRes] = await Promise.all([
           fetch('/api/series',                             { credentials: 'include' }),
-          fetch(`/api/bets/user/${user.username}`,         { credentials: 'include' }),
+          fetch(`/api/user-bets/user/${user.username}`,     { credentials: 'include' }),
         ]);
         const series = await sRes.json();
         const bData  = await bRes.json();
@@ -119,7 +119,7 @@ function UserBetsEditor({ user, onBack }) {
       ) : (
         seriesList.map((series) => {
           const userBet = userBets.find(
-            (ub) => (ub.seriesId?._id || ub.seriesId) === series._id
+            (ub) => String(ub.seriesId?._id || ub.seriesId) === String(series._id)
           );
           return (
             <SeriesBetEditor
