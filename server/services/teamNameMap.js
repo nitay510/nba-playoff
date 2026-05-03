@@ -21,7 +21,7 @@ const ESPN_TO_HEBREW = {
   'Chicago Bulls':           'שיקאגו בולס',
   'Dallas Mavericks':        'דאלאס מאבריקס',
   'Phoenix Suns':            'פיניקס סאנס',
-  'Philadelphia 76ers':      'פילדלפיה 76',
+  'Philadelphia 76ers':      'פילדלפיה',
   'Toronto Raptors':         'טורונטו ראפטורס',
   'Brooklyn Nets':           'ברוקלין נטס',
   'Washington Wizards':      'וושינגטון ווויזרדס',
