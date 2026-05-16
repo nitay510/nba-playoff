@@ -14,6 +14,7 @@ const OTHER = { name: 'אחר', odds: 1 };
 const CAT_POINTS  = 'מלך הנקודות';
 const CAT_REB     = 'מלך הריבאונד';
 const CAT_ASSISTS = 'מלך האסיסטים';
+const STANDARD_CATS = new Set(['מנצחת הסדרה', 'בכמה משחקים', CAT_POINTS, CAT_REB, CAT_ASSISTS]);
 
 function withOther(list) {
   return [...list.filter((p) => p.name !== 'אחר'), OTHER];
@@ -68,6 +69,53 @@ function PlayerCategory({ label, players, onManualAdd, onRemove }) {
   );
 }
 
+/* ── Custom bet block ─────────────────────────────────────── */
+function CustomBetBlock({ bet, onChange, onRemove }) {
+  const [newPlayer, setNewPlayer] = useState('');
+
+  const addPlayer = () => {
+    const name = newPlayer.trim();
+    if (!name || bet.choices.some((c) => c.name === name)) return;
+    onChange({ ...bet, choices: [...bet.choices, { name, odds: 1 }] });
+    setNewPlayer('');
+  };
+
+  const removePlayer = (name) =>
+    onChange({ ...bet, choices: bet.choices.filter((c) => c.name !== name) });
+
+  return (
+    <div className="custom-bet-block">
+      <div className="custom-bet-header">
+        <input
+          className="custom-bet-title-input"
+          placeholder="כותרת ההימור (לדוג׳: שחקן MVP)"
+          value={bet.category}
+          onChange={(e) => onChange({ ...bet, category: e.target.value })}
+        />
+        <button type="button" className="remove-custom-bet-btn" onClick={onRemove}>✕</button>
+      </div>
+      <div className="player-list">
+        {bet.choices.map((c) => (
+          <div key={c.name} className="player-row">
+            <span className="player-name">{c.name}</span>
+            <button type="button" className="remove-btn" onClick={() => removePlayer(c.name)}>✕</button>
+          </div>
+        ))}
+      </div>
+      <div className="add-player-form">
+        <input
+          className="player-input-he"
+          placeholder="שם שחקן"
+          value={newPlayer}
+          onChange={(e) => setNewPlayer(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+        />
+        <button type="button" className="add-player-btn" onClick={addPlayer}>+ הוסף</button>
+      </div>
+    </div>
+  );
+}
+
 /* ── Main modal ───────────────────────────────────────────── */
 function SeriesModal({ onClose, onSave, existingSeries }) {
   const [step,         setStep]      = useState(1);
@@ -80,6 +128,7 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
   const [scorers,     setScorers]     = useState([OTHER]);
   const [rebounders,  setRebounders]  = useState([OTHER]);
   const [assisters,   setAssisters]   = useState([OTHER]);
+  const [customBets,  setCustomBets]  = useState([]);
 
   // ESPN roster state
   const [roster,       setRoster]      = useState([]); // [{ nameEn, nameHe }]
@@ -115,6 +164,9 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
     setScorers(scorer?.choices    ? withOther(scorer.choices)    : [OTHER]);
     setRebounders(rebounder?.choices ? withOther(rebounder.choices) : [OTHER]);
     setAssisters(assister?.choices  ? withOther(assister.choices)  : [OTHER]);
+
+    const custom = opts.filter((o) => !STANDARD_CATS.has(o.category));
+    setCustomBets(custom.map((o) => ({ id: o._id || Math.random(), category: o.category, choices: o.choices || [] })));
     setStep(2);
   }, [existingSeries]);
 
@@ -194,6 +246,9 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
         { category: CAT_POINTS,    choices: scorers },
         { category: CAT_REB,       choices: rebounders },
         { category: CAT_ASSISTS,   choices: assisters },
+        ...customBets
+          .filter((b) => b.category.trim() && b.choices.length > 0)
+          .map((b) => ({ category: b.category.trim(), choices: b.choices })),
       ];
 
       const url    = existingSeries ? `/api/series/${existingSeries._id}` : '/api/series';
@@ -343,6 +398,28 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
             <PlayerCategory label={`🎯 ${CAT_ASSISTS}`} players={assisters}
               onManualAdd={(p) => manualAdd(setAssisters, p)}
               onRemove={(n) => removeFrom(setAssisters, n)} />
+
+            {/* ── Custom bet categories ── */}
+            <div className="custom-bets-section">
+              <div className="custom-bets-header">
+                <strong>הימורים מותאמים אישית</strong>
+                <button
+                  type="button"
+                  className="add-custom-bet-btn"
+                  onClick={() => setCustomBets((prev) => [...prev, { id: Date.now(), category: '', choices: [] }])}
+                >
+                  + הוסף הימור
+                </button>
+              </div>
+              {customBets.map((bet) => (
+                <CustomBetBlock
+                  key={bet.id}
+                  bet={bet}
+                  onChange={(updated) => setCustomBets((prev) => prev.map((b) => b.id === bet.id ? updated : b))}
+                  onRemove={() => setCustomBets((prev) => prev.filter((b) => b.id !== bet.id))}
+                />
+              ))}
+            </div>
 
             <div className="modal-actions">
               <button className="save-btn" onClick={handleSave}>שמור סדרה</button>

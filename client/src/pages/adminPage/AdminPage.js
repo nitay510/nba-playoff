@@ -73,6 +73,7 @@ function AdminPage() {
   const openResultsModal  = (s) => { setCurrentSeries(s); setShowResultsModal(true); };
   const onResultsSaved    = () => { setShowResultsModal(false); fetchUnfinishedSeries(); };
   const handleCreateNew   = () => { setEditSeries(null); setShowSeriesModal(true); };
+  const handleEditSeries  = (s) => { setEditSeries(s); setShowSeriesModal(true); };
   const onSeriesModalSave = () => { setShowSeriesModal(false); fetchUnfinishedSeries(); };
 
   /* ── Series score badge ── */
@@ -134,9 +135,16 @@ function AdminPage() {
                   </div>
                   <TeamLogo teamName={s.teamB} className="admin-logo" />
                 </div>
-                <button className="results-btn" onClick={() => openResultsModal(s)}>
-                  הגדר תוצאות סופיות
-                </button>
+                <div className="card-actions">
+                  {!s.isLocked && (
+                    <button className="edit-btn" onClick={() => handleEditSeries(s)}>
+                      ערוך סדרה
+                    </button>
+                  )}
+                  <button className="results-btn" onClick={() => openResultsModal(s)}>
+                    הגדר תוצאות סופיות
+                  </button>
+                </div>
               </div>
             );
           })

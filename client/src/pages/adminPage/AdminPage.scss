@@ -85,8 +85,24 @@
         margin-bottom: 0.25rem;
       }
 
-      .results-btn {
+      .card-actions {
+        display: flex;
+        gap: 0.5rem;
         margin-top: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .edit-btn {
+        background: #f39c12;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.4rem 0.9rem;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .results-btn {
         background: #dc3545;
         color: white;
         border: none;
