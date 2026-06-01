@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import './ResultsModal.scss';
 
 function ResultsModal({ series, onClose, onResultsSaved }) {
-  // Build local state: each category => finalChoice
   const initialFinals = (series.betOptions || []).map((opt) => ({
     category: opt.category,
     finalChoice: opt.finalChoice || '',
   }));
-  const [localResults, setLocalResults] = useState(initialFinals);
+  const [localResults,       setLocalResults]       = useState(initialFinals);
+  const [tiebreakerAnswer,   setTiebreakerAnswer]   = useState(
+    series.tiebreakerAnswer != null ? String(series.tiebreakerAnswer) : ''
+  );
 
   // 1) Helper: parse numeric from strings like "5 משחקים" or "מילווקי ב5" => "5"
   const parseGamesNumber = (str = '') => {
@@ -84,7 +86,10 @@ function ResultsModal({ series, onClose, onResultsSaved }) {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ finalResults }),
+        body: JSON.stringify({
+          finalResults,
+          tiebreakerAnswer: tiebreakerAnswer !== '' ? Number(tiebreakerAnswer) : null,
+        }),
       });
       const data = await res.json();
       console.log('Results saved:', data);
@@ -131,6 +136,21 @@ function ResultsModal({ series, onClose, onResultsSaved }) {
             </div>
           );
         })}
+
+        {series.tiebreakerQuestion && (
+          <div className="results-category tiebreaker-result">
+            <strong>שובר שיוון: {series.tiebreakerQuestion}</strong>
+            <div style={{ marginTop: '0.5rem' }}>
+              <input
+                type="number"
+                placeholder="הכנס תשובה נכונה"
+                value={tiebreakerAnswer}
+                onChange={(e) => setTiebreakerAnswer(e.target.value)}
+                style={{ width: '120px', padding: '0.4rem', fontSize: '1rem' }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="results-actions">
           <button onClick={handleSaveResults}>שמור תוצאות</button>

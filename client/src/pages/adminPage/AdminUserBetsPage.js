@@ -11,6 +11,9 @@ function SeriesBetEditor({ series, userBet, onSave }) {
     }
     return map;
   });
+  const [tiebreakerGuess, setTiebreakerGuess] = useState(
+    userBet?.tiebreakerGuess != null ? String(userBet.tiebreakerGuess) : ''
+  );
   const [saving, setSaving] = useState(false);
   const [msg,    setMsg]    = useState('');
 
@@ -29,11 +32,13 @@ function SeriesBetEditor({ series, userBet, onSave }) {
         oddsWhenPlaced: opt.choices.find((c) => c.name === choices[opt.category])?.odds || 1,
       })).filter((b) => b.choiceName);
 
+      const tbNum = tiebreakerGuess !== '' ? Number(tiebreakerGuess) : null;
+
       const res = await fetch('/api/user-bets/admin/override', {
         method:      'PUT',
         credentials: 'include',
         headers:     { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: onSave.userId, seriesId: series._id, bets }),
+        body: JSON.stringify({ userId: onSave.userId, seriesId: series._id, bets, tiebreakerGuess: tbNum }),
       });
       const d = await res.json();
       setMsg(res.ok ? '✓ נשמר' : `✗ ${d.msg}`);
@@ -68,6 +73,19 @@ function SeriesBetEditor({ series, userBet, onSave }) {
           </select>
         </div>
       ))}
+
+      {series.tiebreakerQuestion && (
+        <div className="sbe-row sbe-tiebreaker">
+          <label className="sbe-cat">🔢 {series.tiebreakerQuestion}</label>
+          <input
+            type="number"
+            placeholder="ניחוש שובר שיוון"
+            value={tiebreakerGuess}
+            onChange={(e) => { setTiebreakerGuess(e.target.value); setMsg(''); }}
+            style={{ width: '100px', padding: '0.3rem' }}
+          />
+        </div>
+      )}
 
       <div className="sbe-footer">
         {msg && <span className={msg.startsWith('✓') ? 'sbe-ok' : 'sbe-err'}>{msg}</span>}

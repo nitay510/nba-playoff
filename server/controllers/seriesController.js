@@ -7,13 +7,14 @@ const { NBA_TEAM_IDS } = require('../services/nbaTeamIds');
 // Create a new series (admin)
 exports.createSeries = async (req, res) => {
   try {
-    const { teamA, teamB, betOptions, startDate } = req.body;
+    const { teamA, teamB, betOptions, startDate, tiebreakerQuestion } = req.body;
 
     const newSeries = await Series.create({
       teamA,
       teamB,
       betOptions,
       startDate,
+      tiebreakerQuestion: tiebreakerQuestion || null,
     });
     return res.status(201).json(newSeries);
   } catch (err) {
@@ -26,11 +27,11 @@ exports.createSeries = async (req, res) => {
 exports.updateSeries = async (req, res) => {
   try {
     const { seriesId } = req.params;
-    const { teamA, teamB, betOptions, startDate } = req.body;
+    const { teamA, teamB, betOptions, startDate, tiebreakerQuestion } = req.body;
 
     const updated = await Series.findByIdAndUpdate(
       seriesId,
-      { teamA, teamB, betOptions, startDate },
+      { teamA, teamB, betOptions, startDate, tiebreakerQuestion: tiebreakerQuestion || null },
       { new: true }
     );
 
@@ -107,12 +108,12 @@ exports.getSeriesById = async (req, res) => {
 exports.setFinalResults = async (req, res) => {
     try {
       const { seriesId } = req.params;
-      const { finalResults } = req.body;
+      const { finalResults, tiebreakerAnswer } = req.body;
       const series = await Series.findById(seriesId);
       if (!series) {
         return res.status(404).json({ msg: 'Series not found' });
       }
-  
+
       // update finalChoice in each category
       finalResults.forEach((fr) => {
         const opt = series.betOptions.find((o) => o.category === fr.category);
@@ -120,7 +121,11 @@ exports.setFinalResults = async (req, res) => {
           opt.finalChoice = fr.finalChoice;
         }
       });
-  
+
+      if (tiebreakerAnswer !== undefined && tiebreakerAnswer !== null && tiebreakerAnswer !== '') {
+        series.tiebreakerAnswer = Number(tiebreakerAnswer);
+      }
+
       series.isFinished = true;
       await series.save();
   

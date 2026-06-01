@@ -6,7 +6,7 @@ const User = require('../models/User');
 exports.placeOrUpdateBet = async (req, res) => {
   try {
     const { seriesId } = req.params;
-    const { bets } = req.body;
+    const { bets, tiebreakerGuess } = req.body;
     const userId = req.user._id;
 
     const series = await Series.findById(seriesId);
@@ -19,10 +19,11 @@ exports.placeOrUpdateBet = async (req, res) => {
 
     let userBet = await UserBet.findOne({ userId, seriesId });
     if (!userBet) {
-      userBet = new UserBet({ userId, seriesId, bets });
+      userBet = new UserBet({ userId, seriesId, bets, tiebreakerGuess: tiebreakerGuess ?? null });
       await userBet.save();
     } else {
       userBet.bets = bets;
+      if (tiebreakerGuess !== undefined) userBet.tiebreakerGuess = tiebreakerGuess;
       userBet.updatedAt = Date.now();
       await userBet.save();
     }
@@ -82,7 +83,7 @@ exports.getAllUserBets = async (req, res) => {
 ──────────────────────────────────────────────────────────────── */
 exports.adminOverrideBet = async (req, res) => {
   try {
-    const { userId, seriesId, bets } = req.body;
+    const { userId, seriesId, bets, tiebreakerGuess } = req.body;
 
     const series = await Series.findById(seriesId);
     if (!series) return res.status(404).json({ msg: 'Series not found' });
@@ -90,9 +91,10 @@ exports.adminOverrideBet = async (req, res) => {
 
     let userBet = await UserBet.findOne({ userId, seriesId });
     if (!userBet) {
-      userBet = new UserBet({ userId, seriesId, bets });
+      userBet = new UserBet({ userId, seriesId, bets, tiebreakerGuess: tiebreakerGuess ?? null });
     } else {
       userBet.bets      = bets;
+      if (tiebreakerGuess !== undefined) userBet.tiebreakerGuess = tiebreakerGuess;
       userBet.updatedAt = Date.now();
     }
     await userBet.save();

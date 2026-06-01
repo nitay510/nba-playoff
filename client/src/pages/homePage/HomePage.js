@@ -96,7 +96,8 @@ export default function HomePage() {
   const [seriesList, setSeriesList] = useState([]);
   const [userBets,   setUserBets]   = useState([]);
   const [openCards,  setOpenCards]  = useState({});
-  const [localBets,  setLocalBets]  = useState({});
+  const [localBets,        setLocalBets]        = useState({});
+  const [tiebreakerGuess,  setTiebreakerGuess]  = useState({});
   const [statsSeries, setStatsSeries] = useState(null);
   const [showPushBanner, setShowPushBanner] = useState(false);
   const [pushLoading,    setPushLoading]    = useState(false);
@@ -197,6 +198,10 @@ export default function HomePage() {
   const openCard  = (id) => {
     setOpenCards((p) => ({ ...p, [id]: true }));
     setLocalBets((p) => ({ ...p, [id]: findDoc(id)?.bets || [] }));
+    const existing = findDoc(id);
+    if (existing?.tiebreakerGuess != null) {
+      setTiebreakerGuess((p) => ({ ...p, [id]: String(existing.tiebreakerGuess) }));
+    }
   };
   const closeCard = (id) => setOpenCards((p) => ({ ...p, [id]: false }));
 
@@ -227,10 +232,12 @@ export default function HomePage() {
 
   const saveBet = async (sid) => {
     try {
+      const tbVal = tiebreakerGuess[sid];
+      const tbNum = tbVal !== undefined && tbVal !== '' ? Number(tbVal) : null;
       await fetch(`/api/user-bets/${sid}`, {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bets: localBets[sid] || [] }),
+        body: JSON.stringify({ bets: localBets[sid] || [], tiebreakerGuess: tbNum }),
       });
       await fetchUserBets();
       closeCard(sid);
@@ -361,6 +368,20 @@ export default function HomePage() {
                           </div>
                         </div>
                       ))}
+
+                      {s.tiebreakerQuestion && (
+                        <div className="bet-category tiebreaker-bet">
+                          <h5>🔢 שובר שיוון <span className="tiebreaker-no-odds">(ללא יחס)</span></h5>
+                          <p className="tiebreaker-question">{s.tiebreakerQuestion}</p>
+                          <input
+                            type="number"
+                            className="tiebreaker-input"
+                            placeholder="הכנס מספר"
+                            value={tiebreakerGuess[s._id] || ''}
+                            onChange={(e) => setTiebreakerGuess((p) => ({ ...p, [s._id]: e.target.value }))}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className="modal-actions">
@@ -414,6 +435,13 @@ export default function HomePage() {
                           <span className="bet-odds">×{(+b.oddsWhenPlaced).toFixed(1)}</span>
                         </div>
                       ))}
+                      {s.tiebreakerQuestion && myBet.tiebreakerGuess != null && (
+                        <div className="locked-bet-row tiebreaker-locked-row">
+                          <span className="bet-cat">🔢 שובר שיוון</span>
+                          <span className="bet-choice">{myBet.tiebreakerGuess}</span>
+                          <span className="bet-odds tiebreaker-no-odds">ללא יחס</span>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="no-bet-notice">לא הגשת ניחוש לסדרה זו</div>
@@ -499,6 +527,18 @@ export default function HomePage() {
                           )}
                         </div>
                       ))}
+                      {s.tiebreakerQuestion && myBet.tiebreakerGuess != null && (
+                        <div className="locked-bet-row tiebreaker-locked-row">
+                          <span className="bet-cat">🔢 שובר שיוון</span>
+                          <span className="bet-choice">
+                            {myBet.tiebreakerGuess}
+                            {s.tiebreakerAnswer != null && (
+                              <span className="bet-actual"> (תשובה: {s.tiebreakerAnswer})</span>
+                            )}
+                          </span>
+                          <span className="bet-odds tiebreaker-no-odds">ללא יחס</span>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="no-bet-notice">לא השתתפת בסדרה זו</div>

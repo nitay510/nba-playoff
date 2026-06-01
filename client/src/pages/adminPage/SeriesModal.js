@@ -124,11 +124,13 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
   const [teamB,        setTeamB]     = useState('');
   const [startDateStr, setStartDate] = useState('');
 
-  const [winnerOdds,  setWinnerOdds]  = useState({ a: 1.9, b: 1.9 });
-  const [scorers,     setScorers]     = useState([OTHER]);
-  const [rebounders,  setRebounders]  = useState([OTHER]);
-  const [assisters,   setAssisters]   = useState([OTHER]);
-  const [customBets,  setCustomBets]  = useState([]);
+  const [winnerOdds,         setWinnerOdds]         = useState({ a: 1.9, b: 1.9 });
+  const [scorers,            setScorers]            = useState([OTHER]);
+  const [rebounders,         setRebounders]         = useState([OTHER]);
+  const [assisters,          setAssisters]          = useState([OTHER]);
+  const [customBets,         setCustomBets]         = useState([]);
+  const [tiebreakerEnabled,  setTiebreakerEnabled]  = useState(false);
+  const [tiebreakerQuestion, setTiebreakerQuestion] = useState('');
 
   // ESPN roster state
   const [roster,       setRoster]      = useState([]); // [{ nameEn, nameHe }]
@@ -167,6 +169,11 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
 
     const custom = opts.filter((o) => !STANDARD_CATS.has(o.category));
     setCustomBets(custom.map((o) => ({ id: o._id || Math.random(), category: o.category, choices: o.choices || [] })));
+
+    if (existingSeries.tiebreakerQuestion) {
+      setTiebreakerEnabled(true);
+      setTiebreakerQuestion(existingSeries.tiebreakerQuestion);
+    }
     setStep(2);
   }, [existingSeries]);
 
@@ -258,7 +265,10 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
       await fetch(url, {
         method, credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teamA, teamB, betOptions, startDate }),
+        body: JSON.stringify({
+          teamA, teamB, betOptions, startDate,
+          tiebreakerQuestion: tiebreakerEnabled && tiebreakerQuestion.trim() ? tiebreakerQuestion.trim() : null,
+        }),
       });
       onSave();
       onClose();
@@ -419,6 +429,29 @@ function SeriesModal({ onClose, onSave, existingSeries }) {
                   onRemove={() => setCustomBets((prev) => prev.filter((b) => b.id !== bet.id))}
                 />
               ))}
+            </div>
+
+            {/* ── Tiebreaker ── */}
+            <div className="tiebreaker-section">
+              <div className="tiebreaker-header">
+                <label className="tiebreaker-toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={tiebreakerEnabled}
+                    onChange={(e) => setTiebreakerEnabled(e.target.checked)}
+                  />
+                  <strong>הוסף שאלת שובר שיוון</strong>
+                </label>
+                <span className="tiebreaker-hint">ללא יחס — משמש רק לקביעת מיקום בשיוון</span>
+              </div>
+              {tiebreakerEnabled && (
+                <input
+                  className="modal-input"
+                  placeholder='לדוג׳: "כמה בלוקים יהיו לXXX בסדרה?"'
+                  value={tiebreakerQuestion}
+                  onChange={(e) => setTiebreakerQuestion(e.target.value)}
+                />
+              )}
             </div>
 
             <div className="modal-actions">

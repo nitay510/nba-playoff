@@ -18,6 +18,8 @@ const SeriesSchema = new mongoose.Schema({
   betOptions: [BetOptionSchema],
   startDate: { type: Date },
   isFinished: { type: Boolean, default: false },
+  tiebreakerQuestion: { type: String, default: null },
+  tiebreakerAnswer:   { type: Number, default: null },
   // Live sync fields (populated by the ESPN sync)
   externalId:   { type: String },
   teamAWins:    { type: Number, default: 0 },

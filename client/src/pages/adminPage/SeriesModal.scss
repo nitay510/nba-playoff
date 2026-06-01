@@ -421,3 +421,34 @@
     }
   }
 }
+
+.tiebreaker-section {
+  margin-top: 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.05);
+
+  .tiebreaker-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .tiebreaker-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .tiebreaker-hint {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .modal-input {
+    margin-top: 0.7rem;
+  }
+}

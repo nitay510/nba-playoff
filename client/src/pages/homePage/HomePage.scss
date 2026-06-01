@@ -633,3 +633,46 @@
     margin-top: 0.15rem;
   }
 }
+
+.tiebreaker-bet {
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 215, 0, 0.05);
+
+  .tiebreaker-no-odds {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-right: 0.4rem;
+    font-weight: 400;
+  }
+
+  .tiebreaker-question {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.3rem 0 0.6rem;
+  }
+
+  .tiebreaker-input {
+    width: 110px;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+
+    &:focus {
+      outline: none;
+      border-color: #ffd700;
+    }
+  }
+}
+
+.tiebreaker-locked-row {
+  .tiebreaker-no-odds {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
