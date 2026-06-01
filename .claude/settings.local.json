@@ -22,7 +22,8 @@
       "Bash(MONGO_URI=\"mongodb+srv://nitay510:nitay511@finalbet-cloud.4pf6q.mongodb.net/\" node fixPoints.js)",
       "Bash(\"/mnt/c/Program Files/nodejs/node.exe\" -e \"console.log\\(process.env.MONGO_URI\\)\")",
       "Bash(/mnt/c/Program Files/nodejs/node.exe *)",
-      "Bash(npx react-scripts *)"
+      "Bash(npx react-scripts *)",
+      "Bash(git *)"
     ]
   }
 }
